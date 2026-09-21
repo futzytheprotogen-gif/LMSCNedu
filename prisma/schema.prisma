@@ -1,0 +1,462 @@
+// ============================================================
+// CN Edu — Schema Prisma
+// Next.js + Prisma 7 + MySQL (Laragon lokal) + Vercel
+// Catatan: DATABASE_URL diatur lewat prisma.config.ts (Prisma 7),
+// bukan lewat url = env(...) di datasource ini.
+// ============================================================
+
+datasource db {
+  provider = "mysql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ------------------------------------------------------------
+// ENUM
+// ------------------------------------------------------------
+
+enum RoleAdmin {
+  ADMIN
+  KEPSEK
+  KURIKULUM
+}
+
+enum JenisKelamin {
+  L
+  P
+}
+
+enum TipeAsesmen {
+  KUIS
+  UJIAN
+}
+
+enum StatusAsesmen {
+  PROSES
+  SELESAI
+}
+
+enum TipeSoal {
+  PILIHAN_GANDA
+  CHECKBOX
+  ESSAY
+}
+
+enum TipeMateri {
+  PDF
+  LINK
+}
+
+enum TipeLampiranTugas {
+  PDF
+  LINK
+}
+
+enum TipeAkunLaporan {
+  GURU
+  SISWA
+}
+
+enum StatusLaporan {
+  MENUNGGU
+  DITERIMA
+  DITOLAK
+  SELESAI
+}
+
+// ------------------------------------------------------------
+// AKUN
+// ------------------------------------------------------------
+
+// Admin, Kepsek, Kurikulum — satu tabel, dibedakan lewat field `role`.
+// Login pakai Email + Password. Kepsek & Kurikulum dibuat lewat seed,
+// bukan lewat form registrasi, dan tidak pernah punya passwordSementara.
+model Admin {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  password    String
+  nama        String
+  role        RoleAdmin
+  fotoProfil  String?
+  deskripsi   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  laporanDiproses LaporanLupaPassword[] @relation("AdminMemprosesLaporan")
+
+  @@map("admin")
+}
+
+// Login pakai NIK + Password. Password default = NIK saat akun dibuat admin.
+model Guru {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  nik                BigInt   @unique
+  nama               String
+  tanggalLahir       DateTime
+  jenisKelamin       JenisKelamin?
+  fotoProfil         String?
+  deskripsi          String?
+  password           String
+  passwordSementara  Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  mapelDiampu   GuruMapel[]
+  kelasDiajar   KelasGuru[]
+  pengumuman    Pengumuman[]
+  asesmenDibuat Asesmen[]
+  materiDiunggah Materi[]
+  tugasDibuat   Tugas[]
+  laporanLupaPassword LaporanLupaPassword[]
+
+  @@map("guru")
+}
+
+// Login pakai NIS + Password. Password default = NIS saat akun dibuat admin.
+model Siswa {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  nis                BigInt   @unique
+  nisn               BigInt?  @unique
+  nama               String
+  tanggalLahir       DateTime
+  jenisKelamin       JenisKelamin?
+  fotoProfil         String?
+  deskripsi          String?
+  password           String
+  passwordSementara  Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  rombelId String
+  rombel   RombelAkademik @relation(fields: [rombelId], references: [id])
+
+  kelasDiikuti      KelasSiswa[]
+  submissionAsesmen SubmissionAsesmen[]
+  submissionTugas   SubmissionTugas[]
+  laporanLupaPassword LaporanLupaPassword[]
+
+  @@map("siswa")
+}
+
+// ------------------------------------------------------------
+// JURUSAN & ROMBEL (63 kelas jurusan + SMP + SMA sebagai label umum)
+// Dipakai untuk pengelompokan otomatis di "Daftar Siswa" & saat Buat Akun.
+// Ini BUKAN "Kelas" ala Google Classroom — itu model Kelas di bawah.
+// ------------------------------------------------------------
+
+model RombelAkademik {
+  id       String  @id @default(cuid())
+  label    String  @unique // contoh: "12 PPLG 2", "10 TJKT PLUS", "SMP", "SMA"
+  jenjang  String  // "SMP" | "SMA" | "SMK"
+  angkatan Int?    // 10 | 11 | 12, null untuk SMP/SMA generik
+  jurusan  String? // DKV | TJKT | PPLG | PEMASARAN | MPLB, null untuk SMP/SMA
+  variasi  String? // "PLUS" | "1" | "2" dst, null untuk SMP/SMA
+
+  siswa Siswa[]
+
+  @@map("rombel_akademik")
+}
+
+model MataPelajaran {
+  id   String @id @default(cuid())
+  nama String @unique
+
+  guruPengampu GuruMapel[]
+  kelasGuru    KelasGuru[]
+  asesmen      Asesmen[]
+
+  @@map("mata_pelajaran")
+}
+
+// Mapel yang diampu seorang guru (many-to-many)
+model GuruMapel {
+  guruId  String
+  mapelId String
+
+  guru  Guru          @relation(fields: [guruId], references: [id], onDelete: Cascade)
+  mapel MataPelajaran @relation(fields: [mapelId], references: [id], onDelete: Cascade)
+
+  @@id([guruId, mapelId])
+  @@map("guru_mapel")
+}
+
+// ------------------------------------------------------------
+// KELAS (ala Google Classroom) — dibuat oleh Admin
+// Tanpa konsep walas. Siswa/guru tidak otomatis masuk.
+// ------------------------------------------------------------
+
+model Kelas {
+  id          String   @id @default(cuid())
+  judul       String
+  deskripsi   String?
+  kodeKelas   String   @unique // dipakai untuk link undangan
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  siswa       KelasSiswa[]
+  guru        KelasGuru[]
+  pengumuman  Pengumuman[]
+  materi      Materi[]
+  asesmen     AsesmenKelas[]
+  tugas       TugasKelas[]
+
+  @@map("kelas")
+}
+
+model KelasSiswa {
+  kelasId String
+  siswaId String
+  joinedAt DateTime @default(now())
+
+  kelas Kelas @relation(fields: [kelasId], references: [id], onDelete: Cascade)
+  siswa Siswa @relation(fields: [siswaId], references: [id], onDelete: Cascade)
+
+  @@id([kelasId, siswaId])
+  @@map("kelas_siswa")
+}
+
+// Guru yang mengajar di kelas ini, beserta mapel yang diampunya di kelas itu.
+// Tanpa field walas.
+model KelasGuru {
+  kelasId String
+  guruId  String
+  mapelId String
+
+  kelas Kelas         @relation(fields: [kelasId], references: [id], onDelete: Cascade)
+  guru  Guru          @relation(fields: [guruId], references: [id], onDelete: Cascade)
+  mapel MataPelajaran @relation(fields: [mapelId], references: [id])
+
+  @@id([kelasId, guruId, mapelId])
+  @@map("kelas_guru")
+}
+
+// ------------------------------------------------------------
+// PENGUMUMAN (tanpa komentar; hanya guru yang bisa posting)
+// ------------------------------------------------------------
+
+model Pengumuman {
+  id        String   @id @default(cuid())
+  kelasId   String
+  guruId    String
+  isi       String   @db.Text
+  gambar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kelas Kelas @relation(fields: [kelasId], references: [id], onDelete: Cascade)
+  guru  Guru  @relation(fields: [guruId], references: [id], onDelete: Cascade)
+
+  @@map("pengumuman")
+}
+
+// ------------------------------------------------------------
+// ASESMEN (Kuis / Ujian Online)
+// ------------------------------------------------------------
+
+model Asesmen {
+  id           String        @id @default(cuid())
+  judul        String
+  tipe         TipeAsesmen
+  status       StatusAsesmen @default(PROSES)
+  durasiMenit  Int?
+  mapelId      String
+  guruId       String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  mapel MataPelajaran @relation(fields: [mapelId], references: [id])
+  guru  Guru          @relation(fields: [guruId], references: [id], onDelete: Cascade)
+
+  soal        Soal[]
+  kelasTujuan AsesmenKelas[]
+  submission  SubmissionAsesmen[]
+
+  @@map("asesmen")
+}
+
+// Asesmen bisa dikirim ke lebih dari satu kelas
+model AsesmenKelas {
+  asesmenId String
+  kelasId   String
+
+  asesmen Asesmen @relation(fields: [asesmenId], references: [id], onDelete: Cascade)
+  kelas   Kelas   @relation(fields: [kelasId], references: [id], onDelete: Cascade)
+
+  @@id([asesmenId, kelasId])
+  @@map("asesmen_kelas")
+}
+
+model Soal {
+  id          String   @id @default(cuid())
+  asesmenId   String
+  tipe        TipeSoal
+  pertanyaan  String   @db.Text
+  gambar      String?
+  urutan      Int      @default(0)
+
+  asesmen Asesmen @relation(fields: [asesmenId], references: [id], onDelete: Cascade)
+  opsi    OpsiJawaban[]
+  jawaban JawabanSiswa[]
+
+  @@map("soal")
+}
+
+// Opsi jawaban untuk tipe Pilihan Ganda & Checkbox
+model OpsiJawaban {
+  id     String  @id @default(cuid())
+  soalId String
+  teks   String
+  benar  Boolean @default(false)
+
+  soal Soal @relation(fields: [soalId], references: [id], onDelete: Cascade)
+  dipilihOleh JawabanOpsiDipilih[]
+
+  @@map("opsi_jawaban")
+}
+
+// Satu kali pengerjaan asesmen oleh siswa, dalam konteks kelas tertentu
+model SubmissionAsesmen {
+  id           String    @id @default(cuid())
+  asesmenId    String
+  siswaId      String
+  kelasId      String
+  waktuMulai   DateTime  @default(now())
+  waktuSelesai DateTime?
+  nilai        Float?
+  createdAt    DateTime  @default(now())
+
+  asesmen Asesmen @relation(fields: [asesmenId], references: [id], onDelete: Cascade)
+  siswa   Siswa   @relation(fields: [siswaId], references: [id], onDelete: Cascade)
+  jawaban JawabanSiswa[]
+
+  @@unique([asesmenId, siswaId])
+  @@map("submission_asesmen")
+}
+
+// Jawaban siswa untuk satu soal dalam satu submission
+model JawabanSiswa {
+  id            String  @id @default(cuid())
+  submissionId  String
+  soalId        String
+  jawabanEssay  String? @db.Text
+
+  submission SubmissionAsesmen @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  soal       Soal              @relation(fields: [soalId], references: [id], onDelete: Cascade)
+  opsiDipilih JawabanOpsiDipilih[]
+
+  @@unique([submissionId, soalId])
+  @@map("jawaban_siswa")
+}
+
+// Opsi yang dipilih siswa untuk soal Pilihan Ganda/Checkbox (many-to-many)
+model JawabanOpsiDipilih {
+  jawabanSiswaId String
+  opsiId         String
+
+  jawabanSiswa JawabanSiswa @relation(fields: [jawabanSiswaId], references: [id], onDelete: Cascade)
+  opsi         OpsiJawaban  @relation(fields: [opsiId], references: [id], onDelete: Cascade)
+
+  @@id([jawabanSiswaId, opsiId])
+  @@map("jawaban_opsi_dipilih")
+}
+
+// ------------------------------------------------------------
+// MATERI
+// ------------------------------------------------------------
+
+model Materi {
+  id        String     @id @default(cuid())
+  kelasId   String
+  guruId    String
+  judul     String
+  tipe      TipeMateri
+  url       String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  kelas Kelas @relation(fields: [kelasId], references: [id], onDelete: Cascade)
+  guru  Guru  @relation(fields: [guruId], references: [id], onDelete: Cascade)
+
+  @@map("materi")
+}
+
+// ------------------------------------------------------------
+// TUGAS (fitur baru — menggantikan pengumuman/komentar siswa)
+// ------------------------------------------------------------
+
+model Tugas {
+  id            String            @id @default(cuid())
+  guruId        String
+  judul         String
+  deskripsi     String            @db.Text
+  tipeLampiran  TipeLampiranTugas?
+  lampiran      String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  guru       Guru               @relation(fields: [guruId], references: [id], onDelete: Cascade)
+  kelasTujuan TugasKelas[]
+  submission SubmissionTugas[]
+
+  @@map("tugas")
+}
+
+// Tugas bisa disimpan dulu (belum dikirim ke kelas manapun) lalu dikirim
+// belakangan; baris ini merepresentasikan "tugas sudah dikirim ke kelas X"
+model TugasKelas {
+  tugasId   String
+  kelasId   String
+  dikirimAt DateTime @default(now())
+
+  tugas Tugas @relation(fields: [tugasId], references: [id], onDelete: Cascade)
+  kelas Kelas @relation(fields: [kelasId], references: [id], onDelete: Cascade)
+
+  @@id([tugasId, kelasId])
+  @@map("tugas_kelas")
+}
+
+// Siswa mengumpulkan tugas (upload PDF) untuk tugas yang dikirim ke kelasnya
+model SubmissionTugas {
+  id          String   @id @default(cuid())
+  tugasId     String
+  siswaId     String
+  fileUrl     String
+  waktuKumpul DateTime @default(now())
+
+  tugas Tugas @relation(fields: [tugasId], references: [id], onDelete: Cascade)
+  siswa Siswa @relation(fields: [siswaId], references: [id], onDelete: Cascade)
+
+  @@unique([tugasId, siswaId])
+  @@map("submission_tugas")
+}
+
+// ------------------------------------------------------------
+// LUPA PASSWORD (sistem OTP human-in-the-loop)
+// ------------------------------------------------------------
+
+model LaporanLupaPassword {
+  id             String          @id @default(cuid())
+  tipeAkun       TipeAkunLaporan
+  guruId         String?
+  siswaId        String?
+  email          String
+  nikNisInput    String
+  tanggalLahir   DateTime
+  alasan         String          @db.Text
+  status         StatusLaporan   @default(MENUNGGU)
+  otp            String?
+  otpExpiredAt   DateTime?
+  diprosesOlehId String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  guru           Guru?  @relation(fields: [guruId], references: [id], onDelete: SetNull)
+  siswa          Siswa? @relation(fields: [siswaId], references: [id], onDelete: SetNull)
+  diprosesOleh   Admin? @relation("AdminMemprosesLaporan", fields: [diprosesOlehId], references: [id], onDelete: SetNull)
+
+  @@map("laporan_lupa_password")
+}
