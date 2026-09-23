@@ -22,6 +22,9 @@ const WARNA = {
 
   orange: "#d97706",
   orangeSoft: "#fef3c7",
+
+  red: "#ef4444",
+  redSoft: "#fee2e2",
 };
 
 interface AsesmenRingkas {
@@ -42,8 +45,11 @@ export default function HalamanAsesmenGuru() {
   const [daftar, setDaftar] = useState<AsesmenRingkas[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
   const [kataKunci, setKataKunci] = useState("");
-  const [filterStatus, setFilterStatus] =
-    useState<FilterStatus>("SEMUA");
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>("SEMUA");
+
+  // State untuk konfirmasi hapus
+  const [asesmenDiHapus, setAsesmenDiHapus] = useState<AsesmenRingkas | null>(null);
+  const [sedangMenghapus, setSedangMenghapus] = useState(false);
 
   useEffect(() => {
     fetch("/api/asesmen")
@@ -53,19 +59,37 @@ export default function HalamanAsesmenGuru() {
       .finally(() => setSedangMuat(false));
   }, []);
 
-  const totalProses = daftar.filter(
-    (a) => a.status === "PROSES"
-  ).length;
+  // Fungsi untuk menangani proses hapus
+  const tanganiHapus = async () => {
+    if (!asesmenDiHapus) return;
 
-  const totalSelesai = daftar.filter(
-    (a) => a.status === "SELESAI"
-  ).length;
+    setSedangMenghapus(true);
+    try {
+      const res = await fetch(`/api/asesmen/${asesmenDiHapus.id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setDaftar((prev) => prev.filter((a) => a.id !== asesmenDiHapus.id));
+        setAsesmenDiHapus(null);
+      } else {
+        alert("Gagal menghapus asesmen. Silakan coba lagi.");
+      }
+    } catch {
+      alert("Terjadi kesalahan saat menghapus asesmen.");
+    } finally {
+      setSedangMenghapus(false);
+    }
+  };
+
+  const totalProses = daftar.filter((a) => a.status === "PROSES").length;
+
+  const totalSelesai = daftar.filter((a) => a.status === "SELESAI").length;
 
   const daftarTampil = useMemo(() => {
     return daftar.filter((a) => {
       const cocokStatus =
-        filterStatus === "SEMUA" ||
-        a.status === filterStatus;
+        filterStatus === "SEMUA" || a.status === filterStatus;
 
       const query = kataKunci.toLowerCase().trim();
 
@@ -86,13 +110,9 @@ export default function HalamanAsesmenGuru() {
 
       <div style={estilo.header}>
         <div>
-          <div style={estilo.labelHalaman}>
-            RUANG GURU
-          </div>
+          <div style={estilo.labelHalaman}>RUANG GURU</div>
 
-          <h1 style={estilo.judulHalaman}>
-            Asesmen
-          </h1>
+          <h1 style={estilo.judulHalaman}>Asesmen</h1>
 
           <p style={estilo.subjudul}>
             Kelola kuis dan ujian online untuk siswa.
@@ -141,9 +161,7 @@ export default function HalamanAsesmenGuru() {
 
       <div style={estilo.toolbar}>
         <div style={estilo.searchWrapper}>
-          <span style={estilo.searchIcon}>
-            🔍
-          </span>
+          <span style={estilo.searchIcon}>🔍</span>
 
           <input
             type="text"
@@ -201,9 +219,7 @@ export default function HalamanAsesmenGuru() {
         <>
           <div style={estilo.headerDaftar}>
             <div>
-              <h2 style={estilo.judulDaftar}>
-                Daftar Asesmen
-              </h2>
+              <h2 style={estilo.judulDaftar}>Daftar Asesmen</h2>
 
               <p style={estilo.infoDaftar}>
                 {daftarTampil.length} asesmen ditampilkan
@@ -218,9 +234,7 @@ export default function HalamanAsesmenGuru() {
                 setKataKunci("");
                 setFilterStatus("SEMUA");
               }}
-              onBuat={() =>
-                router.push("/guru/asesmen/baru")
-              }
+              onBuat={() => router.push("/guru/asesmen/baru")}
             />
           ) : (
             <div style={estilo.grid}>
@@ -228,14 +242,49 @@ export default function HalamanAsesmenGuru() {
                 <KartuAsesmen
                   key={a.id}
                   a={a}
-                  onKlik={() =>
-                    router.push(`/guru/asesmen/${a.id}`)
-                  }
+                  onKlik={() => router.push(`/guru/asesmen/${a.id}`)}
+                  onHapus={() => setAsesmenDiHapus(a)}
                 />
               ))}
             </div>
           )}
         </>
+      )}
+
+      {/* =====================================================
+          MODAL KONFIRMASI HAPUS
+      ====================================================== */}
+
+      {asesmenDiHapus && (
+        <div style={estilo.modalOverlay}>
+          <div style={estilo.modalContainer}>
+            <div style={estilo.modalIcon}>🗑️</div>
+            <h3 style={estilo.modalJudul}>Hapus Asesmen</h3>
+            <p style={estilo.modalTeks}>
+              Apakah Anda yakin ingin menghapus asesmen{" "}
+              <strong>"{asesmenDiHapus.judul}"</strong>? Tindakan ini tidak
+              dapat dibatalkan.
+            </p>
+            <div style={estilo.modalAksi}>
+              <button
+                type="button"
+                onClick={() => setAsesmenDiHapus(null)}
+                disabled={sedangMenghapus}
+                style={estilo.tombolBatal}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={tanganiHapus}
+                disabled={sedangMenghapus}
+                style={estilo.tombolKonfirmasiHapus}
+              >
+                {sedangMenghapus ? "Menghapus..." : "Hapus"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -288,13 +337,9 @@ function StatCard({
       </div>
 
       <div style={estilo.statContent}>
-        <span style={estilo.statLabel}>
-          {label}
-        </span>
+        <span style={estilo.statLabel}>{label}</span>
 
-        <strong style={estilo.statValue}>
-          {nilai}
-        </strong>
+        <strong style={estilo.statValue}>{nilai}</strong>
       </div>
     </div>
   );
@@ -334,148 +379,123 @@ function FilterButton({
 function KartuAsesmen({
   a,
   onKlik,
+  onHapus,
 }: {
   a: AsesmenRingkas;
   onKlik: () => void;
+  onHapus: () => void;
 }) {
   const adalahKuis = a.tipe === "KUIS";
 
   return (
-    <button
-      onClick={onKlik}
-      type="button"
-      style={estilo.kartu}
-    >
-      {/* Garis warna di atas kartu */}
-
-      <div
-        style={{
-          ...estilo.garisKartu,
-          backgroundColor: adalahKuis
-            ? WARNA.primary
-            : "#70c1c4",
-        }}
-      />
-
-      {/* Header */}
-
-      <div style={estilo.kartuHeader}>
+    <div style={estilo.kartuWrapper}>
+      <button onClick={onKlik} type="button" style={estilo.kartu}>
+        {/* Garis warna di atas kartu */}
         <div
           style={{
-            ...estilo.iconAsesmen,
-            backgroundColor: adalahKuis
-              ? WARNA.primarySoft
-              : "#e8f8f7",
-          }}
-        >
-          {adalahKuis ? "📝" : "📋"}
-        </div>
-
-        <span
-          style={{
-            ...estilo.badgeTipe,
-            color: adalahKuis
-              ? WARNA.primary
-              : "#378b8e",
-            backgroundColor: adalahKuis
-              ? WARNA.primarySoft
-              : "#e8f8f7",
-          }}
-        >
-          {adalahKuis
-            ? "Kuis"
-            : "Ujian Online"}
-        </span>
-
-        <span
-          style={{
-            ...estilo.statusDot,
-            backgroundColor:
-              a.status === "PROSES"
-                ? WARNA.orange
-                : WARNA.green,
+            ...estilo.garisKartu,
+            backgroundColor: adalahKuis ? WARNA.primary : "#70c1c4",
           }}
         />
-      </div>
 
-      {/* Judul */}
-
-      <div style={estilo.kartuBody}>
-        <h3 style={estilo.judulKartu}>
-          {a.judul}
-        </h3>
-
-        <p style={estilo.mapelKartu}>
-          {a.mapel}
-        </p>
-      </div>
-
-      {/* Informasi */}
-
-      <div style={estilo.infoKartu}>
-        <div style={estilo.infoItem}>
-          <span style={estilo.infoIcon}>❓</span>
-
-          <div>
-            <span style={estilo.infoLabel}>
-              Soal
-            </span>
-
-            <strong style={estilo.infoValue}>
-              {a.jumlahSoal}
-            </strong>
+        {/* Header */}
+        <div style={estilo.kartuHeader}>
+          <div
+            style={{
+              ...estilo.iconAsesmen,
+              backgroundColor: adalahKuis ? WARNA.primarySoft : "#e8f8f7",
+            }}
+          >
+            {adalahKuis ? "📝" : "📋"}
           </div>
-        </div>
 
-        <div style={estilo.pemisah} />
-
-        <div style={estilo.infoItem}>
-          <span style={estilo.infoIcon}>👥</span>
-
-          <div>
-            <span style={estilo.infoLabel}>
-              Kelas
-            </span>
-
-            <strong style={estilo.infoValue}>
-              {a.jumlahKelasTujuan}
-            </strong>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-
-      <div style={estilo.kartuFooter}>
-        <span
-          style={{
-            ...estilo.statusText,
-            color:
-              a.status === "PROSES"
-                ? WARNA.orange
-                : WARNA.green,
-          }}
-        >
           <span
             style={{
-              ...estilo.statusIndicator,
+              ...estilo.badgeTipe,
+              color: adalahKuis ? WARNA.primary : "#378b8e",
+              backgroundColor: adalahKuis ? WARNA.primarySoft : "#e8f8f7",
+            }}
+          >
+            {adalahKuis ? "Kuis" : "Ujian Online"}
+          </span>
+
+          <span
+            style={{
+              ...estilo.statusDot,
               backgroundColor:
-                a.status === "PROSES"
-                  ? WARNA.orange
-                  : WARNA.green,
+                a.status === "PROSES" ? WARNA.orange : WARNA.green,
             }}
           />
+        </div>
 
-          {a.status === "PROSES"
-            ? "Sedang dibuat"
-            : "Sudah selesai"}
-        </span>
+        {/* Judul */}
+        <div style={estilo.kartuBody}>
+          <h3 style={estilo.judulKartu}>{a.judul}</h3>
 
-        <span style={estilo.panah}>
-          →
-        </span>
-      </div>
-    </button>
+          <p style={estilo.mapelKartu}>{a.mapel}</p>
+        </div>
+
+        {/* Informasi */}
+        <div style={estilo.infoKartu}>
+          <div style={estilo.infoItem}>
+            <span style={estilo.infoIcon}>❓</span>
+
+            <div>
+              <span style={estilo.infoLabel}>Soal</span>
+
+              <strong style={estilo.infoValue}>{a.jumlahSoal}</strong>
+            </div>
+          </div>
+
+          <div style={estilo.pemisah} />
+
+          <div style={estilo.infoItem}>
+            <span style={estilo.infoIcon}>👥</span>
+
+            <div>
+              <span style={estilo.infoLabel}>Kelas</span>
+
+              <strong style={estilo.infoValue}>{a.jumlahKelasTujuan}</strong>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={estilo.kartuFooter}>
+          <span
+            style={{
+              ...estilo.statusText,
+              color: a.status === "PROSES" ? WARNA.orange : WARNA.green,
+            }}
+          >
+            <span
+              style={{
+                ...estilo.statusIndicator,
+                backgroundColor:
+                  a.status === "PROSES" ? WARNA.orange : WARNA.green,
+              }}
+            />
+
+            {a.status === "PROSES" ? "Sedang dibuat" : "Sudah selesai"}
+          </span>
+
+          <span style={estilo.panah}>→</span>
+        </div>
+      </button>
+
+      {/* Tombol Hapus */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onHapus();
+        }}
+        title="Hapus Asesmen"
+        style={estilo.tombolHapusKartu}
+      >
+        🗑️
+      </button>
+    </div>
   );
 }
 
@@ -494,14 +514,10 @@ function EmptyState({
 }) {
   return (
     <div style={estilo.emptyState}>
-      <div style={estilo.emptyIcon}>
-        {adaData ? "🔍" : "📝"}
-      </div>
+      <div style={estilo.emptyIcon}>{adaData ? "🔍" : "📝"}</div>
 
       <h3 style={estilo.emptyTitle}>
-        {adaData
-          ? "Asesmen tidak ditemukan"
-          : "Belum ada asesmen"}
+        {adaData ? "Asesmen tidak ditemukan" : "Belum ada asesmen"}
       </h3>
 
       <p style={estilo.emptyText}>
@@ -511,19 +527,11 @@ function EmptyState({
       </p>
 
       {adaData ? (
-        <button
-          onClick={onReset}
-          style={estilo.emptyButton}
-          type="button"
-        >
+        <button onClick={onReset} style={estilo.emptyButton} type="button">
           Reset Filter
         </button>
       ) : (
-        <button
-          onClick={onBuat}
-          style={estilo.emptyButton}
-          type="button"
-        >
+        <button onClick={onBuat} style={estilo.emptyButton} type="button">
           + Buat Asesmen
         </button>
       )}
@@ -605,8 +613,7 @@ const estilo = {
 
   statistik: {
     display: "grid",
-    gridTemplateColumns:
-      "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
     gap: "14px",
     marginBottom: "22px",
   },
@@ -757,14 +764,17 @@ const estilo = {
 
   grid: {
     display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fill, minmax(290px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))",
     gap: "15px",
   },
 
   // ==========================================================
   // KARTU
   // ==========================================================
+
+  kartuWrapper: {
+    position: "relative" as const,
+  },
 
   kartu: {
     position: "relative" as const,
@@ -776,11 +786,31 @@ const estilo = {
     borderRadius: "14px",
     backgroundColor: WARNA.white,
     padding: "17px",
+    paddingRight: "42px",
     cursor: "pointer",
     boxSizing: "border-box" as const,
     boxShadow: "0 2px 8px rgba(15, 23, 42, 0.035)",
     transition:
       "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease",
+  },
+
+  tombolHapusKartu: {
+    position: "absolute" as const,
+    top: "14px",
+    right: "12px",
+    zIndex: 2,
+    border: "none",
+    backgroundColor: "transparent",
+    borderRadius: "6px",
+    width: "28px",
+    height: "28px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    fontSize: "13px",
+    opacity: 0.7,
+    transition: "opacity 0.2s, background-color 0.2s",
   },
 
   garisKartu: {
@@ -988,6 +1018,89 @@ const estilo = {
     backgroundColor: WARNA.primary,
     color: "#ffffff",
     fontSize: "11px",
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+
+  // ==========================================================
+  // MODAL
+  // ==========================================================
+
+  modalOverlay: {
+    position: "fixed" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(17, 24, 39, 0.4)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 999,
+    padding: "20px",
+  },
+
+  modalContainer: {
+    backgroundColor: WARNA.white,
+    borderRadius: "16px",
+    padding: "24px",
+    maxWidth: "400px",
+    width: "100%",
+    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+    textAlign: "center" as const,
+  },
+
+  modalIcon: {
+    width: "48px",
+    height: "48px",
+    borderRadius: "50%",
+    backgroundColor: WARNA.redSoft,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "22px",
+    margin: "0 auto 14px",
+  },
+
+  modalJudul: {
+    margin: "0 0 8px",
+    fontSize: "17px",
+    fontWeight: 800,
+    color: WARNA.text,
+  },
+
+  modalTeks: {
+    margin: "0 0 20px",
+    fontSize: "13px",
+    color: WARNA.textSecondary,
+    lineHeight: 1.5,
+  },
+
+  modalAksi: {
+    display: "flex",
+    gap: "10px",
+  },
+
+  tombolBatal: {
+    flex: 1,
+    padding: "10px",
+    border: `1px solid ${WARNA.border}`,
+    borderRadius: "8px",
+    backgroundColor: WARNA.white,
+    color: WARNA.text,
+    fontSize: "12px",
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+
+  tombolKonfirmasiHapus: {
+    flex: 1,
+    padding: "10px",
+    border: "none",
+    borderRadius: "8px",
+    backgroundColor: WARNA.red,
+    color: WARNA.white,
+    fontSize: "12px",
     fontWeight: 700,
     cursor: "pointer",
   },
