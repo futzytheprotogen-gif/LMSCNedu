@@ -505,11 +505,11 @@ export default function HalamanDetailKelasGuru() {
             {/* TUGAS */}
 
             <button
-              onClick={() =>
-                alert(
-                  "Halaman Buat Tugas belum terhubung."
-                )
-              }
+           onClick={() =>
+  router.push(
+    `/guru/tugas/baru?kelasId=${kelasId}`
+  )
+}
               style={style.actionCard}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform =
@@ -552,11 +552,11 @@ export default function HalamanDetailKelasGuru() {
             {/* MATERI */}
 
             <button
-              onClick={() =>
-                alert(
-                  "Halaman Upload Materi belum terhubung."
-                )
-              }
+          onClick={() =>
+  router.push(
+    `/guru/materi/baru?kelasId=${kelasId}`
+  )
+}
               style={style.actionCard}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform =
