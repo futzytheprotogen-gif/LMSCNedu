@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-const WARNA_PRIMARY = "#2196f3";
+const WARNA_PRIMARY = "var(--cn-primary)";
 const TINGGI_NAVBAR = 56;
 const LEBAR_SIDEBAR = 240;
 
@@ -20,14 +20,16 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   async function handleLogout() {
+    if (!window.confirm("Keluar dari akun CN Edu?")) return;
     await fetch("/api/auth", { method: "DELETE" });
     router.push("/login");
   }
 
   return (
     <div style={estilo.wadah}>
-      <header style={estilo.navbar}>
+      <header className="cn-role-navbar" style={estilo.navbar}>
         <button
+          className="cn-role-hamburger"
           onClick={() => setSidebarTerbuka(true)}
           style={estilo.tombolHamburger}
           aria-label="Buka menu"
@@ -35,19 +37,17 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
         >
           ☰
         </button>
-        <span style={estilo.namaBrand}>CN Edu — Guru</span>
+        <span className="cn-role-brand" style={estilo.namaBrand}>CN Edu — Guru</span>
         <div style={estilo.navKanan}>
           <Link href="/profil/saya" style={estilo.tombolProfil}>
             Profil
           </Link>
-          <button onClick={handleLogout} style={estilo.tombolLogout} type="button">
-            Keluar
-          </button>
         </div>
       </header>
 
       {sidebarTerbuka && (
         <div
+          className="cn-role-overlay"
           style={estilo.overlay}
           onClick={() => setSidebarTerbuka(false)}
           aria-hidden="true"
@@ -55,12 +55,13 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
       )}
 
       <aside
+        className="cn-role-sidebar"
         style={{
           ...estilo.sidebar,
           transform: sidebarTerbuka ? "translateX(0)" : "translateX(-100%)",
         }}
       >
-        <div style={estilo.headerSidebar}>
+        <div className="cn-role-sidebar-header" style={estilo.headerSidebar}>
           <span style={estilo.namaBrandSidebar}>CN Edu</span>
           <button
             onClick={() => setSidebarTerbuka(false)}
@@ -90,23 +91,28 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
+        <div className="cn-role-sidebar-footer">
+          <button className="cn-role-logout-action" onClick={handleLogout} type="button">
+            Keluar dari akun
+          </button>
+        </div>
       </aside>
 
-      <main style={estilo.konten}>{children}</main>
+      <main className="cn-role-main" style={estilo.konten}>{children}</main>
     </div>
   );
 }
 
 const estilo = {
-  wadah: { minHeight: "100vh", backgroundColor: "#ffffff" },
+  wadah: { minHeight: "100vh", backgroundColor: "var(--cn-surface)" },
   navbar: {
     position: "fixed" as const,
     top: 0,
     left: 0,
     right: 0,
     height: `${TINGGI_NAVBAR}px`,
-    backgroundColor: "#ffffff",
-    borderBottom: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    borderBottom: "1px solid var(--cn-line)",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -118,10 +124,10 @@ const estilo = {
     background: "none",
     border: "none",
     cursor: "pointer",
-    color: "#000000",
+    color: "var(--cn-navy)",
     padding: "8px",
   },
-  namaBrand: { fontSize: "15px", fontWeight: 700, color: "#000000" },
+  namaBrand: { fontSize: "15px", fontWeight: 700, color: "var(--cn-navy)" },
   navKanan: { display: "flex", alignItems: "center", gap: "10px" },
   tombolProfil: {
     fontSize: "13px",
@@ -129,20 +135,10 @@ const estilo = {
     color: WARNA_PRIMARY,
     textDecoration: "none",
   },
-  tombolLogout: {
-    fontSize: "13px",
-    fontWeight: 600,
-    color: "#dc2626",
-    background: "none",
-    border: "1px solid #dc2626",
-    borderRadius: "6px",
-    padding: "6px 12px",
-    cursor: "pointer",
-  },
   overlay: {
     position: "fixed" as const,
     inset: 0,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "rgba(var(--cn-navy-rgb), 0.4)",
     zIndex: 40,
   },
   sidebar: {
@@ -151,8 +147,8 @@ const estilo = {
     left: 0,
     bottom: 0,
     width: `${LEBAR_SIDEBAR}px`,
-    backgroundColor: "#ffffff",
-    borderRight: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    borderRight: "1px solid var(--cn-line)",
     zIndex: 50,
     transition: "transform 0.2s ease-in-out",
     display: "flex",
@@ -164,7 +160,7 @@ const estilo = {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "0 16px",
-    borderBottom: "1px solid #e5e7eb",
+    borderBottom: "1px solid var(--cn-line)",
   },
   namaBrandSidebar: { fontSize: "16px", fontWeight: 700, color: WARNA_PRIMARY },
   tombolTutup: {
@@ -172,7 +168,7 @@ const estilo = {
     background: "none",
     border: "none",
     cursor: "pointer",
-    color: "#000000",
+    color: "var(--cn-navy)",
   },
   nav: { display: "flex", flexDirection: "column" as const, padding: "12px", gap: "4px" },
   linkMenu: {
@@ -180,9 +176,9 @@ const estilo = {
     borderRadius: "8px",
     fontSize: "14px",
     fontWeight: 600,
-    color: "#374151",
+    color: "var(--cn-coral-dark)",
     textDecoration: "none",
   },
-  linkMenuAktif: { backgroundColor: "#e8f3fe", color: WARNA_PRIMARY },
+  linkMenuAktif: { backgroundColor: "var(--cn-tint)", color: WARNA_PRIMARY },
   konten: { paddingTop: `${TINGGI_NAVBAR}px` },
 };

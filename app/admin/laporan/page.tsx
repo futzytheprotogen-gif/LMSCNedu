@@ -3,30 +3,30 @@
 import { useEffect, useState, useCallback } from "react";
 
 const WARNA = {
-  primary: "#2196f3",
-  primaryDark: "#1976d2",
-  primarySoft: "#e8f3fe",
+  primary: "var(--cn-primary)",
+  primaryDark: "var(--cn-primary)",
+  primarySoft: "var(--cn-tint)",
 
-  text: "#111827",
-  textSecondary: "#64748b",
-  muted: "#94a3b8",
+  text: "var(--cn-coral-dark)",
+  textSecondary: "var(--cn-coral)",
+  muted: "var(--cn-coral)",
 
-  background: "#f7f9fc",
-  white: "#ffffff",
-  border: "#e5e7eb",
+  background: "var(--cn-tint)",
+  white: "var(--cn-surface)",
+  border: "var(--cn-line)",
 
-  warning: "#f59e0b",
-  warningSoft: "#fff7e6",
+  warning: "var(--cn-coral)",
+  warningSoft: "var(--cn-coral-tint)",
 
-  danger: "#ef4444",
-  dangerDark: "#dc2626",
-  dangerSoft: "#fee2e2",
+  danger: "var(--cn-danger)",
+  dangerDark: "var(--cn-danger)",
+  dangerSoft: "var(--cn-danger-tint)",
 
-  success: "#16a34a",
-  successSoft: "#dcfce7",
+  success: "var(--cn-success)",
+  successSoft: "var(--cn-success-tint)",
 
-  purple: "#7c3aed",
-  purpleSoft: "#ede9fe",
+  purple: "var(--cn-coral)",
+  purpleSoft: "var(--cn-tint)",
 };
 
 interface Laporan {
@@ -228,7 +228,7 @@ export default function HalamanLaporan() {
           style={{
             ...estilo.kartuStat,
             borderColor:
-              jumlahMenunggu > 0 ? "#fcd34d" : WARNA.border,
+              jumlahMenunggu > 0 ? "var(--cn-coral)" : WARNA.border,
           }}
         >
           <div
@@ -627,7 +627,7 @@ function gayaStatus(status: Laporan["status"]) {
     case "MENUNGGU":
       return {
         background: WARNA.warningSoft,
-        color: "#b45309",
+        color: "var(--cn-coral)",
       };
 
     case "DITERIMA":
@@ -722,7 +722,7 @@ const estilo = {
     display: "flex",
     alignItems: "center",
     gap: "7px",
-    boxShadow: "0 2px 6px rgba(15, 23, 42, 0.04)",
+    boxShadow: "0 2px 6px rgba(var(--cn-navy-rgb), 0.04)",
   },
 
   iconRefresh: {
@@ -797,7 +797,7 @@ const estilo = {
     border: `1px solid ${WARNA.border}`,
     borderRadius: "16px",
     overflow: "hidden",
-    boxShadow: "0 3px 12px rgba(15, 23, 42, 0.03)",
+    boxShadow: "0 3px 12px rgba(var(--cn-navy-rgb), 0.03)",
   },
 
   panelHeader: {
@@ -834,7 +834,7 @@ const estilo = {
 
   toolbar: {
     padding: "15px 22px",
-    backgroundColor: "#fbfcfe",
+    backgroundColor: "var(--cn-tint)",
     borderBottom: `1px solid ${WARNA.border}`,
     display: "flex",
     justifyContent: "space-between",
@@ -894,7 +894,7 @@ const estilo = {
   filterAktif: {
     backgroundColor: WARNA.primarySoft,
     color: WARNA.primaryDark,
-    borderColor: "#cce5fc",
+    borderColor: "var(--cn-tint)",
   },
 
   filterBadge: {
@@ -1002,7 +1002,7 @@ const estilo = {
   },
 
   infoItem: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: "var(--cn-tint)",
     borderRadius: "9px",
     padding: "9px 11px",
   },
@@ -1028,7 +1028,7 @@ const estilo = {
   alasanBox: {
     marginTop: "10px",
     padding: "10px 12px",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "var(--cn-tint)",
     borderRadius: "9px",
   },
 
@@ -1042,7 +1042,7 @@ const estilo = {
 
   alasan: {
     margin: 0,
-    color: "#374151",
+    color: "var(--cn-coral-dark)",
     fontSize: "12px",
     lineHeight: 1.55,
   },
@@ -1054,7 +1054,7 @@ const estilo = {
     gap: "12px",
     marginTop: "14px",
     paddingTop: "13px",
-    borderTop: `1px solid #f1f5f9`,
+    borderTop: `1px solid var(--cn-coral-tint)`,
     flexWrap: "wrap" as const,
   },
 
@@ -1081,7 +1081,7 @@ const estilo = {
   },
 
   tombolSecondary: {
-    border: `1px solid #bfdbfe`,
+    border: `1px solid var(--cn-tint)`,
     backgroundColor: WARNA.primarySoft,
     color: WARNA.primaryDark,
     borderRadius: "8px",
@@ -1092,7 +1092,7 @@ const estilo = {
   },
 
   tombolDangerOutline: {
-    border: `1px solid #fecaca`,
+    border: `1px solid var(--cn-danger-tint)`,
     backgroundColor: WARNA.white,
     color: WARNA.dangerDark,
     borderRadius: "8px",
@@ -1103,7 +1103,7 @@ const estilo = {
   },
 
   tombolSuccess: {
-    border: `1px solid #bbf7d0`,
+    border: `1px solid var(--cn-success-tint)`,
     backgroundColor: WARNA.successSoft,
     color: WARNA.success,
     borderRadius: "8px",
@@ -1126,7 +1126,7 @@ const estilo = {
   spinner: {
     width: "28px",
     height: "28px",
-    border: "3px solid #dbeafe",
+    border: "3px solid var(--cn-tint)",
     borderTop: `3px solid ${WARNA.primary}`,
     borderRadius: "50%",
     marginBottom: "10px",

@@ -1,26 +1,253 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cn-primary: #1677ff;
+  --cn-primary-dark: #0955c9;
+  --cn-navy: #102a43;
+  --cn-coral: var(--cn-primary);
+  --cn-coral-dark: var(--cn-primary-dark);
+  --cn-cyan: var(--cn-primary);
+  --cn-bg: #f8fbff;
+  --cn-surface: #ffffff;
+  --cn-tint: #eef6ff;
+  --cn-coral-tint: var(--cn-tint);
+  --cn-text: #102a43;
+  --cn-muted: #52677d;
+  --cn-line: #dbe7f2;
+  --cn-success: var(--cn-primary-dark);
+  --cn-success-tint: var(--cn-tint);
+  --cn-danger: #b42318;
+  --cn-danger-tint: #fff1f0;
+  --cn-warning: var(--cn-danger);
+  --cn-warning-tint: var(--cn-danger-tint);
+  --cn-primary-rgb: 22, 119, 255;
+  --cn-coral-rgb: 22, 119, 255;
+  --cn-cyan-rgb: 22, 119, 255;
+  --cn-navy-rgb: 16, 42, 67;
+  --cn-white-rgb: 255, 255, 255;
+  --cn-muted-rgb: 82, 103, 125;
+  --cn-success-rgb: 9, 85, 201;
+  --cn-danger-rgb: 180, 35, 24;
+  --background: var(--cn-bg);
+  --foreground: var(--cn-text);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Sans", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Sora", sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+fieldset {
+  min-width: 0;
+}
+
+main {
+  min-width: 0;
+}
+
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.cn-role-navbar {
+  color: var(--cn-navy) !important;
+  background: var(--cn-surface) !important;
+  border-bottom: 1px solid var(--cn-line) !important;
+}
+
+.cn-role-sidebar {
+  color: var(--cn-text) !important;
+  background: var(--cn-surface) !important;
+  border-color: var(--cn-line) !important;
+}
+
+.cn-role-brand {
+  color: var(--cn-navy) !important;
+  font-family: "Sora", sans-serif !important;
+}
+
+.cn-role-hamburger {
+  color: var(--cn-navy) !important;
+}
+
+.cn-role-logout {
+  color: var(--cn-coral-dark) !important;
+  border-color: var(--cn-coral) !important;
+}
+
+.cn-role-sidebar a {
+  color: var(--cn-muted);
+}
+
+.cn-role-sidebar-footer {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--cn-line);
+}
+
+.cn-role-logout-action {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--cn-danger);
+  border-radius: 7px;
+  color: var(--cn-danger);
+  background: var(--cn-danger-tint);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cn-role-logout-action:hover {
+  color: var(--cn-surface);
+  background: var(--cn-danger);
+}
+
+.cn-role-main {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .cn-role-navbar {
+    padding-left: 260px !important;
+  }
+
+  .cn-role-hamburger {
+    display: none !important;
+  }
+
+  .cn-role-sidebar {
+    top: 56px !important;
+    transform: translateX(0) !important;
+    box-shadow: none !important;
+  }
+
+  .cn-role-sidebar-header {
+    display: none !important;
+  }
+
+  .cn-role-main {
+    padding-left: 240px !important;
+  }
+
+  .cn-role-overlay {
+    display: none !important;
+  }
+}
+
+@media (max-width: 899px) {
+  .cn-role-navbar {
+    gap: 8px;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+  }
+
+  .cn-role-sidebar {
+    width: min(240px, calc(100vw - 32px)) !important;
+    max-width: calc(100vw - 32px);
+  }
+
+  .cnedu-modal {
+    width: min(100% - 24px, 640px) !important;
+    max-height: calc(100dvh - 24px) !important;
+    overflow-y: auto !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .cn-guru-kelas-page {
+    padding: 18px 16px 40px !important;
+  }
+
+  .cn-guru-kelas-main-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  .cn-guru-kelas-main-grid > * {
+    width: 100%;
+    min-width: 0;
+  }
+
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns: repeat(2,"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  [style*="grid-template-columns: repeat(3"],
+  [style*="grid-template-columns: repeat(4"],
+  [style*="grid-template-columns: 1fr 1fr 1fr"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  [style*="grid-template-columns: repeat(auto-fill, minmax(290px"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .cn-role-navbar {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
 }

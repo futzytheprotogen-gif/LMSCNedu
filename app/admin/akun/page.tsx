@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 
-const WARNA_PRIMARY = "#2196f3";
+const WARNA_PRIMARY = "var(--cn-primary)";
 
 type TipeAkun = "SISWA" | "GURU";
 
@@ -14,6 +14,12 @@ interface RombelRingkas {
 interface MapelRingkas {
   id: string;
   nama: string;
+}
+
+interface HasilImporAkun {
+  berhasil: number;
+  gagal: { baris: number; pesan: string }[];
+  pesan: string;
 }
 
 export default function HalamanBuatAkun() {
@@ -40,6 +46,10 @@ export default function HalamanBuatAkun() {
   const [sedangProses, setSedangProses] = useState(false);
   const [pesanError, setPesanError] = useState<string | null>(null);
   const [pesanSukses, setPesanSukses] = useState<string | null>(null);
+  const [fileAkun, setFileAkun] = useState<File | null>(null);
+  const [versiInputAkun, setVersiInputAkun] = useState(0);
+  const [sedangImpor, setSedangImpor] = useState(false);
+  const [hasilImpor, setHasilImpor] = useState<HasilImporAkun | null>(null);
 
   useEffect(() => {
     fetch("/api/kelas-referensi")
@@ -80,6 +90,45 @@ export default function HalamanBuatAkun() {
 
   function namaMapel(id: string) {
     return daftarMapel.find((m) => m.id === id)?.nama ?? id;
+  }
+
+  async function imporAkun() {
+    if (!fileAkun) return;
+    setSedangImpor(true);
+    setHasilImpor(null);
+    const formData = new FormData();
+    formData.set("file", fileAkun);
+
+    try {
+      const response = await fetch("/api/akun/import", { method: "POST", body: formData });
+      const data = await response.json();
+      if (!response.ok) {
+        setHasilImpor({ berhasil: 0, gagal: [], pesan: data.pesan ?? "Impor akun gagal." });
+        return;
+      }
+      setHasilImpor(data as HasilImporAkun);
+      setFileAkun(null);
+      setVersiInputAkun((versi) => versi + 1);
+    } catch {
+      setHasilImpor({ berhasil: 0, gagal: [], pesan: "Tidak dapat terhubung ke server." });
+    } finally {
+      setSedangImpor(false);
+    }
+  }
+
+  async function unduhTemplate() {
+    try {
+      const response = await fetch("/api/akun/import");
+      if (!response.ok) throw new Error("Template Excel tidak dapat diunduh.");
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "template-import-akun.xlsx";
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      setHasilImpor({ berhasil: 0, gagal: [], pesan: "Template Excel tidak dapat diunduh." });
+    }
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -161,6 +210,55 @@ export default function HalamanBuatAkun() {
 
         {/* FORM CARD */}
         <div style={styles.card}>
+
+          <section style={styles.importSection} aria-labelledby="import-akun-title">
+            <div style={styles.importHeader}>
+              <div>
+                <h2 id="import-akun-title" style={styles.importTitle}>Impor dari Excel</h2>
+                <p style={styles.importDescription}>Tambahkan hingga 200 akun dalam satu file .xlsx.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void unduhTemplate()}
+                style={styles.templateLink}
+              >
+                Unduh template
+              </button>
+            </div>
+            <div style={styles.importControls}>
+              <input
+                key={versiInputAkun}
+                type="file"
+                accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                onChange={(event) => setFileAkun(event.target.files?.[0] ?? null)}
+                style={styles.importFile}
+                aria-label="Pilih file Excel akun"
+              />
+              <button
+                type="button"
+                onClick={imporAkun}
+                disabled={!fileAkun || sedangImpor}
+                style={{ ...styles.importButton, opacity: !fileAkun || sedangImpor ? 0.6 : 1 }}
+              >
+                {sedangImpor ? "Mengimpor..." : "Impor akun"}
+              </button>
+            </div>
+            <p style={styles.importDescription}>Password awal otomatis memakai NIS/NIK. Data yang gagal akan ditampilkan per baris.</p>
+            {hasilImpor && (
+              <div style={styles.importResult} role="status">
+                <strong>{hasilImpor.pesan}</strong>
+                {hasilImpor.gagal.length > 0 && (
+                  <ul style={styles.importFailures}>
+                    {hasilImpor.gagal.map((item) => (
+                      <li key={`${item.baris}-${item.pesan}`}>Baris {item.baris}: {item.pesan}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </section>
+
+          <div style={styles.divider} />
 
           {/* ROLE SELECTOR */}
           <div style={styles.roleSection}>
@@ -488,7 +586,7 @@ export default function HalamanBuatAkun() {
 const styles = {
   page: {
     minHeight: "100vh",
-    backgroundColor: "#f5f9fd",
+    backgroundColor: "var(--cn-tint)",
     padding: "40px 20px",
     boxSizing: "border-box" as const,
   },
@@ -508,7 +606,7 @@ const styles = {
     alignItems: "center",
     padding: "6px 10px",
     borderRadius: "999px",
-    backgroundColor: "#e8f3fe",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     fontSize: "10px",
     fontWeight: 800,
@@ -521,23 +619,23 @@ const styles = {
     fontSize: "30px",
     lineHeight: 1.2,
     fontWeight: 800,
-    color: "#111827",
+    color: "var(--cn-coral-dark)",
     letterSpacing: "-0.6px",
   },
 
   subtitle: {
     margin: "8px 0 0",
     fontSize: "14px",
-    color: "#6b7280",
+    color: "var(--cn-text)",
     lineHeight: 1.6,
   },
 
   card: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    border: "1px solid var(--cn-line)",
     borderRadius: "18px",
     padding: "30px",
-    boxShadow: "0 12px 35px rgba(15, 23, 42, 0.07)",
+    boxShadow: "0 12px 35px rgba(var(--cn-navy-rgb), 0.07)",
     boxSizing: "border-box" as const,
   },
 
@@ -549,7 +647,89 @@ const styles = {
     margin: "0 0 10px",
     fontSize: "13px",
     fontWeight: 700,
-    color: "#374151",
+    color: "var(--cn-coral-dark)",
+  },
+
+  importSection: {
+    display: "grid",
+    gap: "12px",
+  },
+
+  importHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap" as const,
+    gap: "8px",
+  },
+
+  importTitle: {
+    margin: 0,
+    color: "var(--cn-text)",
+    fontSize: "16px",
+    fontWeight: 700,
+  },
+
+  importDescription: {
+    margin: "4px 0 0",
+    color: "var(--cn-muted)",
+    fontSize: "12px",
+    lineHeight: 1.5,
+  },
+
+  templateLink: {
+    padding: 0,
+    border: 0,
+    background: "transparent",
+    color: WARNA_PRIMARY,
+    fontSize: "13px",
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+
+  importControls: {
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap" as const,
+    gap: "10px",
+  },
+
+  importFile: {
+    flex: "1 1 260px",
+    minWidth: 0,
+    padding: "8px",
+    border: "1px solid var(--cn-line)",
+    borderRadius: "8px",
+    color: "var(--cn-text)",
+    fontSize: "12px",
+  },
+
+  importButton: {
+    minHeight: "40px",
+    padding: "0 15px",
+    border: 0,
+    borderRadius: "8px",
+    backgroundColor: WARNA_PRIMARY,
+    color: "var(--cn-surface)",
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+
+  importResult: {
+    padding: "12px",
+    border: "1px solid var(--cn-line)",
+    borderRadius: "8px",
+    color: "var(--cn-text)",
+    backgroundColor: "var(--cn-tint)",
+    fontSize: "12px",
+    lineHeight: 1.5,
+    overflowWrap: "anywhere" as const,
+  },
+
+  importFailures: {
+    margin: "8px 0 0",
+    paddingLeft: "20px",
+    color: "var(--cn-danger)",
   },
 
   roleTabs: {
@@ -560,10 +740,10 @@ const styles = {
 
   roleButton: {
     minHeight: "58px",
-    border: "1px solid #e5e7eb",
+    border: "1px solid var(--cn-line)",
     borderRadius: "12px",
-    backgroundColor: "#ffffff",
-    color: "#4b5563",
+    backgroundColor: "var(--cn-surface)",
+    color: "var(--cn-text)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -577,8 +757,8 @@ const styles = {
   roleButtonActive: {
     backgroundColor: WARNA_PRIMARY,
     borderColor: WARNA_PRIMARY,
-    color: "#ffffff",
-    boxShadow: "0 6px 16px rgba(33, 150, 243, 0.22)",
+    color: "var(--cn-surface)",
+    boxShadow: "0 6px 16px rgba(var(--cn-primary-rgb), 0.22)",
   },
 
   roleIcon: {
@@ -587,7 +767,7 @@ const styles = {
 
   divider: {
     height: "1px",
-    backgroundColor: "#eef0f3",
+    backgroundColor: "var(--cn-coral-tint)",
     margin: "26px 0",
   },
 
@@ -609,17 +789,17 @@ const styles = {
     gap: "5px",
     fontSize: "13px",
     fontWeight: 700,
-    color: "#1f2937",
+    color: "var(--cn-coral-dark)",
   },
 
   required: {
-    color: "#ef4444",
+    color: "var(--cn-danger)",
     fontSize: "13px",
   },
 
   optional: {
     marginLeft: "3px",
-    color: "#9ca3af",
+    color: "var(--cn-muted)",
     fontSize: "11px",
     fontWeight: 500,
   },
@@ -630,9 +810,9 @@ const styles = {
     padding: "0 13px",
     boxSizing: "border-box" as const,
     borderRadius: "10px",
-    border: "1px solid #d9dee5",
-    backgroundColor: "#ffffff",
-    color: "#111827",
+    border: "1px solid var(--cn-coral-tint)",
+    backgroundColor: "var(--cn-surface)",
+    color: "var(--cn-coral-dark)",
     fontSize: "13px",
     outline: "none",
   },
@@ -642,9 +822,9 @@ const styles = {
     padding: "12px 13px",
     boxSizing: "border-box" as const,
     borderRadius: "10px",
-    border: "1px solid #d9dee5",
-    backgroundColor: "#ffffff",
-    color: "#111827",
+    border: "1px solid var(--cn-coral-tint)",
+    backgroundColor: "var(--cn-surface)",
+    color: "var(--cn-coral-dark)",
     fontSize: "13px",
     outline: "none",
     resize: "vertical" as const,
@@ -660,7 +840,7 @@ const styles = {
 
   helper: {
     fontSize: "11px",
-    color: "#9ca3af",
+    color: "var(--cn-muted)",
     fontWeight: 400,
   },
 
@@ -677,7 +857,7 @@ const styles = {
     gap: "7px",
     padding: "6px 9px",
     borderRadius: "999px",
-    backgroundColor: "#eaf4ff",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     fontSize: "11px",
     fontWeight: 700,
@@ -691,7 +871,7 @@ const styles = {
     justifyContent: "center",
     border: "none",
     borderRadius: "50%",
-    backgroundColor: "rgba(33, 150, 243, 0.12)",
+    backgroundColor: "rgba(var(--cn-primary-rgb), 0.12)",
     color: WARNA_PRIMARY,
     cursor: "pointer",
     fontSize: "14px",
@@ -705,9 +885,9 @@ const styles = {
     gap: "9px",
     padding: "11px 13px",
     borderRadius: "10px",
-    backgroundColor: "#fef2f2",
-    border: "1px solid #fecaca",
-    color: "#dc2626",
+    backgroundColor: "var(--cn-danger-tint)",
+    border: "1px solid var(--cn-danger-tint)",
+    color: "var(--cn-danger)",
     fontSize: "12px",
     fontWeight: 600,
   },
@@ -718,9 +898,9 @@ const styles = {
     gap: "9px",
     padding: "11px 13px",
     borderRadius: "10px",
-    backgroundColor: "#f0fdf4",
-    border: "1px solid #bbf7d0",
-    color: "#16a34a",
+    backgroundColor: "var(--cn-success-tint)",
+    border: "1px solid var(--cn-success-tint)",
+    color: "var(--cn-success)",
     fontSize: "12px",
     fontWeight: 600,
   },
@@ -732,16 +912,16 @@ const styles = {
     border: "none",
     borderRadius: "10px",
     backgroundColor: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "14px",
     fontWeight: 700,
-    boxShadow: "0 6px 16px rgba(33, 150, 243, 0.2)",
+    boxShadow: "0 6px 16px rgba(var(--cn-primary-rgb), 0.2)",
   },
 
   footerText: {
     textAlign: "center" as const,
     marginTop: "22px",
-    color: "#9ca3af",
+    color: "var(--cn-muted)",
     fontSize: "11px",
   },
 };

@@ -1,23 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
-
 :root {
-  --primary: #2196f3;
-  --primary-dark: #1669b8;
-  --navy: #0d3b66;
-  --tint: #eaf4fe;
-  --amber: #f5a623;
-  --amber-dark: #b4740a;
-  --amber-tint: #fef3e0;
-  --ink: #0a0a0a;
-  --ink-soft: #4b5563;
-  --line: #e6e9ee;
-  --white: #ffffff;
+  --primary: var(--cn-primary);
+  --primary-dark: var(--cn-primary-dark);
+  --navy: var(--cn-navy);
+  --tint: var(--cn-tint);
+  --coral: var(--cn-coral);
+  --coral-dark: var(--cn-coral-dark);
+  --coral-tint: var(--cn-coral-tint);
+  --ink: var(--cn-text);
+  --ink-soft: var(--cn-muted);
+  --line: var(--cn-line);
+  --white: var(--cn-surface);
 }
 
 .wadah {
   font-family: "IBM Plex Sans", sans-serif;
   color: var(--ink);
-  background: var(--white);
+  background: var(--cn-tint);
   overflow-x: hidden;
 }
 
@@ -37,8 +35,8 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
+  background: rgba(var(--cn-white-rgb), 0.86);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
 }
 
@@ -56,6 +54,18 @@
   font-weight: 800;
   font-size: 19px;
   color: var(--navy);
+  letter-spacing: -0.4px;
+}
+
+.logo::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin: 0 8px 1px 0;
+  border-radius: 3px;
+  background: var(--coral);
+  box-shadow: 5px -5px 0 var(--primary);
 }
 
 .navLinks {
@@ -84,7 +94,7 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--white);
-  background: var(--primary);
+  background: var(--navy);
   padding: 9px 18px;
   border-radius: 8px;
   text-decoration: none;
@@ -125,15 +135,29 @@
 .hero {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 72px 24px 88px;
+  padding: 86px 24px 100px;
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  gap: 56px;
+  gap: 72px;
   align-items: center;
 }
 
 .heroTeks {
   animation: naikMasuk 0.6s ease both;
+}
+
+.heroTeks::before {
+  content: "PLATFORM BELAJAR TERPADU SMK";
+  display: inline-flex;
+  margin-bottom: 18px;
+  padding: 7px 10px;
+  border: 1px solid var(--cn-tint);
+  border-radius: 999px;
+  color: var(--primary-dark);
+  background: var(--tint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
 }
 
 @keyframes naikMasuk {
@@ -148,10 +172,10 @@
 }
 
 .heroJudul {
-  font-size: 42px;
+  font-size: clamp(36px, 4.5vw, 58px);
   line-height: 1.15;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -1.4px;
   margin: 0 0 20px;
   max-width: 15ch;
 }
@@ -175,7 +199,7 @@
   font-weight: 700;
   color: var(--white);
   background: var(--primary);
-  padding: 13px 26px;
+  padding: 14px 24px;
   border-radius: 9px;
   text-decoration: none;
   display: inline-block;
@@ -183,6 +207,8 @@
 
 .tombolUtama:hover {
   background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(var(--cn-primary-rgb), 0.2);
 }
 
 .tombolSekunder {
@@ -200,26 +226,58 @@
 .tombolSekunder:hover {
   border-color: var(--primary);
   color: var(--primary);
+  background: var(--white);
+  transform: translateY(-2px);
+}
+
+.tombolMasukKecil:hover {
+  background: var(--primary);
 }
 
 /* ---- Hero visual: mockup dashboard ---- */
 
 .heroVisual {
   animation: naikMasuk 0.7s ease 0.1s both;
+  position: relative;
+}
+
+.heroVisual::before,
+.heroVisual::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  z-index: -1;
+}
+
+.heroVisual::before {
+  width: 190px;
+  height: 190px;
+  top: -42px;
+  right: -30px;
+  background: var(--cn-tint);
+}
+
+.heroVisual::after {
+  width: 110px;
+  height: 110px;
+  bottom: -28px;
+  left: -34px;
+  background: var(--cn-coral-tint);
 }
 
 .mockupWindow {
   background: var(--white);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  box-shadow: 0 24px 60px rgba(13, 59, 102, 0.12);
+  border-radius: 22px;
+  box-shadow: 0 28px 70px rgba(var(--cn-navy-rgb), 0.16);
+  transform: rotate(1deg);
   overflow: hidden;
 }
 
 .mockupBar {
   display: flex;
   gap: 6px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -227,8 +285,12 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--line);
+  background: var(--cn-coral);
 }
+
+.mockupBar span:first-child { background: var(--coral); }
+.mockupBar span:nth-child(2) { background: var(--cn-coral); }
+.mockupBar span:last-child { background: var(--cn-success); }
 
 .mockupBody {
   display: flex;
@@ -236,9 +298,9 @@
 }
 
 .mockupSidebar {
-  width: 64px;
+  width: 78px;
   background: var(--navy);
-  padding: 16px 10px;
+  padding: 20px 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -248,26 +310,26 @@
 .mockupSidebarItemAktif {
   height: 8px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(var(--cn-white-rgb), 0.18);
 }
 
 .mockupSidebarItemAktif {
-  background: var(--primary);
+  background: var(--coral);
 }
 
 .mockupKonten {
   flex: 1;
-  padding: 18px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: var(--tint);
+  background: var(--cn-tint);
 }
 
 .mockupKartuKelas {
   background: var(--white);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 14px;
 }
 
@@ -275,7 +337,7 @@
   width: 20px;
   height: 20px;
   border-radius: 6px;
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--cn-primary));
   margin-bottom: 10px;
 }
 
@@ -283,7 +345,7 @@
   width: 70%;
   height: 8px;
   border-radius: 4px;
-  background: #dbeafe;
+  background: var(--cn-tint);
   margin-bottom: 6px;
 }
 
@@ -299,7 +361,7 @@
 .statsWadah {
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  background: var(--tint);
+  background: var(--cn-tint);
 }
 
 .stats {
@@ -307,8 +369,8 @@
   margin: 0 auto;
   padding: 32px 24px;
   display: flex;
-  justify-content: center;
-  gap: 64px;
+  justify-content: space-between;
+  gap: 32px;
   flex-wrap: wrap;
 }
 
@@ -326,7 +388,7 @@
 }
 
 .statAngkaSorot {
-  color: var(--amber-dark);
+  color: var(--coral-dark);
 }
 
 .statLabel {
@@ -385,6 +447,16 @@
   grid-template-columns: 1fr 1fr;
   gap: 48px;
   align-items: center;
+  padding: 24px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+}
+
+.baFitur:hover {
+  background: var(--white);
+  border-color: var(--line);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 38px rgba(var(--cn-navy-rgb), 0.08);
 }
 
 .baFiturTerbalik {
@@ -409,8 +481,8 @@
 }
 
 .fiturVisual {
-  background: var(--tint);
-  border-radius: 16px;
+  background: linear-gradient(145deg, var(--cn-tint), var(--cn-coral-tint));
+  border-radius: 18px;
   min-height: 180px;
   display: flex;
   align-items: center;
@@ -423,12 +495,16 @@
   border-radius: 12px;
   background: linear-gradient(135deg, var(--primary), var(--navy));
   opacity: 0.85;
+  box-shadow: 16px 16px 0 rgba(var(--cn-coral-rgb), 0.35);
+  transform: rotate(-5deg);
 }
 
 /* ---------------- ROLE ---------------- */
 
 .roleSeksi {
   background: var(--navy);
+  position: relative;
+  overflow: hidden;
   padding: 96px 24px;
 }
 
@@ -442,7 +518,7 @@
 
 .subSeksiTerang {
   text-align: center;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(var(--cn-white-rgb), 0.7);
   font-size: 15px;
   max-width: 50ch;
   margin: 0 auto 48px;
@@ -457,8 +533,8 @@
 }
 
 .kartuRole {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(var(--cn-white-rgb), 0.06);
+  border: 1px solid rgba(var(--cn-white-rgb), 0.12);
   border-radius: 14px;
   padding: 22px;
   display: flex;
@@ -466,11 +542,17 @@
   align-items: flex-start;
 }
 
+.kartuRole:hover {
+  background: rgba(var(--cn-white-rgb), 0.12);
+  border-color: rgba(var(--cn-white-rgb), 0.25);
+  transform: translateY(-5px);
+}
+
 .inisialRole {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: var(--primary);
+  background: var(--coral);
   color: var(--white);
   font-family: "Sora", sans-serif;
   font-weight: 700;
@@ -490,7 +572,7 @@
 .deskripsiRole {
   font-size: 13px;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(var(--cn-white-rgb), 0.68);
   margin: 0;
 }
 
@@ -523,12 +605,12 @@
 }
 
 .kolomSebelum {
-  background: #fafafa;
+  background: var(--cn-surface);
 }
 
 .kolomSesudah {
-  background: var(--amber-tint);
-  border-color: #f0d9a8;
+  background: var(--coral-tint);
+  border-color: var(--cn-coral-tint);
 }
 
 .labelKolom {
@@ -540,7 +622,7 @@
 }
 
 .kolomSesudah .labelKolom {
-  color: var(--amber-dark);
+  color: var(--coral-dark);
 }
 
 .kolomSebelum ul,
@@ -570,7 +652,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #c9ccd1;
+  background: var(--cn-line);
 }
 
 .kolomSesudah li::before {
@@ -581,7 +663,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--amber);
+  background: var(--coral);
 }
 
 /* ---------------- JURUSAN ---------------- */
@@ -606,9 +688,16 @@
   font-weight: 600;
   color: var(--navy);
   background: var(--tint);
-  border: 1px solid #cfe6fb;
+  border: 1px solid var(--cn-tint);
   padding: 10px 20px;
   border-radius: 999px;
+}
+
+.chipJurusan:hover {
+  color: var(--white);
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-2px);
 }
 
 /* ---------------- CTA ---------------- */
@@ -616,7 +705,7 @@
 .cta {
   text-align: center;
   padding: 96px 24px;
-  background: linear-gradient(180deg, var(--white), var(--tint));
+  background: linear-gradient(135deg, var(--cn-tint) 0%, var(--cn-coral-tint) 100%);
 }
 
 .ctaJudul {
@@ -664,6 +753,8 @@
   .hero {
     grid-template-columns: 1fr;
     padding-top: 48px;
+    padding-bottom: 72px;
+    gap: 44px;
   }
 
   .heroJudul {
@@ -675,10 +766,15 @@
     order: -1;
   }
 
+  .mockupWindow {
+    transform: none;
+  }
+
   .baFitur,
   .baFiturTerbalik {
     grid-template-columns: 1fr;
     direction: ltr;
+    padding: 18px;
   }
 
   .fiturVisual {
@@ -696,5 +792,57 @@
 
   .judulSeksi {
     font-size: 24px;
+  }
+
+  .stats {
+    justify-content: flex-start;
+    gap: 24px 38px;
+  }
+}
+
+@media (max-width: 520px) {
+  .navbarInner,
+  .hero,
+  .stats,
+  .tentang,
+  .fitur,
+  .kenapa,
+  .jurusanSeksi {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .heroJudul {
+    font-size: 35px;
+  }
+
+  .heroSub {
+    font-size: 15px;
+  }
+
+  .mockupBody {
+    min-height: 220px;
+  }
+
+  .mockupSidebar {
+    width: 58px;
+  }
+
+  .mockupKonten {
+    padding: 14px;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statAngka {
+    font-size: 30px;
+  }
+
+  .heroTombol > * {
+    width: 100%;
+    text-align: center;
   }
 }

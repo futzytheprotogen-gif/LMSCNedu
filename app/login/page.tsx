@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import styles from "./page.module.css";
 
 type TipeAkun = "ADMIN" | "GURU" | "SISWA";
 
@@ -34,7 +35,7 @@ const KONFIGURASI_PORTAL: Record<
   },
 };
 
-const WARNA_PRIMARY = "#2196f3";
+const WARNA_PRIMARY = "var(--cn-primary)";
 
 export default function HalamanLogin() {
   const router = useRouter();
@@ -98,14 +99,14 @@ export default function HalamanLogin() {
   }
 
   return (
-    <main style={estilo.halaman}>
+    <main className={styles.halaman} style={estilo.halaman}>
       {/* Decorative background */}
       <div style={estilo.backgroundGlow1} />
       <div style={estilo.backgroundGlow2} />
 
-      <div style={estilo.wrapper}>
+      <div className={styles.wrapper} style={estilo.wrapper}>
         {/* LEFT SIDE */}
-        <section style={estilo.panelKiri}>
+        <section className={styles.panelKiri} style={estilo.panelKiri}>
           <div style={estilo.logoArea}>
             <div style={estilo.logo}>
               CN
@@ -122,12 +123,12 @@ export default function HalamanLogin() {
             </div>
           </div>
 
-          <div style={estilo.heroContent}>
+          <div className={styles.heroContent} style={estilo.heroContent}>
             <span style={estilo.heroBadge}>
               ✦ DIGITAL LEARNING PLATFORM
             </span>
 
-            <h1 style={estilo.heroTitle}>
+            <h1 className={styles.heroTitle} style={estilo.heroTitle}>
               Belajar.
               <br />
               Berkembang.
@@ -137,7 +138,7 @@ export default function HalamanLogin() {
               </span>
             </h1>
 
-            <p style={estilo.heroDescription}>
+            <p className={styles.heroDescription} style={estilo.heroDescription}>
               Satu ruang digital untuk menghubungkan
               siswa, guru, dan pengelolaan pembelajaran
               di lingkungan Citra Negara.
@@ -145,7 +146,7 @@ export default function HalamanLogin() {
           </div>
 
           {/* Decorative visual */}
-          <div style={estilo.visual}>
+          <div className={styles.visual} style={estilo.visual}>
             <div style={estilo.visualCircleLarge} />
             <div style={estilo.visualCircleSmall} />
 
@@ -174,13 +175,13 @@ export default function HalamanLogin() {
             </div>
           </div>
 
-          <div style={estilo.footerKiri}>
+          <div className={styles.footerKiri} style={estilo.footerKiri}>
             © {new Date().getFullYear()} CN Edu
           </div>
         </section>
 
         {/* RIGHT SIDE */}
-        <section style={estilo.panelKanan}>
+        <section className={styles.panelKanan} style={estilo.panelKanan}>
           <div style={estilo.formContainer}>
             <div style={estilo.formHeader}>
               <span style={estilo.smallTitle}>
@@ -202,7 +203,7 @@ export default function HalamanLogin() {
                 Masuk sebagai
               </span>
 
-              <div style={estilo.barisTab}>
+              <div className={styles.barisTab} style={estilo.barisTab}>
                 {(Object.keys(
                   KONFIGURASI_PORTAL
                 ) as TipeAkun[]).map((tab) => {
@@ -211,6 +212,7 @@ export default function HalamanLogin() {
                   return (
                     <button
                       key={tab}
+                      className={styles.tab}
                       type="button"
                       onClick={() => pindahTab(tab)}
                       disabled={sedangProses}
@@ -427,10 +429,9 @@ const estilo = {
     justifyContent: "center",
     padding: "24px",
     background:
-      "linear-gradient(135deg, #f7fbff 0%, #ffffff 55%, #f3f8fd 100%)",
+      "linear-gradient(135deg, var(--cn-tint) 0%, var(--cn-surface) 55%, var(--cn-coral-tint) 100%)",
     overflow: "hidden" as const,
-    fontFamily:
-      "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    fontFamily: "inherit",
   },
 
   backgroundGlow1: {
@@ -439,7 +440,7 @@ const estilo = {
     height: "420px",
     borderRadius: "50%",
     background:
-      "rgba(33, 150, 243, 0.08)",
+      "rgba(var(--cn-primary-rgb), 0.08)",
     top: "-180px",
     right: "-100px",
     filter: "blur(2px)",
@@ -451,7 +452,7 @@ const estilo = {
     height: "300px",
     borderRadius: "50%",
     background:
-      "rgba(33, 150, 243, 0.05)",
+      "rgba(var(--cn-coral-rgb), 0.08)",
     bottom: "-130px",
     left: "-100px",
   },
@@ -467,10 +468,10 @@ const estilo = {
     minHeight: "650px",
     overflow: "hidden" as const,
     borderRadius: "26px",
-    backgroundColor: "#ffffff",
-    border: "1px solid #e7edf4",
+    backgroundColor: "var(--cn-surface)",
+    border: "1px solid var(--cn-tint)",
     boxShadow:
-      "0 25px 70px rgba(30, 60, 90, 0.10)",
+      "0 25px 70px rgba(var(--cn-navy-rgb), 0.10)",
   },
 
   /* LEFT */
@@ -482,8 +483,8 @@ const estilo = {
     padding: "38px",
     overflow: "hidden" as const,
     background:
-      "linear-gradient(145deg, #f5faff 0%, #edf7ff 100%)",
-    borderRight: "1px solid #e8f0f7",
+      "linear-gradient(145deg, var(--cn-tint) 0%, var(--cn-coral-tint) 100%)",
+    borderRight: "1px solid var(--cn-tint)",
   },
 
   logoArea: {
@@ -502,17 +503,17 @@ const estilo = {
     justifyContent: "center",
     borderRadius: "11px",
     backgroundColor: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "14px",
     fontWeight: 800,
     boxShadow:
-      "0 7px 18px rgba(33, 150, 243, 0.25)",
+      "0 7px 18px rgba(var(--cn-primary-rgb), 0.25)",
   },
 
   logoText: {
     display: "block",
     fontSize: "16px",
-    color: "#172033",
+    color: "var(--cn-navy)",
     lineHeight: 1.1,
   },
 
@@ -520,7 +521,7 @@ const estilo = {
     display: "block",
     marginTop: "3px",
     fontSize: "9px",
-    color: "#8a97a8",
+    color: "var(--cn-coral)",
     letterSpacing: "0.1px",
   },
 
@@ -535,8 +536,8 @@ const estilo = {
     alignItems: "center",
     padding: "6px 9px",
     borderRadius: "6px",
-    backgroundColor: "#ffffff",
-    border: "1px solid #dcebf8",
+    backgroundColor: "var(--cn-surface)",
+    border: "1px solid var(--cn-tint)",
     color: WARNA_PRIMARY,
     fontSize: "8px",
     fontWeight: 800,
@@ -545,7 +546,7 @@ const estilo = {
 
   heroTitle: {
     margin: "19px 0 0",
-    color: "#172033",
+    color: "var(--cn-navy)",
     fontSize: "39px",
     lineHeight: 1.12,
     letterSpacing: "-1.5px",
@@ -559,7 +560,7 @@ const estilo = {
   heroDescription: {
     maxWidth: "370px",
     marginTop: "18px",
-    color: "#788699",
+    color: "var(--cn-text)",
     fontSize: "13px",
     lineHeight: 1.75,
   },
@@ -579,7 +580,7 @@ const estilo = {
     width: "230px",
     height: "230px",
     borderRadius: "50%",
-    border: "34px solid rgba(33, 150, 243, 0.08)",
+    border: "34px solid rgba(var(--cn-primary-rgb), 0.08)",
   },
 
   visualCircleSmall: {
@@ -590,7 +591,7 @@ const estilo = {
     height: "90px",
     borderRadius: "50%",
     background:
-      "rgba(33, 150, 243, 0.08)",
+      "rgba(var(--cn-coral-rgb), 0.14)",
   },
 
   floatingCard1: {
@@ -602,10 +603,10 @@ const estilo = {
     gap: "10px",
     padding: "11px 14px",
     borderRadius: "11px",
-    backgroundColor: "rgba(255,255,255,0.92)",
-    border: "1px solid #e1edf7",
+    backgroundColor: "rgba(var(--cn-white-rgb), 0.92)",
+    border: "1px solid var(--cn-tint)",
     boxShadow:
-      "0 10px 25px rgba(50, 90, 120, 0.08)",
+      "0 10px 25px rgba(var(--cn-primary-rgb), 0.08)",
   },
 
   floatingCard2: {
@@ -617,10 +618,10 @@ const estilo = {
     gap: "10px",
     padding: "11px 14px",
     borderRadius: "11px",
-    backgroundColor: "rgba(255,255,255,0.92)",
-    border: "1px solid #e1edf7",
+    backgroundColor: "rgba(var(--cn-white-rgb), 0.92)",
+    border: "1px solid var(--cn-tint)",
     boxShadow:
-      "0 10px 25px rgba(50, 90, 120, 0.08)",
+      "0 10px 25px rgba(var(--cn-primary-rgb), 0.08)",
   },
 
   miniIconBlue: {
@@ -630,7 +631,7 @@ const estilo = {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "8px",
-    backgroundColor: "#edf7ff",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     fontWeight: 800,
     fontSize: "13px",
@@ -643,22 +644,22 @@ const estilo = {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "8px",
-    backgroundColor: "#eefaf4",
-    color: "#28a66b",
+    backgroundColor: "var(--cn-success-tint)",
+    color: "var(--cn-success)",
     fontWeight: 800,
     fontSize: "13px",
   },
 
   floatingLabel: {
     display: "block",
-    color: "#929cab",
+    color: "var(--cn-muted)",
     fontSize: "8px",
     marginBottom: "2px",
   },
 
   floatingValue: {
     display: "block",
-    color: "#334054",
+    color: "var(--cn-coral-dark)",
     fontSize: "10px",
     fontWeight: 750,
   },
@@ -667,7 +668,7 @@ const estilo = {
     position: "absolute" as const,
     bottom: "24px",
     left: "38px",
-    color: "#a0aaba",
+    color: "var(--cn-coral)",
     fontSize: "9px",
   },
 
@@ -678,7 +679,7 @@ const estilo = {
     alignItems: "center",
     justifyContent: "center",
     padding: "50px 55px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
   },
 
   formContainer: {
@@ -701,7 +702,7 @@ const estilo = {
 
   judul: {
     margin: 0,
-    color: "#172033",
+    color: "var(--cn-navy)",
     fontSize: "27px",
     fontWeight: 800,
     letterSpacing: "-0.7px",
@@ -709,7 +710,7 @@ const estilo = {
 
   subtitle: {
     margin: "8px 0 0",
-    color: "#8994a5",
+    color: "var(--cn-muted)",
     fontSize: "12px",
   },
 
@@ -720,7 +721,7 @@ const estilo = {
   roleLabel: {
     display: "block",
     marginBottom: "8px",
-    color: "#4b5668",
+    color: "var(--cn-coral)",
     fontSize: "11px",
     fontWeight: 700,
   },
@@ -731,8 +732,8 @@ const estilo = {
     gap: "5px",
     padding: "4px",
     borderRadius: "11px",
-    backgroundColor: "#f4f7fa",
-    border: "1px solid #e9eef3",
+    backgroundColor: "var(--cn-coral-tint)",
+    border: "1px solid var(--cn-coral-tint)",
   },
 
   tab: {
@@ -744,7 +745,7 @@ const estilo = {
     border: "none",
     borderRadius: "8px",
     backgroundColor: "transparent",
-    color: "#7c8797",
+    color: "var(--cn-text)",
     fontSize: "11px",
     fontWeight: 700,
     cursor: "pointer",
@@ -753,10 +754,10 @@ const estilo = {
   },
 
   tabAktif: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     color: WARNA_PRIMARY,
     boxShadow:
-      "0 3px 10px rgba(25, 60, 90, 0.08)",
+      "0 3px 10px rgba(var(--cn-primary-rgb), 0.08)",
   },
 
   tabIcon: {
@@ -766,14 +767,14 @@ const estilo = {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "6px",
-    backgroundColor: "#e9eef3",
-    color: "#778394",
+    backgroundColor: "var(--cn-coral-tint)",
+    color: "var(--cn-text)",
     fontSize: "9px",
     fontWeight: 800,
   },
 
   tabIconAktif: {
-    backgroundColor: "#eaf6ff",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
   },
 
@@ -782,7 +783,7 @@ const estilo = {
     alignItems: "center",
     gap: "6px",
     marginTop: "8px",
-    color: "#98a2b1",
+    color: "var(--cn-muted)",
     fontSize: "10px",
   },
 
@@ -790,7 +791,7 @@ const estilo = {
     width: "6px",
     height: "6px",
     borderRadius: "50%",
-    backgroundColor: "#35b879",
+    backgroundColor: "var(--cn-success)",
   },
 
   /* FORM */
@@ -808,7 +809,7 @@ const estilo = {
   },
 
   labelText: {
-    color: "#3e4a5d",
+    color: "var(--cn-coral)",
     fontSize: "11px",
     fontWeight: 700,
   },
@@ -823,7 +824,7 @@ const estilo = {
     position: "absolute" as const,
     left: "13px",
     zIndex: 2,
-    color: "#9aa5b4",
+    color: "var(--cn-coral)",
     fontSize: "11px",
     fontWeight: 800,
     pointerEvents: "none" as const,
@@ -835,10 +836,10 @@ const estilo = {
     boxSizing: "border-box" as const,
     padding: "0 42px",
     borderRadius: "9px",
-    border: "1px solid #dfe5eb",
+    border: "1px solid var(--cn-coral-tint)",
     outline: "none",
-    backgroundColor: "#ffffff",
-    color: "#263246",
+    backgroundColor: "var(--cn-surface)",
+    color: "var(--cn-coral-dark)",
     fontSize: "12px",
     transition:
       "border-color 0.2s ease, box-shadow 0.2s ease",
@@ -855,7 +856,7 @@ const estilo = {
     border: "none",
     borderRadius: "7px",
     backgroundColor: "transparent",
-    color: "#929dad",
+    color: "var(--cn-coral)",
     fontSize: "13px",
     cursor: "pointer",
   },
@@ -866,8 +867,8 @@ const estilo = {
     gap: "9px",
     padding: "11px",
     borderRadius: "9px",
-    border: "1px solid #f1d5d5",
-    backgroundColor: "#fff7f7",
+    border: "1px solid var(--cn-danger-tint)",
+    backgroundColor: "var(--cn-danger-tint)",
   },
 
   errorIcon: {
@@ -878,22 +879,22 @@ const estilo = {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "50%",
-    backgroundColor: "#dc5757",
-    color: "#ffffff",
+    backgroundColor: "var(--cn-danger)",
+    color: "var(--cn-surface)",
     fontSize: "10px",
     fontWeight: 800,
   },
 
   errorTitle: {
     display: "block",
-    color: "#b94c4c",
+    color: "var(--cn-danger)",
     fontSize: "10px",
     marginBottom: "2px",
   },
 
   errorText: {
     margin: 0,
-    color: "#c06a6a",
+    color: "var(--cn-danger)",
     fontSize: "10px",
     lineHeight: 1.45,
   },
@@ -909,12 +910,12 @@ const estilo = {
     border: "none",
     borderRadius: "9px",
     backgroundColor: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "12px",
     fontWeight: 750,
     cursor: "pointer",
     boxShadow:
-      "0 7px 18px rgba(33, 150, 243, 0.20)",
+      "0 7px 18px rgba(var(--cn-primary-rgb), 0.20)",
     transition:
       "all 0.2s ease",
   },
@@ -932,8 +933,8 @@ const estilo = {
   spinner: {
     width: "15px",
     height: "15px",
-    border: "2px solid rgba(255,255,255,0.35)",
-    borderTopColor: "#ffffff",
+    border: "2px solid rgba(var(--cn-white-rgb), 0.35)",
+    borderTopColor: "var(--cn-surface)",
     borderRadius: "50%",
     animation:
       "spin 0.7s linear infinite",
@@ -948,7 +949,7 @@ const estilo = {
   },
 
   lupaText: {
-    color: "#9aa3b0",
+    color: "var(--cn-muted)",
     fontSize: "10px",
   },
 
@@ -965,12 +966,12 @@ const estilo = {
     justifyContent: "center",
     gap: "6px",
     marginTop: "27px",
-    color: "#a3acb8",
+    color: "var(--cn-muted)",
     fontSize: "9px",
   },
 
   lockIcon: {
-    color: "#7fc29f",
+    color: "var(--cn-success)",
     fontSize: "12px",
   },
 };

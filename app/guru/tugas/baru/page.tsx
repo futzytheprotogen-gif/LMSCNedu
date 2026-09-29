@@ -1,24 +1,33 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const WARNA = {
-  primary: "#2196f3",
-  primaryDark: "#1976d2",
-  primarySoft: "#e8f3fe",
-  background: "#f8fafc",
-  white: "#ffffff",
-  text: "#0f172a",
-  textSecondary: "#475569",
-  textMuted: "#94a3b8",
-  border: "#e2e8f0",
-  borderHover: "#cbd5e1",
-  red: "#ef4444",
-  redSoft: "#fef2f2",
+  primary: "var(--cn-primary)",
+  primaryDark: "var(--cn-primary)",
+  primarySoft: "var(--cn-tint)",
+  background: "var(--cn-tint)",
+  white: "var(--cn-surface)",
+  text: "var(--cn-navy)",
+  textSecondary: "var(--cn-coral)",
+  textMuted: "var(--cn-coral)",
+  border: "var(--cn-coral-tint)",
+  borderHover: "var(--cn-coral)",
+  red: "var(--cn-danger)",
+  redSoft: "var(--cn-danger-tint)",
 };
 
 export default function HalamanBuatTugasCepat() {
+  return (
+    <Suspense fallback={<div style={{ padding: "32px 20px", color: "var(--cn-muted)" }}>Memuat formulir tugas...</div>}>
+      <FormBuatTugas />
+    </Suspense>
+  );
+}
+
+function FormBuatTugas() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const kelasId = searchParams.get("kelasId");
@@ -346,7 +355,7 @@ const estilo = {
     borderRadius: "16px",
     border: `1px solid ${WARNA.border}`,
     padding: "24px",
-    boxShadow: "0 4px 12px rgba(15, 23, 42, 0.03)",
+    boxShadow: "0 4px 12px rgba(var(--cn-navy-rgb), 0.03)",
     display: "flex",
     flexDirection: "column" as const,
     gap: "20px",
@@ -419,7 +428,7 @@ const estilo = {
     color: WARNA.text,
   },
   areaLampiran: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: "var(--cn-tint)",
     padding: "14px",
     borderRadius: "12px",
     border: `1px solid ${WARNA.border}`,
@@ -430,7 +439,7 @@ const estilo = {
   barisTab: {
     display: "flex",
     gap: "6px",
-    backgroundColor: "#e2e8f0",
+    backgroundColor: "var(--cn-coral-tint)",
     borderRadius: "8px",
     padding: "3px",
   },
@@ -449,7 +458,7 @@ const estilo = {
   tabKecilAktif: {
     backgroundColor: WARNA.white,
     color: WARNA.primary,
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+    boxShadow: "0 1px 3px rgba(var(--cn-navy-rgb), 0.1)",
   },
   boxUpload: {
     display: "flex",
@@ -525,11 +534,11 @@ const estilo = {
     borderRadius: "10px",
     border: "none",
     backgroundColor: WARNA.primary,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "13px",
     fontWeight: 700,
     cursor: "pointer",
-    boxShadow: "0 4px 10px rgba(33, 150, 243, 0.2)",
+    boxShadow: "0 4px 10px rgba(var(--cn-primary-rgb), 0.2)",
     transition: "background-color 0.2s ease",
   },
   tombolDisabled: {

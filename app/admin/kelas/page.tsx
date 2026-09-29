@@ -7,9 +7,9 @@
   import styles from "./page.module.css";
 
   const WARNA = {
-    navy: "#214E84",
-    blue: "#2870E8",
-    teal: "#70C1C4",
+    navy: "var(--cn-primary-dark)",
+    blue: "var(--cn-primary)",
+    teal: "var(--cn-cyan)",
   };
 
   export default function HalamanBuatKelasAdmin() {

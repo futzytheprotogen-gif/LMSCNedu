@@ -1,0 +1,29 @@
+@media (min-width: 900px) {
+  .navbar {
+    padding-left: 260px !important;
+  }
+
+  .hamburger {
+    display: none !important;
+  }
+
+  .sidebar {
+    top: 56px !important;
+    transform: translateX(0) !important;
+    box-shadow: none !important;
+  }
+
+  .sidebarHeader {
+    display: none !important;
+  }
+
+  .content {
+    padding-left: 240px !important;
+  }
+}
+
+@media (max-width: 899px) {
+  .sidebar {
+    max-width: calc(100vw - 40px);
+  }
+}

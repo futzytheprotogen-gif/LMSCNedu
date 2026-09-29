@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
-const WARNA_PRIMARY = "#2196f3";
+const WARNA_PRIMARY = "var(--cn-primary)";
 
 type TipeSoal = "PILIHAN_GANDA" | "CHECKBOX" | "ESSAY";
 
@@ -111,7 +112,8 @@ export default function HalamanDetailAsesmen() {
   }, [asesmenId]);
 
   useEffect(() => {
-    muatDetail();
+    const timer = window.setTimeout(() => { void muatDetail(); }, 0);
+    return () => window.clearTimeout(timer);
   }, [muatDetail]);
 
   /* =========================
@@ -499,8 +501,8 @@ export default function HalamanDetailAsesmen() {
 
         .cnedu-card-hover:hover {
           transform: translateY(-2px);
-          box-shadow: 0 10px 25px rgba(15, 23, 42, 0.07);
-          border-color: #dbeafe !important;
+          box-shadow: 0 10px 25px rgba(var(--cn-navy-rgb), 0.07);
+          border-color: var(--cn-tint) !important;
         }
 
         .cnedu-button {
@@ -515,6 +517,37 @@ export default function HalamanDetailAsesmen() {
         }
 
         @media (max-width: 760px) {
+          .cnedu-hero {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 16px !important;
+          }
+
+          .cnedu-hero-left {
+            width: 100%;
+            min-width: 0;
+          }
+
+          .cnedu-hero-info {
+            flex: 1;
+            min-width: 0;
+          }
+
+          .cnedu-hero-actions {
+            width: 100%;
+            flex-shrink: 1 !important;
+            align-items: stretch !important;
+          }
+
+          .cnedu-hero-actions button {
+            width: 100%;
+            white-space: normal;
+          }
+
+          .cnedu-hero-title {
+            overflow-wrap: anywhere;
+          }
+
           .cnedu-header {
             flex-direction: column !important;
           }
@@ -537,6 +570,17 @@ export default function HalamanDetailAsesmen() {
 
           .cnedu-question-delete {
             margin-left: 0 !important;
+          }
+
+          .cnedu-bottom-card {
+            align-items: stretch !important;
+            flex-direction: column !important;
+          }
+
+          .cnedu-bottom-action {
+            width: 100%;
+            justify-content: center;
+            text-align: center;
           }
         }
 
@@ -577,15 +621,15 @@ export default function HalamanDetailAsesmen() {
             HERO
         ================================= */}
 
-        <section style={estilo.hero}>
-          <div style={estilo.heroLeft}>
+        <section className="cnedu-hero" style={estilo.hero}>
+          <div className="cnedu-hero-left" style={estilo.heroLeft}>
             <div style={estilo.iconAsesmen}>
               {asesmen.tipe === "KUIS"
                 ? "✦"
                 : "✓"}
             </div>
 
-            <div style={estilo.heroInfo}>
+            <div className="cnedu-hero-info" style={estilo.heroInfo}>
               <div style={estilo.heroMeta}>
                 <span
                   style={{
@@ -607,7 +651,7 @@ export default function HalamanDetailAsesmen() {
                 </span>
               </div>
 
-              <h1 style={estilo.judul}>
+              <h1 className="cnedu-hero-title" style={estilo.judul}>
                 {asesmen.judul}
               </h1>
 
@@ -619,7 +663,7 @@ export default function HalamanDetailAsesmen() {
           </div>
 
           <div
-            className="cnedu-header-actions"
+            className="cnedu-header-actions cnedu-hero-actions"
             style={estilo.heroRight}
           >
             <span
@@ -1043,7 +1087,7 @@ export default function HalamanDetailAsesmen() {
             FOOTER ACTION
         ================================= */}
 
-        <section style={estilo.bottomCard}>
+        <section className="cnedu-bottom-card" style={estilo.bottomCard}>
           <div>
             <strong
               style={estilo.bottomTitle}
@@ -1060,9 +1104,26 @@ export default function HalamanDetailAsesmen() {
             </p>
           </div>
 
+          {asesmen.status === "SELESAI" && (
+            <Link
+              className="cnedu-bottom-action"
+              href={`/guru/asesmen/${asesmen.id}/hasil`}
+              style={{
+                ...estilo.tombolFinalisasiBottom,
+                display: "inline-flex",
+                alignItems: "center",
+                background: "var(--cn-tint)",
+                color: "var(--cn-primary-dark)",
+                textDecoration: "none",
+              }}
+            >
+              Lihat hasil pengumpulan →
+            </Link>
+          )}
+
           {asesmen.status === "PROSES" && (
             <button
-              className="cnedu-button"
+              className="cnedu-button cnedu-bottom-action"
               onClick={finalisasiAsesmen}
               disabled={
                 sedangFinalisasi ||
@@ -1613,8 +1674,8 @@ const estilo = {
   halaman: {
     minHeight: "100vh",
     padding: "28px 32px 50px",
-    backgroundColor: "#f8fafc",
-    color: "#111827",
+    backgroundColor: "var(--cn-tint)",
+    color: "var(--cn-coral-dark)",
   },
 
   /* LOADING */
@@ -1624,45 +1685,45 @@ const estilo = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "var(--cn-tint)",
     padding: "24px",
   },
 
   loadingCard: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    border: "1px solid var(--cn-line)",
     borderRadius: "16px",
     padding: "32px",
     display: "flex",
     flexDirection: "column" as const,
     alignItems: "center",
     gap: "12px",
-    boxShadow: "0 8px 30px rgba(15,23,42,0.06)",
+    boxShadow: "0 8px 30px rgba(var(--cn-navy-rgb), 0.06)",
   },
 
   spinner: {
     width: "28px",
     height: "28px",
-    border: `3px solid #e5e7eb`,
+    border: `3px solid var(--cn-line)`,
     borderTopColor: WARNA_PRIMARY,
     borderRadius: "50%",
   },
 
   loadingText: {
     margin: 0,
-    color: "#6b7280",
+    color: "var(--cn-text)",
     fontSize: "13px",
   },
 
   errorCard: {
     width: "100%",
     maxWidth: "420px",
-    backgroundColor: "#ffffff",
-    border: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    border: "1px solid var(--cn-line)",
     borderRadius: "18px",
     padding: "32px",
     textAlign: "center" as const,
-    boxShadow: "0 12px 40px rgba(15,23,42,0.08)",
+    boxShadow: "0 12px 40px rgba(var(--cn-navy-rgb), 0.08)",
   },
 
   errorIcon: {
@@ -1670,8 +1731,8 @@ const estilo = {
     height: "48px",
     margin: "0 auto 16px",
     borderRadius: "50%",
-    backgroundColor: "#fee2e2",
-    color: "#dc2626",
+    backgroundColor: "var(--cn-danger-tint)",
+    color: "var(--cn-danger)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -1688,7 +1749,7 @@ const estilo = {
   errorText: {
     margin: "0 0 20px",
     fontSize: "13px",
-    color: "#6b7280",
+    color: "var(--cn-text)",
     lineHeight: 1.6,
   },
 
@@ -1702,7 +1763,7 @@ const estilo = {
     marginBottom: "20px",
     border: "none",
     background: "none",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontSize: "13px",
     fontWeight: 600,
     cursor: "pointer",
@@ -1716,8 +1777,8 @@ const estilo = {
   /* HERO */
 
   hero: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    border: "1px solid var(--cn-line)",
     borderRadius: "18px",
     padding: "24px",
     display: "flex",
@@ -1726,7 +1787,7 @@ const estilo = {
     gap: "24px",
     marginBottom: "18px",
     boxShadow:
-      "0 5px 20px rgba(15,23,42,0.035)",
+      "0 5px 20px rgba(var(--cn-navy-rgb), 0.035)",
   },
 
   heroLeft: {
@@ -1742,15 +1803,15 @@ const estilo = {
     flexShrink: 0,
     borderRadius: "14px",
     background:
-      "linear-gradient(135deg, #2196f3, #60a5fa)",
-    color: "#ffffff",
+      "linear-gradient(135deg, var(--cn-primary), var(--cn-primary))",
+    color: "var(--cn-surface)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: "24px",
     fontWeight: 800,
     boxShadow:
-      "0 8px 20px rgba(33,150,243,0.22)",
+      "0 8px 20px rgba(var(--cn-primary-rgb), 0.22)",
   },
 
   heroInfo: {
@@ -1776,22 +1837,22 @@ const estilo = {
   },
 
   badgeKuis: {
-    backgroundColor: "#eff6ff",
-    color: "#2563eb",
+    backgroundColor: "var(--cn-tint)",
+    color: "var(--cn-primary)",
   },
 
   badgeUjian: {
-    backgroundColor: "#f0fdf4",
-    color: "#15803d",
+    backgroundColor: "var(--cn-success-tint)",
+    color: "var(--cn-success)",
   },
 
   dot: {
-    color: "#cbd5e1",
+    color: "var(--cn-coral)",
     fontSize: "12px",
   },
 
   metaText: {
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontSize: "12px",
     fontWeight: 600,
   },
@@ -1801,13 +1862,13 @@ const estilo = {
     fontSize: "25px",
     lineHeight: 1.2,
     fontWeight: 800,
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     letterSpacing: "-0.02em",
   },
 
   heroDescription: {
     margin: "8px 0 0",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontSize: "13px",
     lineHeight: 1.6,
   },
@@ -1831,13 +1892,13 @@ const estilo = {
   },
 
   statusProses: {
-    color: "#92400e",
-    backgroundColor: "#fef3c7",
+    color: "var(--cn-coral)",
+    backgroundColor: "var(--cn-coral-tint)",
   },
 
   statusSelesai: {
-    color: "#166534",
-    backgroundColor: "#dcfce7",
+    color: "var(--cn-success)",
+    backgroundColor: "var(--cn-success-tint)",
   },
 
   statusDot: {
@@ -1851,13 +1912,13 @@ const estilo = {
     border: "none",
     borderRadius: "9px",
     padding: "10px 15px",
-    backgroundColor: "#16a34a",
-    color: "#ffffff",
+    backgroundColor: "var(--cn-success)",
+    color: "var(--cn-surface)",
     fontSize: "13px",
     fontWeight: 700,
     cursor: "pointer",
     boxShadow:
-      "0 5px 15px rgba(22,163,74,0.18)",
+      "0 5px 15px rgba(var(--cn-success-rgb), 0.18)",
   },
 
   /* STATS */
@@ -1871,8 +1932,8 @@ const estilo = {
   },
 
   statCard: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    border: "1px solid var(--cn-line)",
     borderRadius: "14px",
     padding: "17px",
     minWidth: 0,
@@ -1889,7 +1950,7 @@ const estilo = {
     width: "28px",
     height: "28px",
     borderRadius: "8px",
-    backgroundColor: "#eff6ff",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     display: "flex",
     alignItems: "center",
@@ -1900,21 +1961,21 @@ const estilo = {
 
   statLabel: {
     fontSize: "11px",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontWeight: 600,
   },
 
   statValue: {
     display: "block",
     fontSize: "22px",
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     lineHeight: 1,
     marginBottom: "6px",
   },
 
   statDescription: {
     fontSize: "10px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
   },
 
   /* INFO */
@@ -1924,8 +1985,8 @@ const estilo = {
     alignItems: "flex-start",
     gap: "12px",
     padding: "14px 16px",
-    backgroundColor: "#eff6ff",
-    border: "1px solid #dbeafe",
+    backgroundColor: "var(--cn-tint)",
+    border: "1px solid var(--cn-tint)",
     borderRadius: "12px",
     marginBottom: "18px",
   },
@@ -1935,8 +1996,8 @@ const estilo = {
     height: "26px",
     flexShrink: 0,
     borderRadius: "50%",
-    backgroundColor: "#dbeafe",
-    color: "#2563eb",
+    backgroundColor: "var(--cn-tint)",
+    color: "var(--cn-primary)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -1946,14 +2007,14 @@ const estilo = {
 
   infoBannerTitle: {
     display: "block",
-    color: "#1e40af",
+    color: "var(--cn-primary-dark)",
     fontSize: "12px",
     marginBottom: "3px",
   },
 
   infoBannerText: {
     margin: 0,
-    color: "#3b82f6",
+    color: "var(--cn-primary)",
     fontSize: "11px",
     lineHeight: 1.5,
   },
@@ -1961,8 +2022,8 @@ const estilo = {
   /* SECTION */
 
   section: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    border: "1px solid var(--cn-line)",
     borderRadius: "16px",
     padding: "20px",
     marginBottom: "18px",
@@ -1986,13 +2047,13 @@ const estilo = {
     margin: 0,
     fontSize: "16px",
     fontWeight: 800,
-    color: "#0f172a",
+    color: "var(--cn-navy)",
   },
 
   sectionDescription: {
     margin: "4px 0 0",
     fontSize: "11px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
   },
 
   countBadge: {
@@ -2000,7 +2061,7 @@ const estilo = {
     height: "24px",
     padding: "0 7px",
     borderRadius: "999px",
-    backgroundColor: "#eff6ff",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     display: "inline-flex",
     alignItems: "center",
@@ -2014,12 +2075,12 @@ const estilo = {
     borderRadius: "9px",
     padding: "10px 14px",
     backgroundColor: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "12px",
     fontWeight: 700,
     cursor: "pointer",
     boxShadow:
-      "0 5px 14px rgba(33,150,243,0.16)",
+      "0 5px 14px rgba(var(--cn-primary-rgb), 0.16)",
     flexShrink: 0,
   },
 
@@ -2028,17 +2089,17 @@ const estilo = {
     borderRadius: "8px",
     padding: "8px 12px",
     backgroundColor: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "11px",
     fontWeight: 700,
     cursor: "pointer",
   },
 
   tombolOutline: {
-    border: "1px solid #bfdbfe",
+    border: "1px solid var(--cn-tint)",
     borderRadius: "8px",
     padding: "8px 12px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     color: WARNA_PRIMARY,
     fontSize: "12px",
     fontWeight: 700,
@@ -2060,9 +2121,9 @@ const estilo = {
     alignItems: "center",
     gap: "11px",
     padding: "12px",
-    border: "1px solid #e5e7eb",
+    border: "1px solid var(--cn-line)",
     borderRadius: "11px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
   },
 
   kelasIcon: {
@@ -2070,7 +2131,7 @@ const estilo = {
     height: "36px",
     flexShrink: 0,
     borderRadius: "9px",
-    backgroundColor: "#eff6ff",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     display: "flex",
     alignItems: "center",
@@ -2089,7 +2150,7 @@ const estilo = {
 
   kelasNama: {
     fontSize: "12px",
-    color: "#1e293b",
+    color: "var(--cn-coral-dark)",
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap" as const,
@@ -2097,15 +2158,15 @@ const estilo = {
 
   kelasStatus: {
     fontSize: "10px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
   },
 
   checkKelas: {
     width: "22px",
     height: "22px",
     borderRadius: "50%",
-    backgroundColor: "#dcfce7",
-    color: "#16a34a",
+    backgroundColor: "var(--cn-success-tint)",
+    color: "var(--cn-success)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -2122,10 +2183,10 @@ const estilo = {
   },
 
   kartuSoal: {
-    border: "1px solid #e5e7eb",
+    border: "1px solid var(--cn-line)",
     borderRadius: "13px",
     padding: "16px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
   },
 
   headerSoal: {
@@ -2139,8 +2200,8 @@ const estilo = {
     height: "38px",
     flexShrink: 0,
     borderRadius: "9px",
-    backgroundColor: "#f1f5f9",
-    color: "#475569",
+    backgroundColor: "var(--cn-coral-tint)",
+    color: "var(--cn-coral)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -2164,22 +2225,22 @@ const estilo = {
     display: "inline-flex",
     padding: "4px 7px",
     borderRadius: "5px",
-    backgroundColor: "#eff6ff",
-    color: "#2563eb",
+    backgroundColor: "var(--cn-tint)",
+    color: "var(--cn-primary)",
     fontSize: "9px",
     fontWeight: 800,
   },
 
   jumlahOpsi: {
     fontSize: "10px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
   },
 
   teksPertanyaan: {
     margin: 0,
     fontSize: "14px",
     lineHeight: 1.55,
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     fontWeight: 600,
   },
 
@@ -2188,7 +2249,7 @@ const estilo = {
     flexShrink: 0,
     border: "none",
     background: "transparent",
-    color: "#ef4444",
+    color: "var(--cn-danger)",
     fontSize: "11px",
     fontWeight: 600,
     cursor: "pointer",
@@ -2210,14 +2271,14 @@ const estilo = {
     gap: "9px",
     minWidth: 0,
     padding: "9px 10px",
-    border: "1px solid #e5e7eb",
+    border: "1px solid var(--cn-line)",
     borderRadius: "8px",
-    backgroundColor: "#fafafa",
+    backgroundColor: "var(--cn-surface)",
   },
 
   opsiBenar: {
-    borderColor: "#bbf7d0",
-    backgroundColor: "#f0fdf4",
+    borderColor: "var(--cn-success-tint)",
+    backgroundColor: "var(--cn-success-tint)",
   },
 
   hurufOpsi: {
@@ -2225,8 +2286,8 @@ const estilo = {
     height: "24px",
     flexShrink: 0,
     borderRadius: "6px",
-    backgroundColor: "#e2e8f0",
-    color: "#64748b",
+    backgroundColor: "var(--cn-coral-tint)",
+    color: "var(--cn-coral)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -2235,20 +2296,20 @@ const estilo = {
   },
 
   hurufOpsiBenar: {
-    backgroundColor: "#22c55e",
-    color: "#ffffff",
+    backgroundColor: "var(--cn-success)",
+    color: "var(--cn-surface)",
   },
 
   teksOpsi: {
     flex: 1,
     minWidth: 0,
-    color: "#334155",
+    color: "var(--cn-coral-dark)",
     fontSize: "11px",
     lineHeight: 1.4,
   },
 
   labelBenar: {
-    color: "#16a34a",
+    color: "var(--cn-success)",
     fontSize: "9px",
     fontWeight: 800,
     whiteSpace: "nowrap" as const,
@@ -2259,8 +2320,8 @@ const estilo = {
     marginLeft: "50px",
     padding: "10px 12px",
     borderRadius: "8px",
-    backgroundColor: "#f8fafc",
-    color: "#64748b",
+    backgroundColor: "var(--cn-tint)",
+    color: "var(--cn-coral)",
     display: "flex",
     alignItems: "center",
     gap: "8px",
@@ -2270,14 +2331,14 @@ const estilo = {
   /* EMPTY */
 
   emptyState: {
-    border: "1px dashed #cbd5e1",
+    border: "1px dashed var(--cn-coral)",
     borderRadius: "12px",
     padding: "34px 20px",
     display: "flex",
     flexDirection: "column" as const,
     alignItems: "center",
     textAlign: "center" as const,
-    backgroundColor: "#fafafa",
+    backgroundColor: "var(--cn-surface)",
   },
 
   emptyIcon: {
@@ -2285,7 +2346,7 @@ const estilo = {
     height: "42px",
     marginBottom: "10px",
     borderRadius: "11px",
-    backgroundColor: "#eff6ff",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     display: "flex",
     alignItems: "center",
@@ -2296,13 +2357,13 @@ const estilo = {
 
   emptyTitle: {
     fontSize: "13px",
-    color: "#334155",
+    color: "var(--cn-coral-dark)",
   },
 
   emptyText: {
     margin: "5px 0 13px",
     fontSize: "11px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     maxWidth: "350px",
     lineHeight: 1.5,
   },
@@ -2315,9 +2376,9 @@ const estilo = {
     justifyContent: "space-between",
     gap: "18px",
     padding: "18px 20px",
-    backgroundColor: "#0f172a",
+    backgroundColor: "var(--cn-navy)",
     borderRadius: "14px",
-    color: "#ffffff",
+    color: "var(--cn-surface)",
   },
 
   bottomTitle: {
@@ -2328,7 +2389,7 @@ const estilo = {
 
   bottomText: {
     margin: 0,
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "11px",
     lineHeight: 1.5,
   },
@@ -2338,8 +2399,8 @@ const estilo = {
     border: "none",
     borderRadius: "8px",
     padding: "9px 14px",
-    backgroundColor: "#22c55e",
-    color: "#ffffff",
+    backgroundColor: "var(--cn-success)",
+    color: "var(--cn-surface)",
     fontSize: "11px",
     fontWeight: 700,
     cursor: "pointer",
@@ -2352,7 +2413,7 @@ const estilo = {
     inset: 0,
     zIndex: 100,
     padding: "20px",
-    backgroundColor: "rgba(15,23,42,0.48)",
+    backgroundColor: "rgba(var(--cn-navy-rgb), 0.48)",
     backdropFilter: "blur(3px)",
     display: "flex",
     alignItems: "center",
@@ -2364,11 +2425,11 @@ const estilo = {
     maxWidth: "500px",
     maxHeight: "85vh",
     overflowY: "auto" as const,
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     borderRadius: "16px",
     padding: "22px",
     boxShadow:
-      "0 25px 70px rgba(15,23,42,0.22)",
+      "0 25px 70px rgba(var(--cn-navy-rgb), 0.22)",
   },
 
   modalLarge: {
@@ -2376,11 +2437,11 @@ const estilo = {
     maxWidth: "620px",
     maxHeight: "90vh",
     overflowY: "auto" as const,
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     borderRadius: "16px",
     padding: "22px",
     boxShadow:
-      "0 25px 70px rgba(15,23,42,0.22)",
+      "0 25px 70px rgba(var(--cn-navy-rgb), 0.22)",
   },
 
   modalHeader: {
@@ -2402,14 +2463,14 @@ const estilo = {
 
   judulModal: {
     margin: 0,
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     fontSize: "18px",
     fontWeight: 800,
   },
 
   modalDescription: {
     margin: "5px 0 0",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "11px",
   },
 
@@ -2419,8 +2480,8 @@ const estilo = {
     flexShrink: 0,
     border: "none",
     borderRadius: "8px",
-    backgroundColor: "#f1f5f9",
-    color: "#64748b",
+    backgroundColor: "var(--cn-coral-tint)",
+    color: "var(--cn-coral)",
     fontSize: "19px",
     cursor: "pointer",
     lineHeight: 1,
@@ -2435,7 +2496,7 @@ const estilo = {
   fieldLabel: {
     display: "block",
     marginBottom: "7px",
-    color: "#334155",
+    color: "var(--cn-coral-dark)",
     fontSize: "11px",
     fontWeight: 800,
   },
@@ -2453,19 +2514,19 @@ const estilo = {
     justifyContent: "center",
     gap: "6px",
     minHeight: "44px",
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "8px",
-    backgroundColor: "#ffffff",
-    color: "#64748b",
+    backgroundColor: "var(--cn-surface)",
+    color: "var(--cn-coral)",
     fontSize: "10px",
     fontWeight: 700,
     cursor: "pointer",
   },
 
   typeButtonAktif: {
-    borderColor: "#93c5fd",
-    backgroundColor: "#eff6ff",
-    color: "#2563eb",
+    borderColor: "var(--cn-primary)",
+    backgroundColor: "var(--cn-tint)",
+    color: "var(--cn-primary)",
   },
 
   typeIcon: {
@@ -2477,12 +2538,12 @@ const estilo = {
     width: "100%",
     display: "block",
     padding: "11px 12px",
-    border: "1px solid #dbe1e8",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "9px",
     outline: "none",
     resize: "vertical" as const,
-    color: "#0f172a",
-    backgroundColor: "#ffffff",
+    color: "var(--cn-navy)",
+    backgroundColor: "var(--cn-surface)",
     fontSize: "12px",
     lineHeight: 1.5,
   },
@@ -2496,7 +2557,7 @@ const estilo = {
 
   optionHint: {
     fontSize: "9px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
   },
 
   optionList: {
@@ -2510,14 +2571,14 @@ const estilo = {
     alignItems: "center",
     gap: "8px",
     padding: "7px",
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "9px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
   },
 
   optionInputRowActive: {
-    borderColor: "#86efac",
-    backgroundColor: "#f0fdf4",
+    borderColor: "var(--cn-success)",
+    backgroundColor: "var(--cn-success-tint)",
   },
 
   optionSelector: {
@@ -2526,8 +2587,8 @@ const estilo = {
     flexShrink: 0,
     border: "none",
     borderRadius: "7px",
-    backgroundColor: "#f1f5f9",
-    color: "#64748b",
+    backgroundColor: "var(--cn-coral-tint)",
+    color: "var(--cn-coral)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -2537,8 +2598,8 @@ const estilo = {
   },
 
   optionSelectorActive: {
-    backgroundColor: "#22c55e",
-    color: "#ffffff",
+    backgroundColor: "var(--cn-success)",
+    color: "var(--cn-surface)",
   },
 
   inputModern: {
@@ -2547,7 +2608,7 @@ const estilo = {
     border: "none",
     outline: "none",
     background: "transparent",
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     fontSize: "12px",
     padding: "6px 4px",
   },
@@ -2557,7 +2618,7 @@ const estilo = {
     height: "28px",
     border: "none",
     background: "transparent",
-    color: "#ef4444",
+    color: "var(--cn-danger)",
     fontSize: "18px",
     cursor: "pointer",
   },
@@ -2579,9 +2640,9 @@ const estilo = {
     gap: "10px",
     padding: "12px",
     borderRadius: "9px",
-    backgroundColor: "#f8fafc",
-    border: "1px solid #e2e8f0",
-    color: "#64748b",
+    backgroundColor: "var(--cn-tint)",
+    border: "1px solid var(--cn-coral-tint)",
+    color: "var(--cn-coral)",
     fontSize: "11px",
   },
 
@@ -2591,9 +2652,9 @@ const estilo = {
     gap: "8px",
     padding: "10px 12px",
     borderRadius: "8px",
-    backgroundColor: "#fef2f2",
-    border: "1px solid #fecaca",
-    color: "#dc2626",
+    backgroundColor: "var(--cn-danger-tint)",
+    border: "1px solid var(--cn-danger-tint)",
+    color: "var(--cn-danger)",
     fontSize: "11px",
     marginBottom: "15px",
   },
@@ -2604,7 +2665,7 @@ const estilo = {
     gap: "8px",
     marginTop: "20px",
     paddingTop: "16px",
-    borderTop: "1px solid #f1f5f9",
+    borderTop: "1px solid var(--cn-coral-tint)",
   },
 
   modalFooterSingle: {
@@ -2612,15 +2673,15 @@ const estilo = {
     justifyContent: "flex-end",
     marginTop: "18px",
     paddingTop: "15px",
-    borderTop: "1px solid #f1f5f9",
+    borderTop: "1px solid var(--cn-coral-tint)",
   },
 
   tombolBatal: {
-    border: "1px solid #dbe1e8",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "8px",
     padding: "9px 14px",
-    backgroundColor: "#ffffff",
-    color: "#64748b",
+    backgroundColor: "var(--cn-surface)",
+    color: "var(--cn-coral)",
     fontSize: "11px",
     fontWeight: 700,
     cursor: "pointer",
@@ -2631,7 +2692,7 @@ const estilo = {
     borderRadius: "8px",
     padding: "9px 15px",
     backgroundColor: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "11px",
     fontWeight: 700,
     cursor: "pointer",
@@ -2646,14 +2707,14 @@ const estilo = {
     alignItems: "center",
     justifyContent: "center",
     gap: "10px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "11px",
   },
 
   emptyModal: {
     padding: "28px 15px",
     textAlign: "center" as const,
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontSize: "11px",
   },
 
@@ -2670,9 +2731,9 @@ const estilo = {
     alignItems: "center",
     gap: "10px",
     padding: "11px",
-    border: "1px solid #e5e7eb",
+    border: "1px solid var(--cn-line)",
     borderRadius: "10px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
   },
 
   modalClassIcon: {
@@ -2680,7 +2741,7 @@ const estilo = {
     height: "34px",
     flexShrink: 0,
     borderRadius: "8px",
-    backgroundColor: "#eff6ff",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     display: "flex",
     alignItems: "center",
@@ -2697,11 +2758,11 @@ const estilo = {
   },
 
   tombolTambahKelas: {
-    border: "1px solid #bfdbfe",
+    border: "1px solid var(--cn-tint)",
     borderRadius: "7px",
     padding: "6px 10px",
-    backgroundColor: "#eff6ff",
-    color: "#2563eb",
+    backgroundColor: "var(--cn-tint)",
+    color: "var(--cn-primary)",
     fontSize: "10px",
     fontWeight: 700,
     cursor: "pointer",

@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import styles from "./page.module.css";
 
-const WARNA_PRIMARY = "#2196f3";
-const WARNA_NAVY = "#0d3b66";
-const WARNA_AMBER = "#f5a623";
+const WARNA_PRIMARY = "var(--cn-primary)";
+const WARNA_NAVY = "var(--cn-primary-dark)";
+const WARNA_AMBER = "var(--cn-coral)";
 
 type RoleProfil = "ADMIN" | "KEPSEK" | "KURIKULUM" | "GURU" | "SISWA";
 
@@ -126,19 +127,19 @@ export default function HalamanProfil() {
   const inisial = profil.nama.charAt(0).toUpperCase();
 
   return (
-    <div style={estilo.halaman}>
+    <div className={styles.page} style={estilo.halaman}>
       <button onClick={() => router.back()} style={estilo.tombolKembali}>
         ← Kembali
       </button>
 
-      <div style={estilo.kartuUtama}>
-        <div style={estilo.banner}>
+      <div className={styles.profileCard} style={estilo.kartuUtama}>
+        <div className={styles.banner} style={estilo.banner}>
           <div style={estilo.bannerAksen} />
         </div>
 
-        <div style={estilo.isiKartu}>
-          <div style={estilo.barisAtas}>
-            <div style={estilo.avatarWadah}>
+        <div className={styles.profileContent} style={estilo.isiKartu}>
+          <div className={styles.profileTop} style={estilo.barisAtas}>
+            <div className={styles.avatar} style={estilo.avatarWadah}>
               {profil.fotoProfil ? (
                 <img src={profil.fotoProfil} alt={profil.nama} style={estilo.avatarFoto} />
               ) : (
@@ -147,30 +148,30 @@ export default function HalamanProfil() {
             </div>
 
             {iniProfilSendiri && (
-              <button onClick={bukaModalEdit} style={estilo.tombolEditProfil}>
+              <button className={styles.editButton} onClick={bukaModalEdit} style={estilo.tombolEditProfil}>
                 Edit Profil
               </button>
             )}
           </div>
 
-          <h1 style={estilo.nama}>{profil.nama}</h1>
+          <h1 className={styles.profileName} style={estilo.nama}>{profil.nama}</h1>
           <span style={estilo.badgeRole}>{LABEL_ROLE[profil.role]}</span>
 
-          <div style={estilo.baris_info_chip}>
+          <div className={styles.profileChips} style={estilo.baris_info_chip}>
             {profil.role === "SISWA" && (
               <>
-                <span style={estilo.infoChip}>NIS {profil.nis}</span>
-                <span style={estilo.infoChip}>{profil.rombel}</span>
+                <span className={styles.profileChip} style={estilo.infoChip}>NIS {profil.nis}</span>
+                <span className={styles.profileChip} style={estilo.infoChip}>{profil.rombel}</span>
               </>
             )}
             {profil.role === "GURU" &&
               profil.mapelDiampu?.map((m) => (
-                <span key={m} style={estilo.infoChipAmber}>
+                <span key={m} className={styles.profileChip} style={estilo.infoChipAmber}>
                   {m}
                 </span>
               ))}
             {profil.jenisKelamin && (
-              <span style={estilo.infoChip}>
+              <span className={styles.profileChip} style={estilo.infoChip}>
                 {profil.jenisKelamin === "L" ? "Laki-laki" : "Perempuan"}
               </span>
             )}
@@ -259,13 +260,13 @@ export default function HalamanProfil() {
 const estilo = {
   halaman: {
     minHeight: "100vh",
-    backgroundColor: "#f6f8fb",
+    backgroundColor: "var(--cn-coral-tint)",
     padding: "24px 16px",
     display: "flex",
     flexDirection: "column" as const,
     alignItems: "center",
   },
-  pesanMuat: { padding: "24px", color: "#6b7280", textAlign: "center" as const },
+  pesanMuat: { padding: "24px", color: "var(--cn-text)", textAlign: "center" as const },
   tombolKembali: {
     alignSelf: "flex-start",
     maxWidth: "560px",
@@ -282,10 +283,10 @@ const estilo = {
   kartuUtama: {
     width: "100%",
     maxWidth: "560px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     borderRadius: "18px",
     overflow: "hidden",
-    boxShadow: "0 8px 30px rgba(13, 59, 102, 0.08)",
+    boxShadow: "0 8px 30px rgba(var(--cn-primary-rgb), 0.08)",
   },
   banner: {
     height: "120px",
@@ -315,9 +316,9 @@ const estilo = {
     width: "88px",
     height: "88px",
     borderRadius: "50%",
-    border: "4px solid #ffffff",
-    backgroundColor: "#ffffff",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+    border: "4px solid var(--cn-surface)",
+    backgroundColor: "var(--cn-surface)",
+    boxShadow: "0 2px 8px rgba(var(--cn-navy-rgb), 0.1)",
   },
   avatarFoto: {
     width: "100%",
@@ -329,7 +330,7 @@ const estilo = {
     width: "100%",
     height: "100%",
     borderRadius: "50%",
-    backgroundColor: "#e8f3fe",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     display: "flex",
     alignItems: "center",
@@ -341,20 +342,20 @@ const estilo = {
     fontSize: "13px",
     fontWeight: 700,
     color: WARNA_PRIMARY,
-    background: "#e8f3fe",
+    background: "var(--cn-tint)",
     border: "none",
     borderRadius: "8px",
     padding: "8px 16px",
     cursor: "pointer",
     marginBottom: "4px",
   },
-  nama: { margin: "0 0 6px 0", fontSize: "22px", fontWeight: 800, color: "#0a0a0a" },
+  nama: { margin: "0 0 6px 0", fontSize: "22px", fontWeight: 800, color: "var(--cn-navy)" },
   badgeRole: {
     display: "inline-block",
     fontSize: "12px",
     fontWeight: 700,
     color: WARNA_NAVY,
-    backgroundColor: "#eaf4fe",
+    backgroundColor: "var(--cn-tint)",
     padding: "4px 12px",
     borderRadius: "999px",
     marginBottom: "16px",
@@ -363,26 +364,26 @@ const estilo = {
   infoChip: {
     fontSize: "12px",
     fontWeight: 600,
-    color: "#374151",
-    backgroundColor: "#f3f4f6",
+    color: "var(--cn-coral-dark)",
+    backgroundColor: "var(--cn-coral-tint)",
     padding: "5px 12px",
     borderRadius: "999px",
   },
   infoChipAmber: {
     fontSize: "12px",
     fontWeight: 600,
-    color: "#92610b",
-    backgroundColor: "#fef3e0",
+    color: "var(--cn-coral-dark)",
+    backgroundColor: "var(--cn-coral-tint)",
     padding: "5px 12px",
     borderRadius: "999px",
   },
-  garisPemisah: { height: "1px", backgroundColor: "#eef1f5", margin: "0 0 20px" },
-  judulBio: { margin: "0 0 8px 0", fontSize: "13px", fontWeight: 700, color: "#6b7280" },
-  bio: { margin: 0, fontSize: "14px", lineHeight: 1.7, color: "#374151" },
+  garisPemisah: { height: "1px", backgroundColor: "var(--cn-coral-tint)", margin: "0 0 20px" },
+  judulBio: { margin: "0 0 8px 0", fontSize: "13px", fontWeight: 700, color: "var(--cn-text)" },
+  bio: { margin: 0, fontSize: "14px", lineHeight: 1.7, color: "var(--cn-coral-dark)" },
   overlay: {
     position: "fixed" as const,
     inset: 0,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "rgba(var(--cn-navy-rgb), 0.4)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -392,13 +393,13 @@ const estilo = {
   modal: {
     width: "100%",
     maxWidth: "420px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     borderRadius: "14px",
     padding: "24px",
     maxHeight: "85vh",
     overflowY: "auto" as const,
   },
-  judulModal: { margin: "0 0 16px 0", fontSize: "16px", fontWeight: 700, color: "#000000" },
+  judulModal: { margin: "0 0 16px 0", fontSize: "16px", fontWeight: 700, color: "var(--cn-navy)" },
   previewFotoWadah: {
     display: "flex",
     flexDirection: "column" as const,
@@ -411,7 +412,7 @@ const estilo = {
     width: "80px",
     height: "80px",
     borderRadius: "50%",
-    backgroundColor: "#e8f3fe",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     display: "flex",
     alignItems: "center",
@@ -431,36 +432,36 @@ const estilo = {
     gap: "6px",
     fontSize: "13px",
     fontWeight: 600,
-    color: "#000000",
+    color: "var(--cn-navy)",
     marginBottom: "14px",
   },
   input: {
     padding: "10px 12px",
     borderRadius: "8px",
-    border: "1px solid #d1d5db",
+    border: "1px solid var(--cn-line)",
     fontSize: "14px",
-    color: "#000000",
+    color: "var(--cn-navy)",
     outline: "none",
   },
   textarea: {
     padding: "10px 12px",
     borderRadius: "8px",
-    border: "1px solid #d1d5db",
+    border: "1px solid var(--cn-line)",
     fontSize: "14px",
-    color: "#000000",
+    color: "var(--cn-navy)",
     outline: "none",
     resize: "vertical" as const,
     fontFamily: "inherit",
   },
-  catatanKunci: { fontSize: "11px", color: "#9ca3af", margin: "0 0 14px 0", lineHeight: 1.5 },
-  pesan_error: { color: "#dc2626", fontSize: "13px", margin: "0 0 12px 0" },
+  catatanKunci: { fontSize: "11px", color: "var(--cn-muted)", margin: "0 0 14px 0", lineHeight: 1.5 },
+  pesan_error: { color: "var(--cn-danger)", fontSize: "13px", margin: "0 0 12px 0" },
   barisTombolModal: { display: "flex", justifyContent: "flex-end", gap: "8px" },
   tombolBatal: {
     padding: "8px 16px",
     borderRadius: "8px",
-    border: "1px solid #d1d5db",
-    backgroundColor: "#ffffff",
-    color: "#374151",
+    border: "1px solid var(--cn-line)",
+    backgroundColor: "var(--cn-surface)",
+    color: "var(--cn-coral-dark)",
     fontSize: "14px",
     fontWeight: 600,
     cursor: "pointer",
@@ -470,7 +471,7 @@ const estilo = {
     borderRadius: "8px",
     border: "none",
     backgroundColor: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "14px",
     fontWeight: 700,
     cursor: "pointer",

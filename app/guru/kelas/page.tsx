@@ -4,23 +4,28 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const WARNA = {
-  primary: "#2196f3",
-  primaryDark: "#1976d2",
-  primarySoft: "#e8f3fe",
-  text: "#111827",
-  secondary: "#6b7280",
-  muted: "#9ca3af",
-  border: "#e5e7eb",
-  background: "#f7f9fc",
-  white: "#ffffff",
+  primary: "var(--cn-primary)",
+  primaryDark: "var(--cn-primary)",
+  primarySoft: "var(--cn-tint)",
+  text: "var(--cn-coral-dark)",
+  secondary: "var(--cn-text)",
+  muted: "var(--cn-muted)",
+  border: "var(--cn-line)",
+  background: "var(--cn-tint)",
+  white: "var(--cn-surface)",
 };
+
+interface MapelRingkas {
+  id: string;
+  nama: string;
+}
 
 interface KelasGuruRingkas {
   id: string;
   judul: string;
   deskripsi: string | null;
   jumlahSiswa: number;
-  mapel: string[];
+  mapel: MapelRingkas[];
 }
 
 export default function HalamanKelasGuru() {
@@ -68,7 +73,7 @@ export default function HalamanKelasGuru() {
         kelas.deskripsi?.toLowerCase().includes(keyword) ?? false;
 
       const cocokMapel = kelas.mapel.some((mapel) =>
-        mapel.toLowerCase().includes(keyword)
+        mapel.nama.toLowerCase().includes(keyword)
       );
 
       return cocokJudul || cocokDeskripsi || cocokMapel;
@@ -132,7 +137,9 @@ export default function HalamanKelasGuru() {
               <p style={estilo.summaryLabel}>Mata Pelajaran</p>
               <h2 style={estilo.summaryValue}>
                 {new Set(
-                  daftarKelas.flatMap((kelas) => kelas.mapel)
+                  daftarKelas.flatMap((kelas) =>
+                    kelas.mapel.map((mapel) => mapel.id)
+                  )
                 ).size}
               </h2>
             </div>
@@ -230,15 +237,15 @@ export default function HalamanKelasGuru() {
                 e.currentTarget.style.transform =
                   "translateY(-4px)";
                 e.currentTarget.style.boxShadow =
-                  "0 12px 30px rgba(33, 150, 243, 0.12)";
+                  "0 12px 30px rgba(var(--cn-primary-rgb), 0.12)";
                 e.currentTarget.style.borderColor =
-                  "#c7e3fb";
+                  "var(--cn-tint)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform =
                   "translateY(0)";
                 e.currentTarget.style.boxShadow =
-                  "0 4px 14px rgba(15, 23, 42, 0.05)";
+                  "0 4px 14px rgba(var(--cn-navy-rgb), 0.05)";
                 e.currentTarget.style.borderColor =
                   WARNA.border;
               }}
@@ -269,10 +276,10 @@ export default function HalamanKelasGuru() {
                 <div style={estilo.mapelContainer}>
                   {kelas.mapel.slice(0, 3).map((mapel) => (
                     <span
-                      key={mapel}
+                      key={mapel.id}
                       style={estilo.chip}
                     >
-                      {mapel}
+                      {mapel.nama}
                     </span>
                   ))}
 
@@ -371,7 +378,7 @@ const estilo = {
     alignItems: "center",
     gap: "14px",
     boxShadow:
-      "0 3px 12px rgba(15, 23, 42, 0.035)",
+      "0 3px 12px rgba(var(--cn-navy-rgb), 0.035)",
   },
 
   summaryIcon: {
@@ -477,14 +484,14 @@ const estilo = {
     transition:
       "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
     boxShadow:
-      "0 4px 14px rgba(15, 23, 42, 0.05)",
+      "0 4px 14px rgba(var(--cn-navy-rgb), 0.05)",
   },
 
   cardTop: {
     height: "76px",
     padding: "16px",
     background:
-      "linear-gradient(135deg, #2196f3 0%, #1976d2 100%)",
+      "linear-gradient(135deg, var(--cn-primary) 0%, var(--cn-primary) 100%)",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
@@ -494,9 +501,9 @@ const estilo = {
     width: "42px",
     height: "42px",
     borderRadius: "11px",
-    backgroundColor: "rgba(255,255,255,0.18)",
-    border: "1px solid rgba(255,255,255,0.25)",
-    color: "#ffffff",
+    backgroundColor: "rgba(var(--cn-white-rgb), 0.18)",
+    border: "1px solid rgba(var(--cn-white-rgb), 0.25)",
+    color: "var(--cn-surface)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -508,8 +515,8 @@ const estilo = {
     width: "30px",
     height: "30px",
     borderRadius: "50%",
-    backgroundColor: "rgba(255,255,255,0.16)",
-    color: "#ffffff",
+    backgroundColor: "rgba(var(--cn-white-rgb), 0.16)",
+    color: "var(--cn-surface)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -560,7 +567,7 @@ const estilo = {
     fontSize: "10px",
     fontWeight: 700,
     color: WARNA.secondary,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "var(--cn-coral-tint)",
     borderRadius: "6px",
     padding: "5px 8px",
   },
@@ -568,7 +575,7 @@ const estilo = {
   /* FOOTER */
 
   cardFooter: {
-    borderTop: `1px solid #f0f2f5`,
+    borderTop: `1px solid var(--cn-coral-tint)`,
     padding: "12px 17px",
     display: "flex",
     justifyContent: "space-between",
@@ -585,7 +592,7 @@ const estilo = {
     width: "29px",
     height: "29px",
     borderRadius: "8px",
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "var(--cn-coral-tint)",
     color: WARNA.secondary,
     display: "flex",
     alignItems: "center",
@@ -677,4 +684,3 @@ const estilo = {
     color: WARNA.secondary,
   },
 };
-

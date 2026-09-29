@@ -27,6 +27,7 @@ function FormulirBuatAsesmen() {
   const [judul, setJudul] = useState("");
   const [mapelId, setMapelId] = useState("");
   const [durasiMenit, setDurasiMenit] = useState("");
+  const [fileWord, setFileWord] = useState<File | null>(null);
   const [daftarMapel, setDaftarMapel] = useState<MapelRingkas[]>([]);
   const [sedangProses, setSedangProses] = useState(false);
   const [pesanError, setPesanError] = useState<string | null>(null);
@@ -48,10 +49,20 @@ function FormulirBuatAsesmen() {
 
     setSedangProses(true);
     try {
-      const response = await fetch("/api/asesmen", {
+      const isiRequest = fileWord ? new FormData() : null;
+      if (isiRequest && fileWord) {
+        isiRequest.set("file", fileWord);
+        isiRequest.set("judul", judul.trim());
+        isiRequest.set("tipe", tipe);
+        isiRequest.set("mapelId", mapelId);
+        if (durasiMenit) isiRequest.set("durasiMenit", durasiMenit);
+        if (kelasIdAwal) isiRequest.set("kelasIds", kelasIdAwal);
+      }
+
+      const response = await fetch(fileWord ? "/api/asesmen/import" : "/api/asesmen", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        headers: fileWord ? undefined : { "Content-Type": "application/json" },
+        body: isiRequest ?? JSON.stringify({
           judul: judul.trim(),
           tipe,
           mapelId,
@@ -132,6 +143,20 @@ function FormulirBuatAsesmen() {
               />
             </div>
 
+            <div style={estilo.fieldGroup}>
+              <label style={estilo.label} htmlFor="file-word-asesmen">Impor soal dari Word (.docx)</label>
+              <input
+                id="file-word-asesmen"
+                type="file"
+                accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={(event) => setFileWord(event.target.files?.[0] ?? null)}
+                style={estilo.inputFile}
+              />
+              <p style={estilo.petunjukImpor}>
+                Tulis soal dengan nomor (1. Pertanyaan). Opsi gunakan A. sampai H.; tambahkan “Kunci: B” untuk pilihan ganda, “Tipe: CHECKBOX” dan “Kunci: A, C” untuk jawaban jamak, atau “Tipe: ESSAY” tanpa opsi. Maksimal 5 MB.
+              </p>
+            </div>
+
             {/* Input Mapel */}
             <div style={estilo.fieldGroup}>
               <label style={estilo.label}>
@@ -204,7 +229,7 @@ function FormulirBuatAsesmen() {
                   ...(sedangProses ? estilo.tombolDisabled : {}),
                 }}
               >
-                {sedangProses ? "Membuat..." : "Buat & Lanjut Tambah Soal →"}
+                {sedangProses ? "Memproses..." : fileWord ? "Impor Soal & Buat Asesmen" : "Buat & Lanjut Tambah Soal →"}
               </button>
             </div>
           </form>
@@ -216,18 +241,18 @@ function FormulirBuatAsesmen() {
 
 const estilo = {
   halaman: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: "var(--cn-tint)",
     minHeight: "100vh",
     padding: "32px 20px",
-    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-    color: "#0f172a",
+    fontFamily: "inherit",
+    color: "var(--cn-navy)",
   },
   loadingState: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     minHeight: "100vh",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontSize: "14px",
   },
   container: {
@@ -237,7 +262,7 @@ const estilo = {
   tombolKembali: {
     background: "none",
     border: "none",
-    color: "#2563eb",
+    color: "var(--cn-primary)",
     fontSize: "14px",
     fontWeight: 600,
     cursor: "pointer",
@@ -245,12 +270,12 @@ const estilo = {
     display: "inline-block",
   },
   bannerHeader: {
-    background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
+    background: "linear-gradient(135deg, var(--cn-primary) 0%, var(--cn-primary) 100%)",
     borderRadius: "16px",
     padding: "24px 28px",
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     marginBottom: "20px",
-    boxShadow: "0 10px 15px -3px rgba(37, 99, 235, 0.15)",
+    boxShadow: "0 10px 15px -3px rgba(var(--cn-primary-rgb), 0.15)",
   },
   badgeHeader: {
     fontSize: "11px",
@@ -273,17 +298,17 @@ const estilo = {
     lineHeight: 1.4,
   },
   kartuForm: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     borderRadius: "16px",
     padding: "24px",
-    border: "1px solid #e2e8f0",
-    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)",
+    border: "1px solid var(--cn-coral-tint)",
+    boxShadow: "0 1px 3px 0 rgba(var(--cn-navy-rgb), 0.05)",
   },
   barisTab: {
     display: "flex",
     gap: "6px",
     marginBottom: "20px",
-    backgroundColor: "#f1f5f9",
+    backgroundColor: "var(--cn-coral-tint)",
     borderRadius: "10px",
     padding: "4px",
   },
@@ -293,16 +318,16 @@ const estilo = {
     border: "none",
     borderRadius: "8px",
     backgroundColor: "transparent",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontSize: "14px",
     fontWeight: 600,
     cursor: "pointer",
     transition: "all 0.15s ease",
   },
   tabAktif: {
-    backgroundColor: "#ffffff",
-    color: "#2563eb",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
+    backgroundColor: "var(--cn-surface)",
+    color: "var(--cn-primary)",
+    boxShadow: "0 1px 3px rgba(var(--cn-navy-rgb), 0.08)",
   },
   form: {
     display: "flex",
@@ -317,36 +342,51 @@ const estilo = {
   label: {
     fontSize: "13px",
     fontWeight: 600,
-    color: "#334155",
+    color: "var(--cn-coral-dark)",
   },
   wajib: {
-    color: "#ef4444",
+    color: "var(--cn-danger)",
   },
   opsional: {
     fontSize: "12px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontWeight: 400,
   },
   input: {
     padding: "10px 14px",
     borderRadius: "8px",
-    border: "1px solid #cbd5e1",
+    border: "1px solid var(--cn-coral)",
     fontSize: "14px",
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     outline: "none",
     width: "100%",
     boxSizing: "border-box" as const,
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
+  },
+  inputFile: {
+    padding: "10px 12px",
+    borderRadius: "8px",
+    border: "1px solid var(--cn-line)",
+    color: "var(--cn-text)",
+    fontSize: "13px",
+    width: "100%",
+    backgroundColor: "var(--cn-surface)",
+  },
+  petunjukImpor: {
+    margin: 0,
+    color: "var(--cn-muted)",
+    fontSize: "12px",
+    lineHeight: 1.6,
   },
   select: {
     padding: "10px 14px",
     borderRadius: "8px",
-    border: "1px solid #cbd5e1",
+    border: "1px solid var(--cn-coral)",
     fontSize: "14px",
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     outline: "none",
     width: "100%",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     cursor: "pointer",
   },
   inputDurasiWrapper: {
@@ -358,7 +398,7 @@ const estilo = {
     position: "absolute" as const,
     right: "14px",
     fontSize: "13px",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontWeight: 500,
     pointerEvents: "none" as const,
   },
@@ -367,17 +407,17 @@ const estilo = {
     alignItems: "flex-start",
     fontSize: "12px",
     lineHeight: "1.5",
-    color: "#1e40af",
-    backgroundColor: "#eff6ff",
-    border: "1px solid #bfdbfe",
+    color: "var(--cn-primary-dark)",
+    backgroundColor: "var(--cn-tint)",
+    border: "1px solid var(--cn-tint)",
     padding: "12px 14px",
     borderRadius: "10px",
   },
   boxError: {
     fontSize: "13px",
-    color: "#991b1b",
-    backgroundColor: "#fef2f2",
-    border: "1px solid #fecaca",
+    color: "var(--cn-danger)",
+    backgroundColor: "var(--cn-danger-tint)",
+    border: "1px solid var(--cn-danger-tint)",
     padding: "10px 14px",
     borderRadius: "8px",
   },
@@ -387,14 +427,14 @@ const estilo = {
     gap: "10px",
     marginTop: "8px",
     paddingTop: "16px",
-    borderTop: "1px solid #f1f5f9",
+    borderTop: "1px solid var(--cn-coral-tint)",
   },
   tombolBatal: {
     padding: "10px 16px",
     borderRadius: "8px",
-    border: "1px solid #cbd5e1",
-    backgroundColor: "#ffffff",
-    color: "#475569",
+    border: "1px solid var(--cn-coral)",
+    backgroundColor: "var(--cn-surface)",
+    color: "var(--cn-coral)",
     fontSize: "14px",
     fontWeight: 600,
     cursor: "pointer",
@@ -403,12 +443,12 @@ const estilo = {
     padding: "10px 20px",
     borderRadius: "8px",
     border: "none",
-    backgroundColor: "#2563eb",
-    color: "#ffffff",
+    backgroundColor: "var(--cn-primary)",
+    color: "var(--cn-surface)",
     fontSize: "14px",
     fontWeight: 600,
     cursor: "pointer",
-    boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)",
+    boxShadow: "0 2px 4px rgba(var(--cn-primary-rgb), 0.2)",
   },
   tombolDisabled: {
     opacity: 0.65,

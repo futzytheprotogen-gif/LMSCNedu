@@ -66,13 +66,13 @@ export async function kirimEmailOtp({
     subject: "Kode OTP Reset Password — CN Edu",
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-        <h2 style="color: #2196f3;">Reset Password CN Edu</h2>
+        <h2 style="color: #1677ff;">Reset Password CN Edu</h2>
         <p>Halo ${nama},</p>
         <p>
           Kami menerima permintaan reset password untuk akun ${labelAkun}
           kamu di CN Edu. Gunakan kode berikut untuk melanjutkan:
         </p>
-        <p style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #2196f3; text-align: center; margin: 24px 0;">
+        <p style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #1677ff; text-align: center; margin: 24px 0;">
           ${kodeOtp}
         </p>
         <p>

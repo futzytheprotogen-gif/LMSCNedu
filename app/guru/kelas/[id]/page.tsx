@@ -4,33 +4,33 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 const WARNA = {
-  primary: "#2196f3",
-  primaryDark: "#1976d2",
-  primarySoft: "#e8f3fe",
+  primary: "var(--cn-primary)",
+  primaryDark: "var(--cn-primary)",
+  primarySoft: "var(--cn-tint)",
 
-  teal: "#70c1c4",
-  tealSoft: "#e9f7f7",
+  teal: "var(--cn-cyan)",
+  tealSoft: "var(--cn-tint)",
 
-  text: "#111827",
-  textDark: "#0f172a",
-  secondary: "#6b7280",
-  muted: "#9ca3af",
+  text: "var(--cn-coral-dark)",
+  textDark: "var(--cn-navy)",
+  secondary: "var(--cn-text)",
+  muted: "var(--cn-muted)",
 
-  border: "#e5e7eb",
-  background: "#f7f9fc",
-  white: "#ffffff",
+  border: "var(--cn-line)",
+  background: "var(--cn-tint)",
+  white: "var(--cn-surface)",
 
-  danger: "#dc2626",
-  dangerSoft: "#fef2f2",
+  danger: "var(--cn-danger)",
+  dangerSoft: "var(--cn-danger-tint)",
 
-  green: "#16a34a",
-  greenSoft: "#f0fdf4",
+  green: "var(--cn-success)",
+  greenSoft: "var(--cn-success-tint)",
 
-  orange: "#f59e0b",
-  orangeSoft: "#fff7ed",
+  orange: "var(--cn-coral)",
+  orangeSoft: "var(--cn-coral-tint)",
 
-  purple: "#6366f1",
-  purpleSoft: "#eef2ff",
+  purple: "var(--cn-primary)",
+  purpleSoft: "var(--cn-tint)",
 };
 
 interface SiswaKelas {
@@ -274,7 +274,7 @@ export default function HalamanDetailKelasGuru() {
   }
 
   return (
-    <div style={style.halaman}>
+    <div className="cn-guru-kelas-page" style={style.halaman}>
       {/* =====================================================
           BACK
       ====================================================== */}
@@ -412,19 +412,19 @@ export default function HalamanDetailKelasGuru() {
               }
               style={{
                 ...style.actionCard,
-                borderColor: "#cfe8ff",
+                borderColor: "var(--cn-tint)",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform =
                   "translateY(-3px)";
                 e.currentTarget.style.boxShadow =
-                  "0 10px 25px rgba(33,150,243,0.12)";
+                  "0 10px 25px rgba(var(--cn-primary-rgb), 0.12)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform =
                   "translateY(0)";
                 e.currentTarget.style.boxShadow =
-                  "0 2px 8px rgba(0,0,0,0.03)";
+                  "0 2px 8px rgba(var(--cn-navy-rgb), 0.03)";
               }}
             >
               <div
@@ -462,19 +462,19 @@ export default function HalamanDetailKelasGuru() {
               }
               style={{
                 ...style.actionCard,
-                borderColor: "#cfe8ff",
+                borderColor: "var(--cn-tint)",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform =
                   "translateY(-3px)";
                 e.currentTarget.style.boxShadow =
-                  "0 10px 25px rgba(33,150,243,0.12)";
+                  "0 10px 25px rgba(var(--cn-primary-rgb), 0.12)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform =
                   "translateY(0)";
                 e.currentTarget.style.boxShadow =
-                  "0 2px 8px rgba(0,0,0,0.03)";
+                  "0 2px 8px rgba(var(--cn-navy-rgb), 0.03)";
               }}
             >
               <div
@@ -515,13 +515,13 @@ export default function HalamanDetailKelasGuru() {
                 e.currentTarget.style.transform =
                   "translateY(-3px)";
                 e.currentTarget.style.boxShadow =
-                  "0 10px 25px rgba(33,150,243,0.12)";
+                  "0 10px 25px rgba(var(--cn-primary-rgb), 0.12)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform =
                   "translateY(0)";
                 e.currentTarget.style.boxShadow =
-                  "0 2px 8px rgba(0,0,0,0.03)";
+                  "0 2px 8px rgba(var(--cn-navy-rgb), 0.03)";
               }}
             >
               <div
@@ -562,13 +562,13 @@ export default function HalamanDetailKelasGuru() {
                 e.currentTarget.style.transform =
                   "translateY(-3px)";
                 e.currentTarget.style.boxShadow =
-                  "0 10px 25px rgba(33,150,243,0.12)";
+                  "0 10px 25px rgba(var(--cn-primary-rgb), 0.12)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform =
                   "translateY(0)";
                 e.currentTarget.style.boxShadow =
-                  "0 2px 8px rgba(0,0,0,0.03)";
+                  "0 2px 8px rgba(var(--cn-navy-rgb), 0.03)";
               }}
             >
               <div
@@ -601,7 +601,7 @@ export default function HalamanDetailKelasGuru() {
               MAIN CONTENT
           ================================================== */}
 
-          <div style={style.mainGrid}>
+          <div className="cn-guru-kelas-main-grid" style={style.mainGrid}>
             {/* ===============================================
                 PENGUMUMAN
             ================================================ */}
@@ -1339,12 +1339,12 @@ const style = {
 
   hero: {
     background:
-      "linear-gradient(135deg, #2196f3 0%, #2870e8 55%, #70c1c4 100%)",
+      "linear-gradient(135deg, var(--cn-primary) 0%, var(--cn-primary) 55%, var(--cn-cyan) 100%)",
     borderRadius: "20px",
     padding: "26px",
     color: WARNA.white,
     boxShadow:
-      "0 8px 25px rgba(33,150,243,0.15)",
+      "0 8px 25px rgba(var(--cn-primary-rgb), 0.15)",
     marginBottom: "18px",
   },
 
@@ -1363,9 +1363,9 @@ const style = {
     alignItems: "center",
     justifyContent: "center",
     backgroundColor:
-      "rgba(255,255,255,0.2)",
+      "rgba(var(--cn-white-rgb), 0.2)",
     border:
-      "1px solid rgba(255,255,255,0.35)",
+      "1px solid rgba(var(--cn-white-rgb), 0.35)",
     color: WARNA.white,
     fontSize: "30px",
     fontWeight: 800,
@@ -1379,7 +1379,7 @@ const style = {
     fontSize: "10px",
     letterSpacing: "1.5px",
     fontWeight: 800,
-    color: "rgba(255,255,255,0.82)",
+    color: "rgba(var(--cn-white-rgb), 0.82)",
     marginBottom: "4px",
   },
 
@@ -1393,7 +1393,7 @@ const style = {
 
   deskripsi: {
     margin: "7px 0 12px",
-    color: "rgba(255,255,255,0.9)",
+    color: "rgba(var(--cn-white-rgb), 0.9)",
     fontSize: "13px",
     lineHeight: 1.5,
   },
@@ -1487,7 +1487,7 @@ const style = {
     cursor: "pointer",
     transition: "all 0.2s ease",
     boxShadow:
-      "0 2px 8px rgba(0,0,0,0.03)",
+      "0 2px 8px rgba(var(--cn-navy-rgb), 0.03)",
     color: WARNA.text,
   },
 
@@ -1560,7 +1560,7 @@ const style = {
     borderRadius: "16px",
     padding: "20px",
     boxShadow:
-      "0 2px 8px rgba(0,0,0,0.03)",
+      "0 2px 8px rgba(var(--cn-navy-rgb), 0.03)",
     color: WARNA.text,
   },
 
@@ -1703,7 +1703,7 @@ const style = {
 
   isiPengumuman: {
     margin: "12px 0 0 44px",
-    color: "#374151",
+    color: "var(--cn-coral-dark)",
     fontSize: "13px",
     lineHeight: 1.6,
     whiteSpace: "pre-wrap" as const,
@@ -1964,7 +1964,7 @@ const style = {
     height: "44px",
     borderRadius: "13px",
     background:
-      "linear-gradient(135deg, #2196f3, #70c1c4)",
+      "linear-gradient(135deg, var(--cn-primary), var(--cn-cyan))",
     color: WARNA.white,
     display: "flex",
     alignItems: "center",

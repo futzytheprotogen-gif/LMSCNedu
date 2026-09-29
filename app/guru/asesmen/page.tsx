@@ -4,27 +4,27 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const WARNA = {
-  primary: "#2196f3",
-  primaryDark: "#1976d2",
-  primarySoft: "#e8f3fe",
+  primary: "var(--cn-primary)",
+  primaryDark: "var(--cn-primary)",
+  primarySoft: "var(--cn-tint)",
 
-  background: "#f7f9fc",
-  white: "#ffffff",
+  background: "var(--cn-tint)",
+  white: "var(--cn-surface)",
 
-  text: "#111827",
-  textSecondary: "#6b7280",
-  textMuted: "#9ca3af",
+  text: "var(--cn-coral-dark)",
+  textSecondary: "var(--cn-text)",
+  textMuted: "var(--cn-muted)",
 
-  border: "#e5e7eb",
+  border: "var(--cn-line)",
 
-  green: "#16a34a",
-  greenSoft: "#dcfce7",
+  green: "var(--cn-success)",
+  greenSoft: "var(--cn-success-tint)",
 
-  orange: "#d97706",
-  orangeSoft: "#fef3c7",
+  orange: "var(--cn-coral)",
+  orangeSoft: "var(--cn-coral-tint)",
 
-  red: "#ef4444",
-  redSoft: "#fee2e2",
+  red: "var(--cn-danger)",
+  redSoft: "var(--cn-danger-tint)",
 };
 
 interface AsesmenRingkas {
@@ -394,7 +394,7 @@ function KartuAsesmen({
         <div
           style={{
             ...estilo.garisKartu,
-            backgroundColor: adalahKuis ? WARNA.primary : "#70c1c4",
+            backgroundColor: adalahKuis ? WARNA.primary : "var(--cn-cyan)",
           }}
         />
 
@@ -403,7 +403,7 @@ function KartuAsesmen({
           <div
             style={{
               ...estilo.iconAsesmen,
-              backgroundColor: adalahKuis ? WARNA.primarySoft : "#e8f8f7",
+              backgroundColor: adalahKuis ? WARNA.primarySoft : "var(--cn-tint)",
             }}
           >
             {adalahKuis ? "📝" : "📋"}
@@ -412,8 +412,8 @@ function KartuAsesmen({
           <span
             style={{
               ...estilo.badgeTipe,
-              color: adalahKuis ? WARNA.primary : "#378b8e",
-              backgroundColor: adalahKuis ? WARNA.primarySoft : "#e8f8f7",
+              color: adalahKuis ? WARNA.primary : "var(--cn-cyan)",
+              backgroundColor: adalahKuis ? WARNA.primarySoft : "var(--cn-tint)",
             }}
           >
             {adalahKuis ? "Kuis" : "Ujian Online"}
@@ -594,11 +594,11 @@ const estilo = {
     borderRadius: "9px",
     padding: "10px 15px",
     backgroundColor: WARNA.primary,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "13px",
     fontWeight: 700,
     cursor: "pointer",
-    boxShadow: "0 4px 10px rgba(33, 150, 243, 0.18)",
+    boxShadow: "0 4px 10px rgba(var(--cn-primary-rgb), 0.18)",
   },
 
   iconPlus: {
@@ -626,7 +626,7 @@ const estilo = {
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    boxShadow: "0 2px 8px rgba(15, 23, 42, 0.03)",
+    boxShadow: "0 2px 8px rgba(var(--cn-navy-rgb), 0.03)",
   },
 
   statIcon: {
@@ -699,7 +699,7 @@ const estilo = {
     padding: "0 38px",
     fontSize: "12px",
     color: WARNA.text,
-    backgroundColor: "#fafbfc",
+    backgroundColor: "var(--cn-coral-tint)",
   },
 
   tombolClear: {
@@ -709,7 +709,7 @@ const estilo = {
     height: "25px",
     border: "none",
     borderRadius: "50%",
-    backgroundColor: "#eef0f3",
+    backgroundColor: "var(--cn-coral-tint)",
     color: WARNA.textSecondary,
     cursor: "pointer",
     fontSize: "10px",
@@ -719,7 +719,7 @@ const estilo = {
     display: "flex",
     alignItems: "center",
     gap: "4px",
-    backgroundColor: "#f3f5f8",
+    backgroundColor: "var(--cn-coral-tint)",
     borderRadius: "8px",
     padding: "3px",
   },
@@ -738,7 +738,7 @@ const estilo = {
   filterButtonAktif: {
     backgroundColor: WARNA.white,
     color: WARNA.primary,
-    boxShadow: "0 1px 4px rgba(15, 23, 42, 0.08)",
+    boxShadow: "0 1px 4px rgba(var(--cn-navy-rgb), 0.08)",
   },
 
   // ==========================================================
@@ -789,7 +789,7 @@ const estilo = {
     paddingRight: "42px",
     cursor: "pointer",
     boxSizing: "border-box" as const,
-    boxShadow: "0 2px 8px rgba(15, 23, 42, 0.035)",
+    boxShadow: "0 2px 8px rgba(var(--cn-navy-rgb), 0.035)",
     transition:
       "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease",
   },
@@ -881,7 +881,7 @@ const estilo = {
     alignItems: "center",
     padding: "10px",
     borderRadius: "9px",
-    backgroundColor: "#f7f9fc",
+    backgroundColor: "var(--cn-tint)",
     marginBottom: "13px",
   },
 
@@ -973,7 +973,7 @@ const estilo = {
   emptyState: {
     minHeight: "280px",
     backgroundColor: WARNA.white,
-    border: `1px dashed #d7dce3`,
+    border: `1px dashed var(--cn-coral-tint)`,
     borderRadius: "14px",
     display: "flex",
     flexDirection: "column" as const,
@@ -1016,7 +1016,7 @@ const estilo = {
     borderRadius: "8px",
     padding: "9px 14px",
     backgroundColor: WARNA.primary,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "11px",
     fontWeight: 700,
     cursor: "pointer",
@@ -1032,7 +1032,7 @@ const estilo = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(17, 24, 39, 0.4)",
+    backgroundColor: "rgba(var(--cn-coral-rgb), 0.4)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -1046,7 +1046,7 @@ const estilo = {
     padding: "24px",
     maxWidth: "400px",
     width: "100%",
-    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0 20px 25px -5px rgba(var(--cn-navy-rgb), 0.1)",
     textAlign: "center" as const,
   },
 

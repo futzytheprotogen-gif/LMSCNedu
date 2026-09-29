@@ -11,8 +11,8 @@ import { usePathname, useRouter } from "next/navigation";
 // apabila terdapat laporan lupa password dengan status MENUNGGU.
 // ------------------------------------------------------------
 
-const WARNA_PRIMARY = "#2196f3";
-const WARNA_DANGER = "#ef4444";
+const WARNA_PRIMARY = "var(--cn-primary)";
+const WARNA_DANGER = "var(--cn-danger)";
 
 const TINGGI_NAVBAR = 56;
 const LEBAR_SIDEBAR = 240;
@@ -75,14 +75,17 @@ export default function LayoutAdmin({
   // ============================================================
 
   useEffect(() => {
-    cekLaporanBaru();
+    const timer = window.setTimeout(() => { void cekLaporanBaru(); }, 0);
 
     // Cek setiap 15 detik
     const interval = setInterval(() => {
       cekLaporanBaru();
     }, 15000);
 
-    return () => clearInterval(interval);
+    return () => {
+      window.clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, [cekLaporanBaru]);
 
   // ============================================================
@@ -90,6 +93,7 @@ export default function LayoutAdmin({
   // ============================================================
 
   async function handleLogout() {
+    if (!window.confirm("Keluar dari akun CN Edu?")) return;
     await fetch("/api/auth", {
       method: "DELETE",
     });
@@ -118,8 +122,9 @@ export default function LayoutAdmin({
           NAVBAR
       ======================================================= */}
 
-      <header style={estilo.navbar}>
+      <header className="cn-role-navbar" style={estilo.navbar}>
         <button
+          className="cn-role-hamburger"
           onClick={() => setSidebarTerbuka(true)}
           style={estilo.tombolHamburger}
           aria-label="Buka menu"
@@ -128,17 +133,13 @@ export default function LayoutAdmin({
           ☰
         </button>
 
-        <span style={estilo.namaBrand}>
+        <span className="cn-role-brand" style={estilo.namaBrand}>
           CN Edu — Admin
         </span>
 
-        <button
-          onClick={handleLogout}
-          style={estilo.tombolLogout}
-          type="button"
-        >
-          Keluar
-        </button>
+        <div style={estilo.navKanan}>
+          <Link href="/profil/saya" style={estilo.tombolProfil}>Profil</Link>
+        </div>
       </header>
 
       {/* ======================================================
@@ -147,6 +148,7 @@ export default function LayoutAdmin({
 
       {sidebarTerbuka && (
         <div
+          className="cn-role-overlay"
           style={estilo.overlay}
           onClick={() => setSidebarTerbuka(false)}
           aria-hidden="true"
@@ -158,6 +160,7 @@ export default function LayoutAdmin({
       ======================================================= */}
 
       <aside
+        className="cn-role-sidebar"
         style={{
           ...estilo.sidebar,
           transform: sidebarTerbuka
@@ -167,7 +170,7 @@ export default function LayoutAdmin({
       >
         {/* HEADER SIDEBAR */}
 
-        <div style={estilo.headerSidebar}>
+        <div className="cn-role-sidebar-header" style={estilo.headerSidebar}>
           <span style={estilo.namaBrandSidebar}>
             CN Edu
           </span>
@@ -253,13 +256,19 @@ export default function LayoutAdmin({
             </div>
           </div>
         )}
+
+        <div className="cn-role-sidebar-footer">
+          <button className="cn-role-logout-action" onClick={handleLogout} type="button">
+            Keluar dari akun
+          </button>
+        </div>
       </aside>
 
       {/* ======================================================
           CONTENT
       ======================================================= */}
 
-      <main style={estilo.konten}>
+      <main className="cn-role-main" style={estilo.konten}>
         {children}
       </main>
     </div>
@@ -273,7 +282,7 @@ export default function LayoutAdmin({
 const estilo = {
   wadah: {
     minHeight: "100vh",
-    backgroundColor: "#f7f9fc",
+    backgroundColor: "var(--cn-tint)",
   },
 
   // ==========================================================
@@ -286,8 +295,8 @@ const estilo = {
     left: 0,
     right: 0,
     height: `${TINGGI_NAVBAR}px`,
-    backgroundColor: "#ffffff",
-    borderBottom: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    borderBottom: "1px solid var(--cn-line)",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -303,7 +312,7 @@ const estilo = {
     background: "none",
     border: "none",
     cursor: "pointer",
-    color: "#111827",
+    color: "var(--cn-coral-dark)",
     padding: "0",
     borderRadius: "8px",
     display: "flex",
@@ -314,19 +323,11 @@ const estilo = {
   namaBrand: {
     fontSize: "15px",
     fontWeight: 700,
-    color: "#111827",
+    color: "var(--cn-coral-dark)",
   },
 
-  tombolLogout: {
-    fontSize: "13px",
-    fontWeight: 600,
-    color: "#dc2626",
-    background: "#ffffff",
-    border: "1px solid #dc2626",
-    borderRadius: "7px",
-    padding: "7px 13px",
-    cursor: "pointer",
-  },
+  navKanan: { display: "flex", alignItems: "center", marginLeft: "auto" },
+  tombolProfil: { padding: "8px 10px", color: WARNA_PRIMARY, fontSize: "13px", fontWeight: 700, textDecoration: "none" },
 
   // ==========================================================
   // OVERLAY
@@ -335,7 +336,7 @@ const estilo = {
   overlay: {
     position: "fixed" as const,
     inset: 0,
-    backgroundColor: "rgba(15, 23, 42, 0.42)",
+    backgroundColor: "rgba(var(--cn-navy-rgb), 0.42)",
     zIndex: 40,
     backdropFilter: "blur(1px)",
   },
@@ -350,13 +351,13 @@ const estilo = {
     left: 0,
     bottom: 0,
     width: `${LEBAR_SIDEBAR}px`,
-    backgroundColor: "#ffffff",
-    borderRight: "1px solid #e5e7eb",
+    backgroundColor: "var(--cn-surface)",
+    borderRight: "1px solid var(--cn-line)",
     zIndex: 50,
     transition: "transform 0.22s ease-in-out",
     display: "flex",
     flexDirection: "column" as const,
-    boxShadow: "8px 0 25px rgba(15, 23, 42, 0.08)",
+    boxShadow: "8px 0 25px rgba(var(--cn-navy-rgb), 0.08)",
   },
 
   headerSidebar: {
@@ -365,7 +366,7 @@ const estilo = {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "0 16px",
-    borderBottom: "1px solid #e5e7eb",
+    borderBottom: "1px solid var(--cn-line)",
     boxSizing: "border-box" as const,
   },
 
@@ -384,7 +385,7 @@ const estilo = {
     border: "none",
     borderRadius: "7px",
     cursor: "pointer",
-    color: "#374151",
+    color: "var(--cn-coral-dark)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -407,7 +408,7 @@ const estilo = {
     borderRadius: "9px",
     fontSize: "14px",
     fontWeight: 600,
-    color: "#374151",
+    color: "var(--cn-coral-dark)",
     textDecoration: "none",
     display: "flex",
     alignItems: "center",
@@ -418,7 +419,7 @@ const estilo = {
   },
 
   linkMenuAktif: {
-    backgroundColor: "#e8f3fe",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
   },
 
@@ -439,14 +440,14 @@ const estilo = {
     boxSizing: "border-box" as const,
     borderRadius: "999px",
     backgroundColor: WARNA_DANGER,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "10px",
     fontWeight: 800,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     lineHeight: 1,
-    boxShadow: "0 2px 6px rgba(239, 68, 68, 0.3)",
+    boxShadow: "0 2px 6px rgba(var(--cn-danger-rgb), 0.3)",
     flexShrink: 0,
   },
 
@@ -458,8 +459,8 @@ const estilo = {
     margin: "8px 12px 0",
     padding: "11px",
     borderRadius: "10px",
-    backgroundColor: "#fff5f5",
-    border: "1px solid #fee2e2",
+    backgroundColor: "var(--cn-danger-tint)",
+    border: "1px solid var(--cn-danger-tint)",
     display: "flex",
     alignItems: "flex-start",
     gap: "9px",
@@ -470,7 +471,7 @@ const estilo = {
     height: "23px",
     borderRadius: "50%",
     backgroundColor: WARNA_DANGER,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "12px",
     fontWeight: 800,
     display: "flex",
@@ -483,7 +484,7 @@ const estilo = {
     display: "block",
     fontSize: "11px",
     fontWeight: 800,
-    color: "#991b1b",
+    color: "var(--cn-danger)",
     marginBottom: "2px",
   },
 
@@ -491,7 +492,7 @@ const estilo = {
     display: "block",
     fontSize: "10px",
     lineHeight: 1.4,
-    color: "#b91c1c",
+    color: "var(--cn-danger)",
   },
 
   // ==========================================================

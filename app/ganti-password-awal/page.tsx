@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-const WARNA_PRIMARY = "#2196f3";
+const WARNA_PRIMARY = "var(--cn-primary)";
 
 export default function HalamanGantiPasswordAwal() {
   const router = useRouter();
@@ -94,7 +94,7 @@ const estilo = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     padding: "16px",
   },
   kartu: {
@@ -102,18 +102,18 @@ const estilo = {
     maxWidth: "380px",
     padding: "32px",
     borderRadius: "12px",
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+    border: "1px solid var(--cn-line)",
+    boxShadow: "0 2px 12px rgba(var(--cn-navy-rgb), 0.06)",
   },
   judul: {
-    color: "#000000",
+    color: "var(--cn-navy)",
     fontSize: "20px",
     fontWeight: 700,
     marginBottom: "8px",
     textAlign: "center" as const,
   },
   subjudul: {
-    color: "#4b5563",
+    color: "var(--cn-text)",
     fontSize: "13px",
     marginBottom: "20px",
     textAlign: "center" as const,
@@ -130,18 +130,18 @@ const estilo = {
     gap: "6px",
     fontSize: "13px",
     fontWeight: 600,
-    color: "#000000",
+    color: "var(--cn-navy)",
   },
   input: {
     padding: "10px 12px",
     borderRadius: "8px",
-    border: "1px solid #d1d5db",
+    border: "1px solid var(--cn-line)",
     fontSize: "14px",
-    color: "#000000",
+    color: "var(--cn-navy)",
     outline: "none",
   },
   pesan_error: {
-    color: "#dc2626",
+    color: "var(--cn-danger)",
     fontSize: "13px",
     margin: 0,
   },
@@ -151,7 +151,7 @@ const estilo = {
     borderRadius: "8px",
     border: "none",
     backgroundColor: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "15px",
     fontWeight: 700,
     cursor: "pointer",

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 // ------------------------------------------------------------
 // Dipakai oleh:
 // - Guru: Generate Nilai (per kelas / gabungan semua kelas tujuan asesmen)
-// - Admin / Kepsek / Kurikulum: Generate Nilai dari asesmen guru manapun
+// - Akses unduhan dibatasi untuk guru pembuat asesmen
 //
 // Format kolom hasil unduhan (sudah disepakati di spesifikasi):
 // Nama, NIS, Kelas/Jurusan, Mata Pelajaran, Nilai

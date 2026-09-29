@@ -1,0 +1,323 @@
+.page {
+  min-height: calc(100vh - 56px);
+  color: var(--cn-navy);
+  background: var(--cn-tint);
+}
+
+.container {
+  width: min(100%, 1080px);
+  margin: 0 auto;
+  padding: 30px 24px 56px;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 22px;
+  color: var(--cn-primary-dark);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--cn-tint);
+}
+
+.eyebrow {
+  margin: 0 0 7px;
+  color: var(--cn-coral);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 25px;
+}
+
+.header p:last-child {
+  margin: 7px 0 0;
+  color: var(--cn-coral);
+  font-size: 12px;
+}
+
+.published,
+.draft,
+.gradeBadge,
+.ungraded {
+  padding: 6px 9px;
+  border-radius: 6px;
+  color: var(--cn-success);
+  background: var(--cn-success-tint);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.draft,
+.ungraded {
+  color: var(--cn-coral-dark);
+  background: var(--cn-coral-tint);
+}
+
+.exportButton {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 6px;
+  color: var(--cn-surface);
+  background: var(--cn-primary);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.submissions {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.submission {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--cn-tint);
+  border-radius: 8px;
+  background: var(--cn-surface);
+}
+
+.studentHeader {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--cn-coral-tint);
+}
+
+.avatar {
+  display: grid;
+  flex: 0 0 36px;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 7px;
+  color: var(--cn-primary-dark);
+  background: var(--cn-tint);
+  font-weight: 800;
+}
+
+.studentInfo {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+}
+
+.studentInfo strong {
+  font-size: 13px;
+}
+
+.studentInfo span {
+  color: var(--cn-coral);
+  font-size: 10px;
+}
+
+.answers {
+  display: grid;
+}
+
+.answer {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--cn-coral-tint);
+}
+
+.answer h2 {
+  display: flex;
+  gap: 9px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.answer h2 span {
+  flex: 0 0 22px;
+  color: var(--cn-primary-dark);
+}
+
+.essayAnswer {
+  margin: 8px 0 0 31px;
+  padding: 10px 12px;
+  border-left: 2px solid var(--cn-coral);
+  color: var(--cn-coral);
+  background: var(--cn-coral-tint);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.optionReview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0 31px;
+}
+
+.selectedOption,
+.correctOption,
+.noAnswer {
+  padding: 5px 7px;
+  border-radius: 5px;
+  color: var(--cn-coral);
+  background: var(--cn-coral-tint);
+  font-size: 10px;
+}
+
+.correctOption {
+  color: var(--cn-success);
+  background: var(--cn-success-tint);
+}
+
+.noAnswer {
+  color: var(--cn-danger);
+  background: var(--cn-danger-tint);
+}
+
+.gradeForm {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-top: 14px;
+}
+
+.gradeForm label {
+  color: var(--cn-coral);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.gradeForm input {
+  box-sizing: border-box;
+  width: 86px;
+  min-height: 36px;
+  padding: 0 8px;
+  border: 1px solid var(--cn-tint);
+  border-radius: 6px;
+  color: var(--cn-navy);
+  font: inherit;
+  font-size: 12px;
+}
+
+.gradeForm button,
+.stateError button {
+  min-height: 36px;
+  margin-left: auto;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--cn-surface);
+  background: var(--cn-primary);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.gradeForm button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.state,
+.stateError {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 8px;
+  min-height: 38vh;
+  color: var(--cn-coral);
+  text-align: center;
+  font-size: 13px;
+}
+
+.state strong {
+  color: var(--cn-navy);
+}
+
+.state p,
+.stateError p {
+  margin: 0;
+}
+
+.stateError {
+  color: var(--cn-danger);
+}
+
+.stateError button {
+  margin: 0;
+}
+
+.success,
+.error {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.success {
+  color: var(--cn-success);
+  background: var(--cn-success-tint);
+}
+
+.error {
+  color: var(--cn-danger);
+  background: var(--cn-danger-tint);
+}
+
+@media (max-width: 560px) {
+  .container {
+    padding: 23px 16px 40px;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .exportButton {
+    width: 100%;
+  }
+
+  .header h1 {
+    font-size: 21px;
+  }
+
+  .submission {
+    padding: 14px 12px;
+  }
+
+  .studentHeader {
+    flex-wrap: wrap;
+  }
+
+  .gradeBadge,
+  .ungraded {
+    margin-left: 47px;
+  }
+
+  .gradeForm {
+    flex-wrap: wrap;
+  }
+
+  .gradeForm button {
+    width: 100%;
+    margin: 3px 0 0;
+  }
+}

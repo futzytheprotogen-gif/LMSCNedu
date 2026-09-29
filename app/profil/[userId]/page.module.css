@@ -1,0 +1,80 @@
+.page {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.profileCard {
+  position: relative;
+  width: min(100%, 560px);
+}
+
+.banner {
+  min-height: 120px;
+}
+
+.profileContent {
+  display: flow-root;
+  min-width: 0;
+}
+
+.profileTop {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.avatar {
+  flex: 0 0 88px;
+}
+
+.profileName {
+  overflow-wrap: anywhere;
+}
+
+.profileChips {
+  min-width: 0;
+}
+
+.profileChip {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding: 20px 14px !important;
+  }
+
+  .profileCard {
+    border-radius: 14px !important;
+  }
+
+  .banner {
+    height: 104px !important;
+    min-height: 104px;
+  }
+
+  .profileContent {
+    padding: 0 18px 22px !important;
+  }
+
+  .profileTop {
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 76px !important;
+    height: 76px !important;
+    flex-basis: 76px;
+  }
+
+  .profileName {
+    font-size: 20px !important;
+  }
+
+  .editButton {
+    max-width: 48%;
+    padding: 8px 10px !important;
+  }
+}

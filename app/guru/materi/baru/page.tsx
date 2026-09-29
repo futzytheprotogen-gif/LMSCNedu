@@ -1,9 +1,18 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function HalamanUploadMateri() {
+  return (
+    <Suspense fallback={<div style={{ padding: "32px 20px", color: "var(--cn-muted)" }}>Memuat formulir materi...</div>}>
+      <FormUploadMateri />
+    </Suspense>
+  );
+}
+
+function FormUploadMateri() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const kelasId = searchParams.get("kelasId");
@@ -270,18 +279,18 @@ export default function HalamanUploadMateri() {
 }
 
 const COLOR = {
-  bg: "#f8fafc",
-  cardBg: "#ffffff",
-  textMain: "#0f172a",
-  textMuted: "#64748b",
-  border: "#e2e8f0",
-  primary: "#2563eb",
-  primaryHover: "#1d4ed8",
-  primaryBg: "#eff6ff",
-  danger: "#dc2626",
-  dangerBg: "#fef2f2",
-  warning: "#d97706",
-  warningBg: "#fffbeb",
+  bg: "var(--cn-tint)",
+  cardBg: "var(--cn-surface)",
+  textMain: "var(--cn-navy)",
+  textMuted: "var(--cn-coral)",
+  border: "var(--cn-coral-tint)",
+  primary: "var(--cn-primary)",
+  primaryHover: "var(--cn-primary)",
+  primaryBg: "var(--cn-tint)",
+  danger: "var(--cn-danger)",
+  dangerBg: "var(--cn-danger-tint)",
+  warning: "var(--cn-coral)",
+  warningBg: "var(--cn-coral-tint)",
 };
 
 const estilo = {
@@ -293,8 +302,7 @@ const estilo = {
     justifyContent: "center",
     alignItems: "flex-start",
     boxSizing: "border-box" as const,
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: "inherit",
   },
   wrapper: {
     width: "100%",
@@ -351,7 +359,7 @@ const estilo = {
     backgroundColor: COLOR.cardBg,
     borderRadius: "12px",
     border: `1px solid ${COLOR.border}`,
-    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)",
+    boxShadow: "0 1px 3px 0 rgba(var(--cn-navy-rgb), 0.05)",
     padding: "24px",
     display: "flex",
     flexDirection: "column" as const,
@@ -377,13 +385,13 @@ const estilo = {
     border: `1px solid ${COLOR.border}`,
     fontSize: "13px",
     color: COLOR.textMain,
-    backgroundColor: "#fff",
+    backgroundColor: "var(--cn-surface)",
     outline: "none",
     boxSizing: "border-box" as const,
   },
   segmentContainer: {
     display: "flex",
-    backgroundColor: "#f1f5f9",
+    backgroundColor: "var(--cn-coral-tint)",
     padding: "3px",
     borderRadius: "8px",
     gap: "4px",
@@ -401,9 +409,9 @@ const estilo = {
     transition: "all 0.15s ease",
   },
   segmentItemActive: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     color: COLOR.primary,
-    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+    boxShadow: "0 1px 2px rgba(var(--cn-navy-rgb), 0.05)",
   },
   dropzone: {
     border: `1px dashed ${COLOR.border}`,
@@ -495,7 +503,7 @@ const estilo = {
     padding: "10px 0",
     borderRadius: "8px",
     border: `1px solid ${COLOR.border}`,
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     color: COLOR.textMuted,
     fontSize: "13px",
     fontWeight: 600,
@@ -507,11 +515,11 @@ const estilo = {
     borderRadius: "8px",
     border: "none",
     backgroundColor: COLOR.primary,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "13px",
     fontWeight: 600,
     cursor: "pointer",
-    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+    boxShadow: "0 1px 2px rgba(var(--cn-navy-rgb), 0.05)",
   },
   btnDisabled: {
     opacity: 0.5,

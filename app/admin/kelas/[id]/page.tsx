@@ -14,18 +14,18 @@ import styles from "./page.module.css";
 ============================================================================ */
 
 const WARNA = {
-  navy: "#214F86",
-  teal: "#73C5C5",
-  blue: "#2F6FED",
-  cyan: "#55C7DC",
-  background: "#F5F8FC",
-  white: "#FFFFFF",
-  text: "#172033",
-  secondary: "#6B7280",
-  muted: "#94A3B8",
-  border: "#E5EAF0",
-  success: "#16A34A",
-  danger: "#DC2626",
+  navy: "var(--cn-primary-dark)",
+  teal: "var(--cn-cyan)",
+  blue: "var(--cn-primary)",
+  cyan: "var(--cn-cyan)",
+  background: "var(--cn-tint)",
+  white: "var(--cn-surface)",
+  text: "var(--cn-coral-dark)",
+  secondary: "var(--cn-text)",
+  muted: "var(--cn-coral)",
+  border: "var(--cn-coral-tint)",
+  success: "var(--cn-success)",
+  danger: "var(--cn-danger)",
 };
 
 /* ==========================================================================
@@ -97,7 +97,7 @@ interface StatistikKelas {
   }[];
 
   aktivitasGuru: {
-    mapel: string;
+    label: string;
     jumlah: number;
   }[];
 }
@@ -224,7 +224,8 @@ export default function HalamanDetailKelas() {
   }, [kelasId]);
 
   useEffect(() => {
-    muatDetailKelas();
+    const timer = window.setTimeout(() => { void muatDetailKelas(); }, 0);
+    return () => window.clearTimeout(timer);
   }, [muatDetailKelas]);
 
   /* ==========================================================================
@@ -290,7 +291,8 @@ export default function HalamanDetailKelas() {
   }, [kelasId]);
 
   useEffect(() => {
-    muatStatistik();
+    const timer = window.setTimeout(() => { void muatStatistik(); }, 0);
+    return () => window.clearTimeout(timer);
   }, [muatStatistik]);
 
   /* ==========================================================================
@@ -1250,9 +1252,8 @@ export default function HalamanDetailKelas() {
                     </h3>
 
                     <p>
-                      Frekuensi pemberian
-                      materi atau aktivitas
-                      mapel
+                      Materi, tugas, dan asesmen
+                      yang dibagikan ke kelas
                     </p>
                   </div>
                 </div>
@@ -2658,7 +2659,7 @@ function TeacherActivityChart({
   data,
 }: {
   data: {
-    mapel: string;
+    label: string;
     jumlah: number;
   }[];
 }) {
@@ -2690,7 +2691,7 @@ function TeacherActivityChart({
               className={
                 styles.teacherChartRow
               }
-              key={`${item.mapel}-${index}`}
+              key={`${item.label}-${index}`}
             >
               <div
                 className={
@@ -2702,15 +2703,13 @@ function TeacherActivityChart({
                     styles.teacherSubjectIcon
                   }
                 >
-                  M
+                  {item.label.charAt(0).toUpperCase()}
                 </span>
 
                 <span
-                  title={
-                    item.mapel
-                  }
+                  title={item.label}
                 >
-                  {item.mapel}
+                  {item.label}
                 </span>
               </div>
 

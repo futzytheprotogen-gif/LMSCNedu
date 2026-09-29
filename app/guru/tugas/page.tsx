@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-const WARNA_PRIMARY = "#2196f3";
+const WARNA_PRIMARY = "var(--cn-primary)";
 
 interface KelasRingkas {
   id: string;
@@ -1501,10 +1501,10 @@ const styles = {
   page: {
     minHeight: "100vh",
     background:
-      "linear-gradient(180deg, #f7fbff 0%, #ffffff 42%, #f8fafc 100%)",
+      "linear-gradient(180deg, var(--cn-tint) 0%, var(--cn-surface) 42%, var(--cn-tint) 100%)",
     position: "relative" as const,
     overflow: "hidden" as const,
-    color: "#111827",
+    color: "var(--cn-coral-dark)",
   },
 
   backgroundGlowOne: {
@@ -1512,7 +1512,7 @@ const styles = {
     width: "420px",
     height: "420px",
     borderRadius: "50%",
-    background: "rgba(33, 150, 243, 0.07)",
+    background: "rgba(var(--cn-primary-rgb), 0.07)",
     top: "-180px",
     right: "-120px",
     pointerEvents: "none" as const,
@@ -1523,7 +1523,7 @@ const styles = {
     width: "320px",
     height: "320px",
     borderRadius: "50%",
-    background: "rgba(33, 150, 243, 0.045)",
+    background: "rgba(var(--cn-primary-rgb), 0.045)",
     bottom: "10%",
     left: "-180px",
     pointerEvents: "none" as const,
@@ -1549,7 +1549,7 @@ const styles = {
 
   breadcrumb: {
     fontSize: "12px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     marginBottom: "8px",
     fontWeight: 600,
   },
@@ -1560,13 +1560,13 @@ const styles = {
     lineHeight: 1.2,
     fontWeight: 800,
     letterSpacing: "-0.8px",
-    color: "#0f172a",
+    color: "var(--cn-navy)",
   },
 
   pageSubtitle: {
     margin: "8px 0 0",
     fontSize: "14px",
-    color: "#64748b",
+    color: "var(--cn-coral)",
   },
 
   primaryButton: {
@@ -1577,11 +1577,11 @@ const styles = {
     borderRadius: "12px",
     padding: "12px 18px",
     background: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "13px",
     fontWeight: 700,
     cursor: "pointer",
-    boxShadow: "0 8px 20px rgba(33, 150, 243, 0.22)",
+    boxShadow: "0 8px 20px rgba(var(--cn-primary-rgb), 0.22)",
   },
 
   plusIcon: {
@@ -1598,14 +1598,14 @@ const styles = {
   },
 
   statCard: {
-    background: "#ffffff",
-    border: "1px solid #e7edf4",
+    background: "var(--cn-surface)",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "16px",
     padding: "18px",
     display: "flex",
     alignItems: "center",
     gap: "14px",
-    boxShadow: "0 5px 20px rgba(15, 23, 42, 0.035)",
+    boxShadow: "0 5px 20px rgba(var(--cn-navy-rgb), 0.035)",
   },
 
   statIcon: {
@@ -1615,7 +1615,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "#eef7ff",
+    background: "var(--cn-tint)",
     fontSize: "20px",
     flexShrink: 0,
   },
@@ -1628,7 +1628,7 @@ const styles = {
 
   statLabel: {
     fontSize: "12px",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontWeight: 600,
   },
 
@@ -1636,13 +1636,13 @@ const styles = {
     marginTop: "1px",
     fontSize: "23px",
     lineHeight: 1.25,
-    color: "#0f172a",
+    color: "var(--cn-navy)",
   },
 
   statDescription: {
     marginTop: "1px",
     fontSize: "10px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
   },
 
   toolbar: {
@@ -1650,12 +1650,12 @@ const styles = {
     alignItems: "center",
     justifyContent: "space-between",
     gap: "14px",
-    background: "#ffffff",
-    border: "1px solid #e7edf4",
+    background: "var(--cn-surface)",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "14px",
     padding: "10px",
     marginBottom: "30px",
-    boxShadow: "0 5px 18px rgba(15, 23, 42, 0.025)",
+    boxShadow: "0 5px 18px rgba(var(--cn-navy-rgb), 0.025)",
   },
 
   searchWrapper: {
@@ -1667,7 +1667,7 @@ const styles = {
   },
 
   searchIcon: {
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "21px",
   },
 
@@ -1676,7 +1676,7 @@ const styles = {
     border: "none",
     outline: "none",
     background: "transparent",
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     fontSize: "13px",
   },
 
@@ -1685,13 +1685,13 @@ const styles = {
     gap: "4px",
     padding: "4px",
     borderRadius: "10px",
-    background: "#f1f5f9",
+    background: "var(--cn-coral-tint)",
   },
 
   filterButton: {
     border: "none",
     background: "transparent",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     borderRadius: "8px",
     padding: "7px 12px",
     fontSize: "11px",
@@ -1700,9 +1700,9 @@ const styles = {
   },
 
   filterButtonActive: {
-    background: "#ffffff",
+    background: "var(--cn-surface)",
     color: WARNA_PRIMARY,
-    boxShadow: "0 2px 7px rgba(15, 23, 42, 0.08)",
+    boxShadow: "0 2px 7px rgba(var(--cn-navy-rgb), 0.08)",
   },
 
   section: {
@@ -1728,18 +1728,18 @@ const styles = {
   sectionTitle: {
     margin: 0,
     fontSize: "18px",
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     fontWeight: 800,
   },
 
   sectionSubtitle: {
     margin: "4px 0 0",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "12px",
   },
 
   countBadge: {
-    background: "#eef7ff",
+    background: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     borderRadius: "999px",
     padding: "5px 10px",
@@ -1754,11 +1754,11 @@ const styles = {
   },
 
   taskCard: {
-    background: "#ffffff",
-    border: "1px solid #e6edf5",
+    background: "var(--cn-surface)",
+    border: "1px solid var(--cn-tint)",
     borderRadius: "17px",
     padding: "18px",
-    boxShadow: "0 6px 22px rgba(15, 23, 42, 0.035)",
+    boxShadow: "0 6px 22px rgba(var(--cn-navy-rgb), 0.035)",
   },
 
   taskTop: {
@@ -1771,7 +1771,7 @@ const styles = {
     width: "44px",
     height: "44px",
     borderRadius: "12px",
-    background: "#eef7ff",
+    background: "var(--cn-tint)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -1795,7 +1795,7 @@ const styles = {
     margin: 0,
     fontSize: "15px",
     fontWeight: 800,
-    color: "#111827",
+    color: "var(--cn-coral-dark)",
   },
 
   draftBadge: {
@@ -1803,8 +1803,8 @@ const styles = {
     borderRadius: "999px",
     fontSize: "9px",
     fontWeight: 800,
-    color: "#92400e",
-    background: "#fef3c7",
+    color: "var(--cn-coral)",
+    background: "var(--cn-coral-tint)",
   },
 
   sentBadge: {
@@ -1812,13 +1812,13 @@ const styles = {
     borderRadius: "999px",
     fontSize: "9px",
     fontWeight: 800,
-    color: "#047857",
-    background: "#d1fae5",
+    color: "var(--cn-success)",
+    background: "var(--cn-success-tint)",
   },
 
   taskDescription: {
     margin: "7px 0",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontSize: "12px",
     lineHeight: 1.6,
   },
@@ -1827,7 +1827,7 @@ const styles = {
     display: "flex",
     flexWrap: "wrap" as const,
     gap: "12px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "10px",
   },
 
@@ -1838,8 +1838,8 @@ const styles = {
   },
 
   editButton: {
-    border: "1px solid #dbeafe",
-    background: "#f8fbff",
+    border: "1px solid var(--cn-tint)",
+    background: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     borderRadius: "8px",
     padding: "7px 10px",
@@ -1849,9 +1849,9 @@ const styles = {
   },
 
   deleteButton: {
-    border: "1px solid #fee2e2",
-    background: "#fffafa",
-    color: "#dc2626",
+    border: "1px solid var(--cn-danger-tint)",
+    background: "var(--cn-danger-tint)",
+    color: "var(--cn-danger)",
     borderRadius: "8px",
     padding: "7px 10px",
     fontSize: "11px",
@@ -1862,7 +1862,7 @@ const styles = {
   taskBottom: {
     marginTop: "16px",
     paddingTop: "14px",
-    borderTop: "1px solid #f1f5f9",
+    borderTop: "1px solid var(--cn-coral-tint)",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -1877,7 +1877,7 @@ const styles = {
 
   classLabel: {
     display: "block",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "9px",
     fontWeight: 700,
     textTransform: "uppercase" as const,
@@ -1895,8 +1895,8 @@ const styles = {
     display: "inline-flex",
     padding: "4px 8px",
     borderRadius: "999px",
-    background: "#eef7ff",
-    color: "#1675c5",
+    background: "var(--cn-tint)",
+    color: "var(--cn-primary)",
     fontSize: "10px",
     fontWeight: 700,
   },
@@ -1905,8 +1905,8 @@ const styles = {
     display: "inline-flex",
     padding: "4px 8px",
     borderRadius: "999px",
-    background: "#f8fafc",
-    color: "#94a3b8",
+    background: "var(--cn-tint)",
+    color: "var(--cn-coral)",
     fontSize: "10px",
     fontWeight: 600,
   },
@@ -1920,9 +1920,9 @@ const styles = {
   },
 
   submissionButton: {
-    border: "1px solid #bfdbfe",
-    background: "#eff6ff",
-    color: "#1769aa",
+    border: "1px solid var(--cn-tint)",
+    background: "var(--cn-tint)",
+    color: "var(--cn-primary-dark)",
     borderRadius: "9px",
     padding: "8px 11px",
     fontSize: "10px",
@@ -1932,9 +1932,9 @@ const styles = {
 
   attachmentButton: {
     textDecoration: "none",
-    border: "1px solid #e2e8f0",
-    background: "#ffffff",
-    color: "#475569",
+    border: "1px solid var(--cn-coral-tint)",
+    background: "var(--cn-surface)",
+    color: "var(--cn-coral)",
     borderRadius: "9px",
     padding: "8px 11px",
     fontSize: "10px",
@@ -1957,11 +1957,11 @@ const styles = {
     flexDirection: "column" as const,
     gap: "3px",
     minWidth: "190px",
-    background: "#ffffff",
-    border: "1px solid #e2e8f0",
+    background: "var(--cn-surface)",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "10px",
     padding: "6px",
-    boxShadow: "0 12px 30px rgba(15, 23, 42, 0.12)",
+    boxShadow: "0 12px 30px rgba(var(--cn-navy-rgb), 0.12)",
   },
 
   dropdownOption: {
@@ -1971,14 +1971,14 @@ const styles = {
     borderRadius: "7px",
     padding: "8px",
     fontSize: "11px",
-    color: "#334155",
+    color: "var(--cn-coral-dark)",
     cursor: "pointer",
   },
 
   dropdownClose: {
     border: "none",
-    background: "#f8fafc",
-    color: "#64748b",
+    background: "var(--cn-tint)",
+    color: "var(--cn-coral)",
     borderRadius: "7px",
     padding: "6px",
     fontSize: "10px",
@@ -1986,14 +1986,14 @@ const styles = {
   },
 
   noClassText: {
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "10px",
     padding: "5px",
   },
 
   emptyState: {
-    background: "#ffffff",
-    border: "1px dashed #dbe4ee",
+    background: "var(--cn-surface)",
+    border: "1px dashed var(--cn-coral-tint)",
     borderRadius: "16px",
     padding: "42px 20px",
     display: "flex",
@@ -2008,7 +2008,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "#f1f5f9",
+    background: "var(--cn-coral-tint)",
     borderRadius: "14px",
     fontSize: "20px",
     marginBottom: "10px",
@@ -2016,13 +2016,13 @@ const styles = {
 
   emptyTitle: {
     fontSize: "14px",
-    color: "#334155",
+    color: "var(--cn-coral-dark)",
   },
 
   emptyDescription: {
     margin: "5px 0 15px",
     maxWidth: "420px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "12px",
     lineHeight: 1.5,
   },
@@ -2032,7 +2032,7 @@ const styles = {
     borderRadius: "9px",
     padding: "9px 13px",
     background: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     fontSize: "11px",
     fontWeight: 700,
     cursor: "pointer",
@@ -2046,8 +2046,8 @@ const styles = {
 
   loadingCard: {
     height: "110px",
-    background: "#ffffff",
-    border: "1px solid #e7edf4",
+    background: "var(--cn-surface)",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "16px",
     padding: "18px",
     display: "flex",
@@ -2058,7 +2058,7 @@ const styles = {
     width: "44px",
     height: "44px",
     borderRadius: "12px",
-    background: "#f1f5f9",
+    background: "var(--cn-coral-tint)",
   },
 
   loadingContent: {
@@ -2069,7 +2069,7 @@ const styles = {
     width: "35%",
     height: "13px",
     borderRadius: "6px",
-    background: "#f1f5f9",
+    background: "var(--cn-coral-tint)",
     marginBottom: "12px",
   },
 
@@ -2077,7 +2077,7 @@ const styles = {
     width: "75%",
     height: "9px",
     borderRadius: "6px",
-    background: "#f8fafc",
+    background: "var(--cn-tint)",
     marginBottom: "8px",
   },
 
@@ -2085,13 +2085,13 @@ const styles = {
     width: "45%",
     height: "8px",
     borderRadius: "6px",
-    background: "#f8fafc",
+    background: "var(--cn-tint)",
   },
 
   overlay: {
     position: "fixed" as const,
     inset: 0,
-    background: "rgba(15, 23, 42, 0.52)",
+    background: "rgba(var(--cn-navy-rgb), 0.52)",
     backdropFilter: "blur(4px)",
     display: "flex",
     alignItems: "center",
@@ -2105,9 +2105,9 @@ const styles = {
     maxWidth: "570px",
     maxHeight: "90vh",
     overflowY: "auto" as const,
-    background: "#ffffff",
+    background: "var(--cn-surface)",
     borderRadius: "20px",
-    boxShadow: "0 30px 80px rgba(15, 23, 42, 0.22)",
+    boxShadow: "0 30px 80px rgba(var(--cn-navy-rgb), 0.22)",
   },
 
   submissionModal: {
@@ -2115,9 +2115,9 @@ const styles = {
     maxWidth: "900px",
     maxHeight: "90vh",
     overflowY: "auto" as const,
-    background: "#ffffff",
+    background: "var(--cn-surface)",
     borderRadius: "20px",
-    boxShadow: "0 30px 80px rgba(15, 23, 42, 0.22)",
+    boxShadow: "0 30px 80px rgba(var(--cn-navy-rgb), 0.22)",
   },
 
   modalHeader: {
@@ -2126,7 +2126,7 @@ const styles = {
     justifyContent: "space-between",
     gap: "15px",
     padding: "22px 24px",
-    borderBottom: "1px solid #eef2f7",
+    borderBottom: "1px solid var(--cn-coral-tint)",
   },
 
   modalEyebrow: {
@@ -2139,14 +2139,14 @@ const styles = {
 
   modalTitle: {
     margin: 0,
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     fontSize: "19px",
     fontWeight: 800,
   },
 
   modalDescription: {
     margin: "5px 0 0",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "11px",
   },
 
@@ -2155,8 +2155,8 @@ const styles = {
     height: "32px",
     border: "none",
     borderRadius: "9px",
-    background: "#f8fafc",
-    color: "#64748b",
+    background: "var(--cn-tint)",
+    color: "var(--cn-coral)",
     fontSize: "21px",
     cursor: "pointer",
     flexShrink: 0,
@@ -2171,7 +2171,7 @@ const styles = {
     flexDirection: "column" as const,
     gap: "7px",
     marginBottom: "16px",
-    color: "#334155",
+    color: "var(--cn-coral-dark)",
     fontSize: "12px",
     fontWeight: 700,
   },
@@ -2179,11 +2179,11 @@ const styles = {
   input: {
     width: "100%",
     boxSizing: "border-box" as const,
-    border: "1px solid #dbe3ec",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "10px",
     padding: "11px 12px",
-    background: "#ffffff",
-    color: "#0f172a",
+    background: "var(--cn-surface)",
+    color: "var(--cn-navy)",
     fontSize: "13px",
     outline: "none",
   },
@@ -2191,11 +2191,11 @@ const styles = {
   textarea: {
     width: "100%",
     boxSizing: "border-box" as const,
-    border: "1px solid #dbe3ec",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "10px",
     padding: "11px 12px",
-    background: "#ffffff",
-    color: "#0f172a",
+    background: "var(--cn-surface)",
+    color: "var(--cn-navy)",
     fontSize: "13px",
     outline: "none",
     resize: "vertical" as const,
@@ -2205,8 +2205,8 @@ const styles = {
 
   attachmentBox: {
     padding: "14px",
-    background: "#f8fafc",
-    border: "1px solid #edf2f7",
+    background: "var(--cn-tint)",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "12px",
     marginBottom: "16px",
   },
@@ -2215,13 +2215,13 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "9px",
-    color: "#334155",
+    color: "var(--cn-coral-dark)",
     fontSize: "12px",
     cursor: "pointer",
   },
 
   helperText: {
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "10px",
     fontWeight: 400,
   },
@@ -2234,9 +2234,9 @@ const styles = {
   },
 
   attachmentTab: {
-    border: "1px solid #dbe3ec",
-    background: "#ffffff",
-    color: "#64748b",
+    border: "1px solid var(--cn-coral-tint)",
+    background: "var(--cn-surface)",
+    color: "var(--cn-coral)",
     borderRadius: "8px",
     padding: "7px 12px",
     fontSize: "11px",
@@ -2246,22 +2246,22 @@ const styles = {
 
   attachmentTabActive: {
     borderColor: WARNA_PRIMARY,
-    background: "#eef7ff",
+    background: "var(--cn-tint)",
     color: WARNA_PRIMARY,
   },
 
   fileInput: {
     width: "100%",
     fontSize: "12px",
-    color: "#475569",
+    color: "var(--cn-coral)",
   },
 
   fileInfo: {
     marginTop: "8px",
     padding: "8px 10px",
     borderRadius: "8px",
-    background: "#ffffff",
-    color: "#64748b",
+    background: "var(--cn-surface)",
+    color: "var(--cn-coral)",
     fontSize: "11px",
   },
 
@@ -2273,9 +2273,9 @@ const styles = {
   },
 
   classChip: {
-    border: "1px solid #dbe3ec",
-    background: "#ffffff",
-    color: "#64748b",
+    border: "1px solid var(--cn-coral-tint)",
+    background: "var(--cn-surface)",
+    color: "var(--cn-coral)",
     borderRadius: "999px",
     padding: "7px 11px",
     fontSize: "11px",
@@ -2286,25 +2286,25 @@ const styles = {
   classChipActive: {
     borderColor: WARNA_PRIMARY,
     background: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
   },
 
   noClass: {
     width: "100%",
     padding: "12px",
     borderRadius: "9px",
-    background: "#ffffff",
-    border: "1px dashed #dbe3ec",
-    color: "#94a3b8",
+    background: "var(--cn-surface)",
+    border: "1px dashed var(--cn-coral-tint)",
+    color: "var(--cn-coral)",
     fontSize: "11px",
   },
 
   errorBox: {
     padding: "10px 12px",
     borderRadius: "9px",
-    background: "#fef2f2",
-    border: "1px solid #fecaca",
-    color: "#b91c1c",
+    background: "var(--cn-danger-tint)",
+    border: "1px solid var(--cn-danger-tint)",
+    color: "var(--cn-danger)",
     fontSize: "11px",
     marginBottom: "14px",
   },
@@ -2317,9 +2317,9 @@ const styles = {
   },
 
   cancelButton: {
-    border: "1px solid #dbe3ec",
-    background: "#ffffff",
-    color: "#475569",
+    border: "1px solid var(--cn-coral-tint)",
+    background: "var(--cn-surface)",
+    color: "var(--cn-coral)",
     borderRadius: "9px",
     padding: "10px 15px",
     fontSize: "12px",
@@ -2330,13 +2330,13 @@ const styles = {
   saveButton: {
     border: "none",
     background: WARNA_PRIMARY,
-    color: "#ffffff",
+    color: "var(--cn-surface)",
     borderRadius: "9px",
     padding: "10px 16px",
     fontSize: "12px",
     fontWeight: 800,
     cursor: "pointer",
-    boxShadow: "0 5px 14px rgba(33, 150, 243, 0.2)",
+    boxShadow: "0 5px 14px rgba(var(--cn-primary-rgb), 0.2)",
   },
 
   submissionStats: {
@@ -2352,19 +2352,19 @@ const styles = {
     alignItems: "center",
     gap: "9px",
     padding: "12px",
-    border: "1px solid #e7edf4",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "12px",
-    background: "#f8fafc",
+    background: "var(--cn-tint)",
   },
 
   submissionStatSuccess: {
-    background: "#f0fdf4",
-    borderColor: "#bbf7d0",
+    background: "var(--cn-success-tint)",
+    borderColor: "var(--cn-success-tint)",
   },
 
   submissionStatWarning: {
-    background: "#fffbeb",
-    borderColor: "#fde68a",
+    background: "var(--cn-coral-tint)",
+    borderColor: "var(--cn-coral)",
   },
 
   submissionStatIcon: {
@@ -2374,21 +2374,21 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "9px",
-    background: "#ffffff",
+    background: "var(--cn-surface)",
     fontSize: "14px",
     flexShrink: 0,
   },
 
   submissionStatLabel: {
     display: "block",
-    color: "#64748b",
+    color: "var(--cn-coral)",
     fontSize: "9px",
     fontWeight: 700,
   },
 
   submissionStatValue: {
     display: "block",
-    color: "#0f172a",
+    color: "var(--cn-navy)",
     fontSize: "17px",
     marginTop: "1px",
   },
@@ -2397,7 +2397,7 @@ const styles = {
     margin: "16px 24px",
     padding: "14px",
     borderRadius: "12px",
-    background: "#f8fafc",
+    background: "var(--cn-tint)",
   },
 
   progressHeader: {
@@ -2405,12 +2405,12 @@ const styles = {
     justifyContent: "space-between",
     marginBottom: "8px",
     fontSize: "11px",
-    color: "#475569",
+    color: "var(--cn-coral)",
   },
 
   progressTrack: {
     height: "7px",
-    background: "#e2e8f0",
+    background: "var(--cn-coral-tint)",
     borderRadius: "999px",
     overflow: "hidden",
   },
@@ -2429,7 +2429,7 @@ const styles = {
     gap: "10px",
     margin: "0 24px 12px",
     padding: "8px",
-    border: "1px solid #e7edf4",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "11px",
   },
 
@@ -2439,13 +2439,13 @@ const styles = {
     alignItems: "center",
     gap: "7px",
     padding: "0 5px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "17px",
   },
 
   studentList: {
     margin: "0 24px 24px",
-    border: "1px solid #e7edf4",
+    border: "1px solid var(--cn-coral-tint)",
     borderRadius: "12px",
     overflow: "hidden",
   },
@@ -2455,15 +2455,15 @@ const styles = {
     alignItems: "center",
     gap: "11px",
     padding: "12px 13px",
-    borderBottom: "1px solid #f1f5f9",
-    background: "#ffffff",
+    borderBottom: "1px solid var(--cn-coral-tint)",
+    background: "var(--cn-surface)",
   },
 
   studentAvatar: {
     width: "38px",
     height: "38px",
     borderRadius: "11px",
-    background: "#eaf5ff",
+    background: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     display: "flex",
     alignItems: "center",
@@ -2488,12 +2488,12 @@ const styles = {
   },
 
   studentName: {
-    color: "#1e293b",
+    color: "var(--cn-coral-dark)",
     fontSize: "12px",
   },
 
   studentNis: {
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "10px",
     marginTop: "2px",
   },
@@ -2506,27 +2506,27 @@ const styles = {
   },
 
   statusSuccess: {
-    color: "#059669",
+    color: "var(--cn-success)",
     fontSize: "10px",
     fontWeight: 800,
   },
 
   statusPending: {
-    color: "#d97706",
+    color: "var(--cn-coral)",
     fontSize: "10px",
     fontWeight: 800,
   },
 
   submissionTime: {
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "9px",
   },
 
   fileButton: {
     textDecoration: "none",
-    border: "1px solid #dbeafe",
-    background: "#eff6ff",
-    color: "#1769aa",
+    border: "1px solid var(--cn-tint)",
+    background: "var(--cn-tint)",
+    color: "var(--cn-primary-dark)",
     borderRadius: "8px",
     padding: "7px 9px",
     fontSize: "9px",
@@ -2537,7 +2537,7 @@ const styles = {
   noFile: {
     width: "70px",
     textAlign: "center" as const,
-    color: "#cbd5e1",
+    color: "var(--cn-coral)",
     fontSize: "12px",
   },
 
@@ -2548,14 +2548,14 @@ const styles = {
     justifyContent: "center",
     flexDirection: "column" as const,
     gap: "10px",
-    color: "#94a3b8",
+    color: "var(--cn-coral)",
     fontSize: "12px",
   },
 
   spinner: {
     width: "28px",
     height: "28px",
-    border: "3px solid #e2e8f0",
+    border: "3px solid var(--cn-coral-tint)",
     borderTopColor: WARNA_PRIMARY,
     borderRadius: "50%",
   },
@@ -2564,9 +2564,9 @@ const styles = {
     margin: "25px",
     padding: "30px",
     borderRadius: "14px",
-    background: "#f8fafc",
+    background: "var(--cn-tint)",
     textAlign: "center" as const,
-    color: "#64748b",
+    color: "var(--cn-coral)",
   },
 
   errorIcon: {
@@ -2577,14 +2577,14 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "#fee2e2",
-    color: "#dc2626",
+    background: "var(--cn-danger-tint)",
+    color: "var(--cn-danger)",
     fontWeight: 800,
   },
 
   noStudent: {
     padding: "45px 20px",
     textAlign: "center" as const,
-    color: "#64748b",
+    color: "var(--cn-coral)",
   },
 };

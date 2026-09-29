@@ -15,7 +15,7 @@ interface PropsKelasCard {
   onKlik: () => void;
 }
 
-const WARNA_PRIMARY = "#2196f3";
+const WARNA_PRIMARY = "var(--cn-primary)";
 
 export default function KelasCard({ kelas, onKlik }: PropsKelasCard) {
   const [tersalin, setTersalin] = useState(false);
@@ -57,11 +57,11 @@ export default function KelasCard({ kelas, onKlik }: PropsKelasCard) {
 
 const estilo = {
   kartu: {
-    border: "1px solid #e5e7eb",
+    border: "1px solid var(--cn-line)",
     borderRadius: "12px",
     padding: "16px",
     cursor: "pointer",
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--cn-surface)",
     display: "flex",
     flexDirection: "column" as const,
     gap: "8px",
@@ -71,12 +71,12 @@ const estilo = {
     margin: 0,
     fontSize: "16px",
     fontWeight: 700,
-    color: "#000000",
+    color: "var(--cn-text)",
   },
   deskripsi: {
     margin: 0,
     fontSize: "13px",
-    color: "#6b7280",
+    color: "var(--cn-muted)",
     display: "-webkit-box",
     WebkitLineClamp: 2,
     WebkitBoxOrient: "vertical" as const,
@@ -89,14 +89,14 @@ const estilo = {
     fontSize: "12px",
   },
   badge: {
-    backgroundColor: "#e8f3fe",
+    backgroundColor: "var(--cn-tint)",
     color: WARNA_PRIMARY,
     padding: "2px 8px",
     borderRadius: "999px",
     fontWeight: 600,
   },
   kode_kelas: {
-    color: "#9ca3af",
+    color: "var(--cn-muted)",
     fontFamily: "monospace",
   },
   tombol_salin: {

@@ -104,7 +104,7 @@ export function halamanDashboard(role: RoleAplikasi): string {
     case "GURU":
       return "/guru/kelas";
     case "SISWA":
-      return "/siswa/kelas";
+      return "/siswa";
   }
 }
 
