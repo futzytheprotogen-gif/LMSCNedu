@@ -5,14 +5,17 @@ import bcrypt from "bcryptjs";
 // Prisma 7: koneksi lewat driver adapter, bukan url di datasource.
 // Pastikan .env sudah berisi DB_HOST/DB_PORT/DB_USER/DB_PASSWORD/DB_NAME
 // dan Laragon (MySQL) sudah menyala sebelum menjalankan `npx prisma db seed`.
+
 const adapter = new PrismaMariaDb({
   host: process.env.DB_HOST ?? "127.0.0.1",
   port: Number(process.env.DB_PORT ?? 3306),
   user: process.env.DB_USER ?? "root",
   password: process.env.DB_PASSWORD ?? "",
   database: process.env.DB_NAME ?? "CNedu",
+  ssl: process.env.DB_SSL === "true" ? true : undefined,
 });
 
+console.log("Seed menyambung ke host:", process.env.DB_HOST);
 const prisma = new PrismaClient({ adapter });
 
 // ------------------------------------------------------------

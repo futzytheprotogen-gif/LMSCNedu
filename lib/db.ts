@@ -11,6 +11,7 @@ function buatAdapter() {
     user: process.env.DB_USER ?? "root",
     password: process.env.DB_PASSWORD ?? "",
     database: process.env.DB_NAME ?? "CNedu",
+     ssl: process.env.DB_SSL === "true" ? true : undefined,
   });
 }
 
