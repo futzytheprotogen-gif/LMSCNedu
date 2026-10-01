@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 const WARNA = {
   primary: "var(--cn-primary)",
@@ -56,6 +56,21 @@ export default function HalamanLaporan() {
   const [filterStatus, setFilterStatus] = useState<"SEMUA" | Laporan["status"]>(
     "SEMUA"
   );
+  const filterWrapperRef = useRef<HTMLDivElement | null>(null);
+  const filterButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [filterIndicator, setFilterIndicator] = useState({
+    left: 0,
+    width: 0,
+    opacity: 0,
+  });
+
+  const filterOrder: Array<"SEMUA" | Laporan["status"]> = [
+    "SEMUA",
+    "MENUNGGU",
+    "DITERIMA",
+    "DITOLAK",
+    "SELESAI",
+  ];
 
   const muatLaporan = useCallback(async () => {
     try {
@@ -78,7 +93,11 @@ export default function HalamanLaporan() {
   }, []);
 
   useEffect(() => {
-    muatLaporan();
+    const timer = window.setTimeout(() => {
+      void muatLaporan();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [muatLaporan]);
 
   async function kirimOtp(id: string) {
@@ -147,10 +166,6 @@ export default function HalamanLaporan() {
     (l) => l.status === "MENUNGGU"
   ).length;
 
-  const jumlahDiterima = daftarLaporan.filter(
-    (l) => l.status === "DITERIMA"
-  ).length;
-
   const jumlahSiswa = daftarLaporan.filter(
     (l) => l.tipeAkun === "SISWA"
   ).length;
@@ -178,6 +193,29 @@ export default function HalamanLaporan() {
     return cocokStatus && cocokPencarian;
   });
 
+  useEffect(() => {
+    const activeKey = filterStatus;
+    const activeButton = filterButtonRefs.current[activeKey];
+    const wrapper = filterWrapperRef.current;
+
+    if (!activeButton || !wrapper) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      const wrapperRect = wrapper.getBoundingClientRect();
+      const buttonRect = activeButton.getBoundingClientRect();
+
+      setFilterIndicator({
+        left: buttonRect.left - wrapperRect.left,
+        width: buttonRect.width,
+        opacity: 1,
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [filterStatus]);
+
   return (
     <div style={estilo.halaman}>
       {/* =====================================
@@ -195,6 +233,7 @@ export default function HalamanLaporan() {
         </div>
 
         <button
+          type="button"
           onClick={muatLaporan}
           disabled={sedangMuat}
           style={estilo.tombolRefresh}
@@ -319,69 +358,53 @@ export default function HalamanLaporan() {
             />
           </div>
 
-          <div style={estilo.filterWrapper}>
-            <button
-              onClick={() => setFilterStatus("SEMUA")}
+          <div ref={filterWrapperRef} style={estilo.filterWrapper}>
+            <div
               style={{
-                ...estilo.filterButton,
-                ...(filterStatus === "SEMUA"
-                  ? estilo.filterAktif
-                  : {}),
+                ...estilo.filterIndicator,
+                left: filterIndicator.left,
+                width: filterIndicator.width,
+                opacity: filterIndicator.opacity,
               }}
-            >
-              Semua
-            </button>
+            />
 
-            <button
-              onClick={() => setFilterStatus("MENUNGGU")}
-              style={{
-                ...estilo.filterButton,
-                ...(filterStatus === "MENUNGGU"
-                  ? estilo.filterAktif
-                  : {}),
-              }}
-            >
-              Menunggu
-              {jumlahMenunggu > 0 && (
-                <span style={estilo.filterBadge}>{jumlahMenunggu}</span>
-              )}
-            </button>
+            {filterOrder.map((status) => {
+              const label =
+                status === "SEMUA"
+                  ? "Semua"
+                  : status === "MENUNGGU"
+                    ? "Menunggu"
+                    : status === "DITERIMA"
+                      ? "Diterima"
+                      : status === "DITOLAK"
+                        ? "Ditolak"
+                        : "Selesai";
 
-            <button
-              onClick={() => setFilterStatus("DITERIMA")}
-              style={{
-                ...estilo.filterButton,
-                ...(filterStatus === "DITERIMA"
-                  ? estilo.filterAktif
-                  : {}),
-              }}
-            >
-              Diterima
-            </button>
+              const isActive = filterStatus === status;
 
-            <button
-              onClick={() => setFilterStatus("DITOLAK")}
-              style={{
-                ...estilo.filterButton,
-                ...(filterStatus === "DITOLAK"
-                  ? estilo.filterAktif
-                  : {}),
-              }}
-            >
-              Ditolak
-            </button>
-
-            <button
-              onClick={() => setFilterStatus("SELESAI")}
-              style={{
-                ...estilo.filterButton,
-                ...(filterStatus === "SELESAI"
-                  ? estilo.filterAktif
-                  : {}),
-              }}
-            >
-              Selesai
-            </button>
+              return (
+                <button
+                  key={status}
+                  ref={(node) => {
+                    filterButtonRefs.current[status] = node;
+                  }}
+                  type="button"
+                  onClick={() => setFilterStatus(status)}
+                  aria-pressed={isActive}
+                  style={{
+                    ...estilo.filterButton,
+                    ...(isActive ? estilo.filterAktif : {}),
+                    position: "relative",
+                    zIndex: 2,
+                  }}
+                >
+                  {label}
+                  {status === "MENUNGGU" && jumlahMenunggu > 0 && (
+                    <span style={estilo.filterBadge}>{jumlahMenunggu}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -500,7 +523,7 @@ export default function HalamanLaporan() {
                           backgroundColor: statusStyle.color,
                         }}
                       />
-                      {LABEL_STATUS[laporan.status]}
+                      {LABEL_STATUS[laporan.status] ?? "Status tidak diketahui"}
                     </span>
                   </div>
 
@@ -549,6 +572,7 @@ export default function HalamanLaporan() {
                         {laporan.status === "MENUNGGU" && (
                           <>
                             <button
+                              type="button"
                               onClick={() => kirimOtp(laporan.id)}
                               disabled={
                                 sedangProsesId === laporan.id
@@ -567,6 +591,7 @@ export default function HalamanLaporan() {
                             </button>
 
                             <button
+                              type="button"
                               onClick={() =>
                                 tolakLaporan(laporan.id)
                               }
@@ -583,6 +608,7 @@ export default function HalamanLaporan() {
                         {laporan.status === "DITERIMA" && (
                           <>
                             <button
+                              type="button"
                               onClick={() => kirimOtp(laporan.id)}
                               disabled={
                                 sedangProsesId === laporan.id
@@ -593,6 +619,7 @@ export default function HalamanLaporan() {
                             </button>
 
                             <button
+                              type="button"
                               onClick={() =>
                                 selesaikanLaporan(laporan.id)
                               }
@@ -646,6 +673,12 @@ function gayaStatus(status: Laporan["status"]) {
       return {
         background: WARNA.successSoft,
         color: WARNA.success,
+      };
+
+    default:
+      return {
+        background: WARNA.primarySoft,
+        color: WARNA.primaryDark,
       };
   }
 }
@@ -872,13 +905,31 @@ const estilo = {
   },
 
   filterWrapper: {
+    position: "relative" as const,
     display: "flex",
     gap: "5px",
     flexWrap: "wrap" as const,
+    padding: "2px",
+    borderRadius: "10px",
+    backgroundColor: "rgba(35, 88, 167, 0.04)",
+  },
+
+  filterIndicator: {
+    position: "absolute" as const,
+    top: "2px",
+    left: 0,
+    height: "calc(100% - 4px)",
+    borderRadius: "8px",
+    backgroundColor: WARNA.primarySoft,
+    boxShadow: "0 4px 10px rgba(35, 88, 167, 0.08)",
+    transition: "left 0.28s ease, width 0.28s ease, opacity 0.2s ease",
+    zIndex: 1,
   },
 
   filterButton: {
-    border: "1px solid transparent",
+    appearance: "none" as const,
+    WebkitAppearance: "none" as const,
+    border: "none",
     backgroundColor: "transparent",
     color: WARNA.textSecondary,
     borderRadius: "8px",
@@ -888,13 +939,19 @@ const estilo = {
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
+    justifyContent: "center",
     gap: "5px",
+    lineHeight: 1.2,
+    outline: "none",
+    boxSizing: "border-box" as const,
+    transition: "all 0.2s ease",
+    minWidth: "78px",
   },
 
   filterAktif: {
-    backgroundColor: WARNA.primarySoft,
     color: WARNA.primaryDark,
-    borderColor: "var(--cn-tint)",
+    border: "none",
+    boxShadow: "none",
   },
 
   filterBadge: {

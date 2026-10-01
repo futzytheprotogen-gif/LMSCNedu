@@ -756,7 +756,7 @@ const styles = {
 
   roleButtonActive: {
     backgroundColor: WARNA_PRIMARY,
-    borderColor: WARNA_PRIMARY,
+    border: `1px solid ${WARNA_PRIMARY}`,
     color: "var(--cn-surface)",
     boxShadow: "0 6px 16px rgba(var(--cn-primary-rgb), 0.22)",
   },
