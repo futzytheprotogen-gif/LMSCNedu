@@ -54,25 +54,55 @@ export async function POST(request: NextRequest, { params }: KonteksRute) {
     const { id: kelasId } = await params;
 
     const body = await request.json().catch(() => null);
-    const siswaId = body?.siswaId as string | undefined;
+    const inputIds: unknown[] = Array.isArray(body?.siswaIds)
+      ? body.siswaIds
+      : body?.siswaId
+        ? [body.siswaId]
+        : [];
 
-    if (!siswaId) {
-      return NextResponse.json({ pesan: "siswaId wajib diisi" }, { status: 400 });
+    const siswaIds: string[] = inputIds
+      .filter((value: unknown): value is string => typeof value === "string" && value.trim().length > 0)
+      .map((value: string) => value.trim());
+
+    if (siswaIds.length === 0) {
+      return NextResponse.json({ pesan: "siswaId atau siswaIds wajib diisi" }, { status: 400 });
     }
 
-    await db.kelasSiswa.create({
-      data: { kelasId, siswaId },
+    const siswaSudahAda = await db.kelasSiswa.findMany({
+      where: {
+        kelasId,
+        siswaId: { in: siswaIds },
+      },
+      select: { siswaId: true },
     });
 
-    return NextResponse.json({ pesan: "Siswa berhasil ditambahkan" }, { status: 201 });
+    const siswaIdSet = new Set<string>(siswaSudahAda.map((item) => item.siswaId));
+    const siswaBaru: string[] = siswaIds.filter((siswaId: string) => !siswaIdSet.has(siswaId));
+
+    if (siswaBaru.length === 0) {
+      return NextResponse.json({
+        pesan: "Semua siswa yang dipilih sudah terdaftar di kelas ini",
+        data: { ditambahkan: 0 },
+      }, { status: 200 });
+    }
+
+    await db.kelasSiswa.createMany({
+      data: siswaBaru.map((siswaId: string) => ({ kelasId, siswaId })),
+      skipDuplicates: true,
+    });
+
+    return NextResponse.json({
+      pesan: siswaBaru.length === 1 ? "Siswa berhasil ditambahkan" : `${siswaBaru.length} siswa berhasil ditambahkan`,
+      data: { ditambahkan: siswaBaru.length },
+    }, { status: 201 });
   } catch (error) {
-    // P2002 = unique constraint (siswa udah ada di kelas ini)
     if (typeof error === "object" && error && "code" in error && error.code === "P2002") {
       return NextResponse.json(
         { pesan: "Siswa ini sudah ada di kelas" },
         { status: 409 }
       );
     }
+
     return (
       tanganiErrorRbac(error) ??
       NextResponse.json({ pesan: "Terjadi kesalahan di server" }, { status: 500 })

@@ -625,6 +625,50 @@ export default function HalamanDetailKelas() {
     }
   }
 
+  async function tambahSemuaSiswa() {
+    if (!rombelDipilih || siswaModalTerfilter.length === 0) {
+      return;
+    }
+
+    const ids = [...new Set(siswaModalTerfilter.map((siswa) => siswa.id))];
+
+    setSedangTambahSiswa("bulk");
+
+    try {
+      const response = await fetch(
+        `/api/kelas/${kelasId}/siswa`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            siswaIds: ids,
+          }),
+        }
+      );
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        alert(data?.pesan ?? "Gagal menambahkan semua siswa ke kelas.");
+        return;
+      }
+
+      setSiswaTersedia((prev) =>
+        prev.filter((siswa) => !ids.includes(siswa.id))
+      );
+
+      await muatDetailKelas();
+      await muatStatistik();
+    } catch (error) {
+      console.error(error);
+      alert("Terjadi kesalahan saat menambahkan semua siswa.");
+    } finally {
+      setSedangTambahSiswa(null);
+    }
+  }
+
   async function keluarkanSiswa(
     siswaId: string
   ) {
@@ -1911,27 +1955,43 @@ export default function HalamanDetailKelas() {
             {/* SEARCH DALAM MODAL */}
 
             {rombelDipilih && (
-              <div
-                className={
-                  styles.modalSearch
-                }
-              >
-                <span>⌕</span>
+              <div className={styles.modalToolbar}>
+                <div
+                  className={
+                    styles.modalSearch
+                  }
+                >
+                  <span>⌕</span>
 
-                <input
-                  value={
-                    pencarianSiswaModal
+                  <input
+                    value={
+                      pencarianSiswaModal
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      setPencarianSiswaModal(
+                        event.target
+                          .value
+                      )
+                    }
+                    placeholder="Cari siswa..."
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  className={styles.bulkAddButton}
+                  disabled={
+                    sedangTambahSiswa === "bulk" ||
+                    siswaModalTerfilter.length === 0
                   }
-                  onChange={(
-                    event
-                  ) =>
-                    setPencarianSiswaModal(
-                      event.target
-                        .value
-                    )
-                  }
-                  placeholder="Cari siswa..."
-                />
+                  onClick={tambahSemuaSiswa}
+                >
+                  {sedangTambahSiswa === "bulk"
+                    ? "Menambahkan..."
+                    : `Tambah Semua (${siswaModalTerfilter.length})`}
+                </button>
               </div>
             )}
 
