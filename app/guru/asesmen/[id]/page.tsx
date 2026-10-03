@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -43,6 +44,7 @@ interface DetailAsesmen {
 export default function HalamanDetailAsesmen() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const konfirmasi = useAppConfirm();
 
   const asesmenId = params.id;
 
@@ -252,9 +254,11 @@ export default function HalamanDetailAsesmen() {
   }
 
   async function hapusSoal(soalId: string) {
-    const yakin = confirm(
-      "Hapus soal ini?\n\nSoal yang sudah dihapus tidak dapat dikembalikan."
-    );
+    const yakin = await konfirmasi({
+      title: "Hapus soal ini?",
+      message: "Soal yang dihapus tidak dapat dikembalikan.",
+      confirmLabel: "Hapus soal",
+    });
 
     if (!yakin) return;
 
@@ -354,9 +358,12 @@ export default function HalamanDetailAsesmen() {
       return;
     }
 
-    const yakin = confirm(
-      "Finalisasi asesmen ini?\n\nSetelah difinalisasi, asesmen akan masuk ke kelas tujuan dan siswa dapat mulai mengerjakannya."
-    );
+    const yakin = await konfirmasi({
+      title: "Finalisasi asesmen?",
+      message: "Asesmen akan diterbitkan ke kelas tujuan dan siswa dapat mulai mengerjakannya.",
+      confirmLabel: "Finalisasi",
+      tone: "primary",
+    });
 
     if (!yakin) return;
 

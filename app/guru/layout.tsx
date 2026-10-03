@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 const TINGGI_NAVBAR = 56;
@@ -18,9 +19,16 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
   const [sidebarTerbuka, setSidebarTerbuka] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const konfirmasi = useAppConfirm();
 
   async function handleLogout() {
-    if (!window.confirm("Keluar dari akun CN Edu?")) return;
+    if (!(await konfirmasi({
+      title: "Keluar dari akun?",
+      message: "Sesi CN Edu akan diakhiri pada perangkat ini.",
+      confirmLabel: "Ya, keluar",
+      cancelLabel: "Tetap di sini",
+      tone: "primary",
+    }))) return;
     await fetch("/api/auth", { method: "DELETE" });
     router.push("/login");
   }

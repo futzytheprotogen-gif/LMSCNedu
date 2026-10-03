@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ConfirmDialogProvider } from "@/components/ConfirmDialogProvider";
 
 export const metadata: Metadata = {
   title: "CN Edu — Sistem Belajar Terpadu",
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="id" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
+      </body>
     </html>
   );
 }

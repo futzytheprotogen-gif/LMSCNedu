@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import styles from "./page.module.css";
 
 interface OpsiSiswa {
@@ -34,6 +35,7 @@ type JawabanLokal = Record<string, string | string[]>;
 
 export default function DetailAsesmenSiswa() {
   const params = useParams<{ id: string }>();
+  const konfirmasi = useAppConfirm();
   const [asesmen, setAsesmen] = useState<DetailAsesmenSiswa | null>(null);
   const [jawaban, setJawaban] = useState<JawabanLokal>({});
   const [sedangMuat, setSedangMuat] = useState(true);
@@ -86,7 +88,13 @@ export default function DetailAsesmenSiswa() {
       setError("Jawab semua soal sebelum mengumpulkan.");
       return;
     }
-    if (!window.confirm("Kumpulkan jawaban sekarang? Jawaban tidak dapat diubah setelah dikirim.")) {
+    if (!(await konfirmasi({
+      title: "Kumpulkan jawaban?",
+      message: "Pastikan semua jawaban sudah benar. Setelah dikirim, jawaban tidak dapat diubah.",
+      confirmLabel: "Kumpulkan jawaban",
+      cancelLabel: "Periksa kembali",
+      tone: "primary",
+    }))) {
       return;
     }
 

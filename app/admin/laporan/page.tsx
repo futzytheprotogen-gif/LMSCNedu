@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 
 const WARNA = {
   primary: "var(--cn-primary)",
@@ -48,6 +49,7 @@ const LABEL_STATUS: Record<Laporan["status"], string> = {
 };
 
 export default function HalamanLaporan() {
+  const konfirmasi = useAppConfirm();
   const [daftarLaporan, setDaftarLaporan] = useState<Laporan[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
   const [sedangProsesId, setSedangProsesId] = useState<string | null>(null);
@@ -117,7 +119,11 @@ export default function HalamanLaporan() {
   }
 
   async function tolakLaporan(id: string) {
-    if (!confirm("Tolak dan hapus laporan ini?")) return;
+    if (!(await konfirmasi({
+      title: "Tolak laporan ini?",
+      message: "Laporan akan ditolak dan dihapus dari daftar.",
+      confirmLabel: "Tolak laporan",
+    }))) return;
 
     setSedangProsesId(id);
 
@@ -135,11 +141,12 @@ export default function HalamanLaporan() {
   }
 
   async function selesaikanLaporan(id: string) {
-    if (
-      !confirm(
-        "Tandai laporan ini selesai?\n\nLaporan akan dihapus dari daftar."
-      )
-    ) {
+    if (!(await konfirmasi({
+      title: "Selesaikan laporan?",
+      message: "Laporan akan ditandai selesai dan dihapus dari daftar aktif.",
+      confirmLabel: "Tandai selesai",
+      tone: "primary",
+    }))) {
       return;
     }
 

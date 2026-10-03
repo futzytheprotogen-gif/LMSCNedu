@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import styles from "./page.module.css";
 
 /* ==========================================================================
@@ -109,6 +110,7 @@ interface StatistikKelas {
 export default function HalamanDetailKelas() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const konfirmasi = useAppConfirm();
 
   const kelasId = params.id;
 
@@ -426,10 +428,11 @@ export default function HalamanDetailKelas() {
   ========================================================================== */
 
   async function hapusKelas() {
-    const yakin = confirm(
-      "Yakin ingin menghapus kelas ini?\n\n" +
-        "Semua data terkait siswa, guru, materi, asesmen, tugas, dan pengumuman akan ikut terhapus."
-    );
+    const yakin = await konfirmasi({
+      title: "Hapus kelas ini?",
+      message: "Semua siswa, guru, materi, asesmen, tugas, dan pengumuman dalam kelas ini juga akan terhapus permanen.",
+      confirmLabel: "Hapus kelas",
+    });
 
     if (!yakin) return;
 
@@ -678,12 +681,11 @@ export default function HalamanDetailKelas() {
           item.id === siswaId
       );
 
-    const yakin = confirm(
-      `Keluarkan ${
-        siswa?.nama ??
-        "siswa ini"
-      } dari kelas?`
-    );
+    const yakin = await konfirmasi({
+      title: "Keluarkan siswa dari kelas?",
+      message: `${siswa?.nama ?? "Siswa ini"} tidak lagi terdaftar di kelas ini.`,
+      confirmLabel: "Keluarkan siswa",
+    });
 
     if (!yakin) return;
 
@@ -840,9 +842,11 @@ export default function HalamanDetailKelas() {
     guruId: string,
     mapelId: string
   ) {
-    const yakin = confirm(
-      "Keluarkan guru ini dari kelas untuk mata pelajaran tersebut?"
-    );
+    const yakin = await konfirmasi({
+      title: "Keluarkan guru dari kelas?",
+      message: "Guru ini tidak lagi mengampu mata pelajaran tersebut di kelas ini.",
+      confirmLabel: "Keluarkan guru",
+    });
 
     if (!yakin) return;
 

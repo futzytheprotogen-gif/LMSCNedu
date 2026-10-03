@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -38,6 +39,7 @@ interface DataPengumpulan {
 }
 
 export default function HalamanTugasGuru() {
+  const konfirmasi = useAppConfirm();
   const [daftarTugas, setDaftarTugas] = useState<Tugas[]>([]);
   const [kelasSaya, setKelasSaya] = useState<KelasRingkas[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
@@ -239,11 +241,11 @@ export default function HalamanTugasGuru() {
   }
 
   async function hapusTugas(id: string) {
-    if (
-      !confirm(
-        "Hapus tugas ini?\n\nSemua data pengumpulan siswa yang berkaitan dengan tugas ini juga akan terhapus."
-      )
-    ) {
+    if (!(await konfirmasi({
+      title: "Hapus tugas ini?",
+      message: "Semua data pengumpulan siswa yang berkaitan dengan tugas ini juga akan terhapus.",
+      confirmLabel: "Hapus tugas",
+    }))) {
       return;
     }
 

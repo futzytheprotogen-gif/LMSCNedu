@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { hitungAktivitasBaru } from "@/lib/notifikasiSiswa";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import styles from "./layout.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
@@ -30,6 +31,7 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
 
   const pathname = usePathname();
   const router = useRouter();
+  const konfirmasi = useAppConfirm();
 
   const cekNotifBaru = useCallback(async () => {
     try {
@@ -68,7 +70,13 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
   }, [pathname, cekNotifBaru]);
 
   async function handleLogout() {
-    if (!window.confirm("Keluar dari akun CN Edu?")) return;
+    if (!(await konfirmasi({
+      title: "Keluar dari akun?",
+      message: "Sesi CN Edu akan diakhiri pada perangkat ini.",
+      confirmLabel: "Ya, keluar",
+      cancelLabel: "Tetap di sini",
+      tone: "primary",
+    }))) return;
     await fetch("/api/auth", { method: "DELETE" });
     router.push("/login");
   }

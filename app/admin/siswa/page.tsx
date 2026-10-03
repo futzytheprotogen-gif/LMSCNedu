@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import styles from "./page.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
@@ -25,6 +26,7 @@ interface KelompokRombel {
 }
 
 export default function HalamanDaftarSiswa() {
+  const konfirmasi = useAppConfirm();
   const [kelompok, setKelompok] = useState<KelompokRombel[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
 
@@ -179,9 +181,11 @@ export default function HalamanDaftarSiswa() {
   }
 
   async function hapusSiswa(siswa: SiswaApi) {
-    const yakin = window.confirm(
-      `Hapus akun siswa "${siswa.nama}"?\n\nTindakan ini tidak dapat dibatalkan.`
-    );
+    const yakin = await konfirmasi({
+      title: "Hapus akun siswa?",
+      message: `Akun ${siswa.nama} akan dihapus. Tindakan ini tidak dapat dibatalkan.`,
+      confirmLabel: "Hapus akun",
+    });
 
     if (!yakin) return;
 

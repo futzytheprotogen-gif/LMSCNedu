@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 
 // ------------------------------------------------------------
 // Layout Admin
@@ -39,6 +40,7 @@ export default function LayoutAdmin({
 
   const pathname = usePathname();
   const router = useRouter();
+  const konfirmasi = useAppConfirm();
 
   // ============================================================
   // CEK JUMLAH LAPORAN BARU
@@ -93,7 +95,13 @@ export default function LayoutAdmin({
   // ============================================================
 
   async function handleLogout() {
-    if (!window.confirm("Keluar dari akun CN Edu?")) return;
+    if (!(await konfirmasi({
+      title: "Keluar dari akun?",
+      message: "Sesi CN Edu akan diakhiri pada perangkat ini.",
+      confirmLabel: "Ya, keluar",
+      cancelLabel: "Tetap di sini",
+      tone: "primary",
+    }))) return;
     await fetch("/api/auth", {
       method: "DELETE",
     });

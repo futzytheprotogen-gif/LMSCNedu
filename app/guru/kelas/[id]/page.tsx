@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 
 const WARNA = {
   primary: "var(--cn-primary)",
@@ -70,6 +71,7 @@ interface DetailKelas {
 export default function HalamanDetailKelasGuru() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const konfirmasi = useAppConfirm();
 
   const kelasId = params.id;
 
@@ -197,7 +199,11 @@ export default function HalamanDetailKelasGuru() {
   }
 
   async function hapusPengumuman(id: string) {
-    if (!confirm("Hapus pengumuman ini?")) return;
+    if (!(await konfirmasi({
+      title: "Hapus pengumuman?",
+      message: "Pengumuman ini akan dihapus dari kelas.",
+      confirmLabel: "Hapus pengumuman",
+    }))) return;
 
     try {
       const response = await fetch(

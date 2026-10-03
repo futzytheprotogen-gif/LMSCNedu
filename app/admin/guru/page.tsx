@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import styles from "./page.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
@@ -33,6 +34,7 @@ interface KelompokMapel {
 }
 
 export default function HalamanDaftarGuru() {
+  const konfirmasi = useAppConfirm();
   const [daftarGuru, setDaftarGuru] = useState<GuruApi[]>([]);
   const [daftarMapel, setDaftarMapel] = useState<MapelRingkas[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
@@ -220,9 +222,11 @@ export default function HalamanDaftarGuru() {
   }
 
   async function hapusGuru(guru: GuruApi) {
-    const yakin = confirm(
-      `Hapus akun guru "${guru.nama}"?\n\nData akun akan dihapus dan tindakan ini tidak dapat dibatalkan.`
-    );
+    const yakin = await konfirmasi({
+      title: "Hapus akun guru?",
+      message: `Akun ${guru.nama} akan dihapus. Tindakan ini tidak dapat dibatalkan.`,
+      confirmLabel: "Hapus akun",
+    });
 
     if (!yakin) return;
 
