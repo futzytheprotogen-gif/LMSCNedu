@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import MonitoringCharts, { type DataGrafik } from "@/components/MonitoringCharts";
 
 const WARNA = {
   primary: "var(--cn-primary)",
@@ -28,12 +29,19 @@ interface KelasGuruRingkas {
   mapel: MapelRingkas[];
 }
 
+interface TrenNilaiGuru {
+  label: string;
+  nilai: number | null;
+  jumlah: number;
+}
+
 export default function HalamanKelasGuru() {
   const router = useRouter();
 
   const [daftarKelas, setDaftarKelas] = useState<KelasGuruRingkas[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
   const [kataKunci, setKataKunci] = useState("");
+  const [trenNilai, setTrenNilai] = useState<TrenNilaiGuru[]>([]);
 
   useEffect(() => {
     async function muatKelas() {
@@ -52,6 +60,15 @@ export default function HalamanKelasGuru() {
     }
 
     muatKelas();
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/guru/monitoring", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((hasil) => {
+        if (Array.isArray(hasil.data?.trenNilai)) setTrenNilai(hasil.data.trenNilai);
+      })
+      .catch((error) => console.error("Gagal memuat tren nilai:", error));
   }, []);
 
   const totalSiswa = useMemo(() => {
@@ -79,6 +96,17 @@ export default function HalamanKelasGuru() {
       return cocokJudul || cocokDeskripsi || cocokMapel;
     });
   }, [daftarKelas, kataKunci]);
+
+  const dataDonat: DataGrafik[] = daftarKelas.map((kelas, indeks) => ({
+    label: kelas.judul,
+    nilai: kelas.jumlahSiswa,
+    warna: ["#2563eb", "#0f766e", "#8b5cf6", "#f59e0b", "#ec4899"][indeks % 5],
+  }));
+  const dataPai: DataGrafik[] = [
+    { label: "1 mata pelajaran", nilai: daftarKelas.filter((kelas) => kelas.mapel.length === 1).length, warna: "#0f766e" },
+    { label: "2 mata pelajaran", nilai: daftarKelas.filter((kelas) => kelas.mapel.length === 2).length, warna: "#f59e0b" },
+    { label: "3+ mata pelajaran", nilai: daftarKelas.filter((kelas) => kelas.mapel.length >= 3).length, warna: "#8b5cf6" },
+  ].filter((item) => item.nilai > 0);
 
   return (
     <div style={estilo.halaman}>
@@ -145,6 +173,22 @@ export default function HalamanKelasGuru() {
             </div>
           </div>
         </div>
+      )}
+
+      {!sedangMuat && daftarKelas.length > 0 && (
+        <MonitoringCharts
+          judul="Pemantauan kelas"
+          deskripsi="Sebaran siswa, cakupan mapel, dan tren nilai asesmen enam bulan terakhir."
+          dataDonat={dataDonat}
+          judulDonat="Siswa per kelas"
+          satuanDonat="siswa"
+          dataPai={dataPai}
+          judulPai="Cakupan mapel per kelas"
+          satuanPai="kelas"
+          dataTren={trenNilai}
+          judulTren="Rata-rata nilai selesai"
+          satuanTren="nilai"
+        />
       )}
 
       {/* TOOLBAR */}

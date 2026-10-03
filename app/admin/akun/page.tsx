@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
-type TipeAkun = "SISWA" | "GURU";
+type TipeAkun = "SISWA" | "GURU" | "KEPSEK" | "KURIKULUM";
 
 interface RombelRingkas {
   id: string;
@@ -42,6 +42,8 @@ export default function HalamanBuatAkun() {
   // Field khusus guru
   const [nik, setNik] = useState("");
   const [mapelIdsDipilih, setMapelIdsDipilih] = useState<string[]>([]);
+  const [passwordAwal, setPasswordAwal] = useState("");
+  const [konfirmasiPassword, setKonfirmasiPassword] = useState("");
 
   const [sedangProses, setSedangProses] = useState(false);
   const [pesanError, setPesanError] = useState<string | null>(null);
@@ -50,6 +52,9 @@ export default function HalamanBuatAkun() {
   const [versiInputAkun, setVersiInputAkun] = useState(0);
   const [sedangImpor, setSedangImpor] = useState(false);
   const [hasilImpor, setHasilImpor] = useState<HasilImporAkun | null>(null);
+
+  const akunAdminTier = tipeAkun === "KEPSEK" || tipeAkun === "KURIKULUM";
+  const akunDenganNomorIdentitas = tipeAkun === "SISWA" || tipeAkun === "GURU";
 
   useEffect(() => {
     fetch("/api/kelas-referensi")
@@ -73,6 +78,8 @@ export default function HalamanBuatAkun() {
     setRombelId("");
     setNik("");
     setMapelIdsDipilih([]);
+    setPasswordAwal("");
+    setKonfirmasiPassword("");
   }
 
   function toggleTipeAkun(tipe: TipeAkun) {
@@ -138,29 +145,24 @@ export default function HalamanBuatAkun() {
     setPesanSukses(null);
     setSedangProses(true);
 
+    if (akunAdminTier && passwordAwal !== konfirmasiPassword) {
+      setPesanError("Konfirmasi password tidak sama.");
+      setSedangProses(false);
+      return;
+    }
+
     const bodyUmum = {
       email,
       nama: nama || undefined,
-      tanggalLahir,
       deskripsi: deskripsi || undefined,
       jenisKelamin: jenisKelamin || undefined,
     };
 
-    const body =
-      tipeAkun === "SISWA"
-        ? {
-            tipeAkun,
-            ...bodyUmum,
-            nis,
-            rombelId,
-          }
-        : {
-            tipeAkun,
-            ...bodyUmum,
-            nama,
-            nik,
-            mapelIds: mapelIdsDipilih,
-          };
+    const body = tipeAkun === "SISWA"
+      ? { tipeAkun, ...bodyUmum, tanggalLahir, nis, rombelId }
+      : tipeAkun === "GURU"
+        ? { tipeAkun, ...bodyUmum, tanggalLahir, nama, nik, mapelIds: mapelIdsDipilih }
+        : { tipeAkun, email, nama, deskripsi: deskripsi || undefined, password: passwordAwal, konfirmasiPassword };
 
     try {
       const response = await fetch("/api/akun", {
@@ -211,7 +213,7 @@ export default function HalamanBuatAkun() {
         {/* FORM CARD */}
         <div style={styles.card}>
 
-          <section style={styles.importSection} aria-labelledby="import-akun-title">
+          {!akunAdminTier && <section style={styles.importSection} aria-labelledby="import-akun-title">
             <div style={styles.importHeader}>
               <div>
                 <h2 id="import-akun-title" style={styles.importTitle}>Impor dari Excel</h2>
@@ -256,9 +258,9 @@ export default function HalamanBuatAkun() {
                 )}
               </div>
             )}
-          </section>
+          </section>}
 
-          <div style={styles.divider} />
+          {!akunAdminTier && <div style={styles.divider} />}
 
           {/* ROLE SELECTOR */}
           <div style={styles.roleSection}>
@@ -267,7 +269,7 @@ export default function HalamanBuatAkun() {
             </p>
 
             <div style={styles.roleTabs}>
-              {(["SISWA", "GURU"] as TipeAkun[]).map((tab) => {
+              {(["SISWA", "GURU", "KEPSEK", "KURIKULUM"] as TipeAkun[]).map((tab) => {
                 const aktif = tipeAkun === tab;
 
                 return (
@@ -281,11 +283,11 @@ export default function HalamanBuatAkun() {
                     }}
                   >
                     <span style={styles.roleIcon}>
-                      {tab === "SISWA" ? "🎓" : "👨‍🏫"}
+                      {tab === "SISWA" ? "🎓" : tab === "GURU" ? "👨‍🏫" : tab === "KEPSEK" ? "⌂" : "▤"}
                     </span>
 
                     <span>
-                      {tab === "SISWA" ? "Siswa" : "Guru"}
+                      {tab === "SISWA" ? "Siswa" : tab === "GURU" ? "Guru" : tab === "KEPSEK" ? "Kepsek" : "Kurikulum"}
                     </span>
                   </button>
                 );
@@ -316,7 +318,7 @@ export default function HalamanBuatAkun() {
             </div>
 
             {/* NIS / NIK */}
-            <div style={styles.field}>
+            {akunDenganNomorIdentitas && <div style={styles.field}>
               <label style={styles.label}>
                 {tipeAkun === "SISWA" ? "NIS" : "NIK"}
                 <span style={styles.required}>*</span>
@@ -339,7 +341,7 @@ export default function HalamanBuatAkun() {
                 required
                 style={styles.input}
               />
-            </div>
+            </div>}
 
             {/* NAMA */}
             <div style={styles.field}>
@@ -352,7 +354,7 @@ export default function HalamanBuatAkun() {
                   </span>
                 )}
 
-                {tipeAkun === "GURU" && (
+                {tipeAkun !== "SISWA" && (
                   <span style={styles.required}>*</span>
                 )}
               </label>
@@ -362,13 +364,49 @@ export default function HalamanBuatAkun() {
                 value={nama}
                 onChange={(e) => setNama(e.target.value)}
                 placeholder="Masukkan nama lengkap"
-                required={tipeAkun === "GURU"}
+                required={tipeAkun !== "SISWA"}
                 style={styles.input}
               />
             </div>
 
+            {akunAdminTier && (
+              <>
+                <div style={styles.field}>
+                  <label style={styles.label}>
+                    Password Awal <span style={styles.required}>*</span>
+                  </label>
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={passwordAwal}
+                    onChange={(event) => setPasswordAwal(event.target.value)}
+                    placeholder="Minimal 8 karakter"
+                    minLength={8}
+                    required
+                    style={styles.input}
+                  />
+                  <span style={styles.helper}>Gunakan password yang kuat dan sampaikan kepada pemilik akun melalui jalur aman.</span>
+                </div>
+                <div style={styles.field}>
+                  <label style={styles.label}>
+                    Konfirmasi Password <span style={styles.required}>*</span>
+                  </label>
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={konfirmasiPassword}
+                    onChange={(event) => setKonfirmasiPassword(event.target.value)}
+                    placeholder="Ulangi password awal"
+                    minLength={8}
+                    required
+                    style={styles.input}
+                  />
+                </div>
+              </>
+            )}
+
             {/* GRID */}
-            <div style={styles.grid}>
+            {akunDenganNomorIdentitas && <div style={styles.grid}>
 
               {/* TANGGAL LAHIR */}
               <div style={styles.field}>
@@ -410,7 +448,7 @@ export default function HalamanBuatAkun() {
                 </select>
               </div>
 
-            </div>
+            </div>}
 
             {/* SISWA */}
             {tipeAkun === "SISWA" && (
@@ -567,7 +605,11 @@ export default function HalamanBuatAkun() {
                 : `Buat Akun ${
                     tipeAkun === "SISWA"
                       ? "Siswa"
-                      : "Guru"
+                      : tipeAkun === "GURU"
+                        ? "Guru"
+                        : tipeAkun === "KEPSEK"
+                          ? "Kepsek"
+                          : "Kurikulum"
                   }`}
             </button>
 

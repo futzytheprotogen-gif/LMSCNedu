@@ -1,0 +1,166 @@
+.preview { width: min(1120px, 100%); margin: 0 auto; padding: 0 24px 66px; color: var(--cn-text); }
+.previewIntro { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin: 0 0 18px; }
+.previewEyebrow { color: var(--cn-primary); font-size: 10px; font-weight: 800; letter-spacing: 1px; }
+.previewIntro h2 { margin: 6px 0 0; color: var(--cn-text); font-family: "Sora", sans-serif; font-size: 21px; font-weight: 700; }
+.previewIntro p { margin: 0 0 2px; color: var(--cn-muted); font-size: 12px; }
+.roleTabs { display: flex; width: fit-content; max-width: 100%; gap: 3px; overflow-x: auto; margin-bottom: 12px; padding: 4px; border: 1px solid var(--cn-line); border-radius: 9px; background: var(--cn-tint); scrollbar-width: thin; }
+.roleTab { display: inline-flex; min-height: 34px; flex: 0 0 auto; align-items: center; justify-content: center; gap: 7px; padding: 0 11px; border: 1px solid transparent; border-radius: 6px; color: var(--cn-muted); background: transparent; font-size: 11px; font-weight: 600; cursor: pointer; transition: color 150ms ease, background 150ms ease, box-shadow 150ms ease; }
+.roleTab:hover { color: var(--cn-text); }
+.roleTab > span { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 5px; color: var(--cn-muted); background: var(--cn-line); font-size: 9px; font-weight: 800; }
+.roleTabActive { border-color: var(--cn-line); color: var(--cn-text); background: var(--cn-surface); box-shadow: 0 1px 2px rgb(var(--cn-navy-rgb) / 6%); }
+.roleTabActive > span { color: #fff; background: var(--cn-primary); }
+.roleTab:focus-visible { outline: 3px solid rgb(37 99 235 / 25%); outline-offset: 2px; }
+.window { overflow: hidden; border: 1px solid var(--cn-line); border-radius: 10px; background: var(--cn-surface); box-shadow: 0 20px 55px rgb(var(--cn-navy-rgb) / 11%); animation: reveal 260ms ease both; }
+.windowBar { display: grid; height: 46px; grid-template-columns: 1fr minmax(180px, 1.2fr) 1fr; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--cn-line); background: var(--cn-surface); }
+.windowBrand { display: inline-flex; align-items: center; gap: 7px; color: var(--cn-text); font-size: 10px; }
+.windowBrand > span { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 6px; color: #fff; background: #2563eb; font-size: 8px; font-weight: 800; }
+.windowAddress { display: flex; min-width: 0; align-items: center; gap: 7px; padding: 5px 9px; border: 1px solid var(--cn-line); border-radius: 5px; color: var(--cn-muted); background: var(--cn-bg); font-size: 9px; }
+.windowAddress i { width: 5px; height: 5px; flex: 0 0 auto; border-radius: 50%; background: #22a06b; }
+.windowProfile { display: inline-flex; align-items: center; justify-content: flex-end; gap: 7px; color: var(--cn-muted); font-size: 9px; }
+.windowProfile b { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 50%; color: var(--cn-primary-dark); background: var(--cn-tint); font-size: 8px; }
+.appFrame { display: grid; min-height: 330px; grid-template-columns: 172px minmax(0, 1fr); }
+.appSidebar { position: relative; padding: 18px 10px 45px; border-right: 1px solid var(--cn-line); background: var(--cn-surface); }
+.sidebarLabel { padding: 0 8px 9px; color: var(--cn-muted); font-size: 8px; font-weight: 800; letter-spacing: .8px; }
+.sidebarItem { display: flex; min-height: 31px; align-items: center; gap: 8px; margin-bottom: 3px; padding: 0 8px; border-radius: 5px; color: var(--cn-muted); font-size: 9px; }
+.sidebarItem > span { display: grid; width: 15px; place-items: center; font-size: 10px; }
+.sidebarItemActive { color: var(--cn-primary-dark); background: var(--cn-tint); font-weight: 700; }
+.sidebarFoot { position: absolute; right: 10px; bottom: 12px; left: 10px; display: flex; align-items: center; gap: 7px; padding: 9px 7px 0; border-top: 1px solid var(--cn-line); color: var(--cn-muted); font-size: 8px; }
+.sidebarFoot span { display: grid; width: 19px; height: 19px; place-items: center; border-radius: 6px; color: var(--cn-primary-dark); background: var(--cn-tint); font-weight: 800; }
+.appContent { min-width: 0; padding: 18px 20px 20px; background: var(--cn-bg); }
+.appBreadcrumb { color: var(--cn-muted); font-size: 8px; }
+.appBreadcrumb span { padding: 0 5px; color: var(--cn-line); }
+.appHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 13px 0; }
+.appHeading h3 { margin: 0; color: var(--cn-text); font-family: "Sora", sans-serif; font-size: 14px; font-weight: 700; }
+.appHeading p { margin: 4px 0 0; color: var(--cn-muted); font-size: 9px; }
+.dateMark { display: grid; gap: 3px; padding: 6px 9px; border: 1px solid var(--cn-line); border-radius: 5px; color: var(--cn-muted); background: var(--cn-surface); font-size: 7px; }
+.dateMark b { color: var(--cn-text); font-size: 8px; }
+.statGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.statCard { display: grid; min-width: 0; gap: 8px; padding: 11px; border: 1px solid var(--cn-line); border-radius: 7px; background: var(--cn-surface); }
+.statCardHead { display: flex; align-items: center; gap: 6px; color: var(--cn-muted); font-size: 8px; }
+.statCardHead > span { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 5px; color: var(--cn-primary-dark); background: var(--cn-tint); font-size: 9px; }
+.statCard > strong { color: var(--cn-text); font-family: "Sora", sans-serif; font-size: 20px; line-height: 1; }
+.statCaption { color: var(--cn-muted); font-size: 7px; }
+.activityPanel { margin-top: 10px; padding: 11px; border: 1px solid var(--cn-line); border-radius: 7px; background: var(--cn-surface); }
+.activityHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; color: var(--cn-text); font-size: 9px; }
+.activityHead span { color: var(--cn-primary); font-size: 8px; }
+.activityRow { display: grid; min-height: 31px; grid-template-columns: 19px minmax(0, 1fr) auto; align-items: center; gap: 7px; border-top: 1px solid var(--cn-line); color: var(--cn-text); font-size: 8px; }
+.activityIcon { display: grid; width: 17px; height: 17px; place-items: center; border-radius: 5px; color: var(--cn-primary-dark); background: var(--cn-tint); font-size: 7px; font-weight: 800; }
+.activityIconGreen { color: var(--cn-success); background: var(--cn-success-tint); }
+.activityRow time { color: var(--cn-muted); font-size: 7px; white-space: nowrap; }
+.previewNote { margin: 9px 0 0; color: var(--cn-muted); font-size: 9px; text-align: right; }
+
+@keyframes reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 700px) {
+  .preview { padding: 0 18px 48px; }
+  .previewIntro { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .previewIntro h2 { font-size: 18px; }
+  .previewIntro p { font-size: 11px; }
+  .roleTabs { width: 100%; }
+  .roleTab { flex: 1 0 auto; padding-inline: 9px; }
+  .appFrame { grid-template-columns: 112px minmax(0, 1fr); min-height: 310px; }
+  .appSidebar { padding-inline: 6px; }
+  .sidebarItem { padding-inline: 5px; font-size: 8px; }
+  .appContent { padding: 15px 11px; }
+  .statGrid { gap: 5px; }
+  .statCard { gap: 6px; padding: 8px 6px; }
+  .statCardHead { align-items: flex-start; flex-direction: column; gap: 4px; font-size: 7px; }
+  .statCard > strong { font-size: 16px; }
+  .activityRow { grid-template-columns: 17px minmax(0, 1fr); }
+  .activityRow time { display: none; }
+}
+
+@media (max-width: 420px) {
+  .windowBar { grid-template-columns: 1fr auto; padding-inline: 9px; }
+  .windowAddress { display: none; }
+  .appFrame { grid-template-columns: minmax(0, 1fr); }
+  .appSidebar { display: none; }
+  .appContent { padding: 13px 10px; }
+  .appHeading h3 { font-size: 12px; }
+  .dateMark { display: none; }
+  .statCardHead > span { width: 16px; height: 16px; }
+  .activityRow { font-size: 7px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .window { animation-duration: .01ms; }
+}
+
+:global(:root[data-theme="dark"]) .previewIntro h2 { color: var(--cn-text); }
+:global(:root[data-theme="dark"]) .previewIntro p,
+:global(:root[data-theme="dark"]) .previewNote { color: var(--cn-muted); }
+:global(:root[data-theme="dark"]) .roleTabs {
+  border-color: var(--cn-line);
+  background: var(--cn-tint);
+}
+:global(:root[data-theme="dark"]) .roleTab { color: var(--cn-muted); }
+:global(:root[data-theme="dark"]) .roleTab:hover { color: var(--cn-text); }
+:global(:root[data-theme="dark"]) .roleTab > span {
+  color: var(--cn-muted);
+  background: var(--cn-line);
+}
+:global(:root[data-theme="dark"]) .roleTabActive {
+  border-color: var(--cn-line);
+  color: var(--cn-text);
+  background: var(--cn-surface);
+}
+:global(:root[data-theme="dark"]) .window {
+  border-color: var(--cn-line);
+  background: var(--cn-surface);
+}
+:global(:root[data-theme="dark"]) .windowBar {
+  border-color: var(--cn-line);
+  background: var(--cn-surface);
+}
+:global(:root[data-theme="dark"]) .windowBrand,
+:global(:root[data-theme="dark"]) .appHeading h3 { color: var(--cn-text); }
+:global(:root[data-theme="dark"]) .windowAddress,
+:global(:root[data-theme="dark"]) .dateMark {
+  border-color: var(--cn-line);
+  color: var(--cn-muted);
+  background: var(--cn-bg);
+}
+:global(:root[data-theme="dark"]) .windowProfile { color: var(--cn-muted); }
+:global(:root[data-theme="dark"]) .windowProfile b,
+:global(:root[data-theme="dark"]) .statCardHead > span,
+:global(:root[data-theme="dark"]) .activityIcon {
+  color: var(--cn-primary-dark);
+  background: var(--cn-tint);
+}
+:global(:root[data-theme="dark"]) .appSidebar {
+  border-color: var(--cn-line);
+  background: var(--cn-bg);
+}
+:global(:root[data-theme="dark"]) .sidebarLabel,
+:global(:root[data-theme="dark"]) .appBreadcrumb,
+:global(:root[data-theme="dark"]) .statCaption,
+:global(:root[data-theme="dark"]) .activityRow time { color: var(--cn-muted); }
+:global(:root[data-theme="dark"]) .sidebarItem { color: var(--cn-muted); }
+:global(:root[data-theme="dark"]) .sidebarItemActive {
+  color: var(--cn-primary-dark);
+  background: var(--cn-tint);
+}
+:global(:root[data-theme="dark"]) .sidebarFoot,
+:global(:root[data-theme="dark"]) .activityRow { border-color: var(--cn-line); }
+:global(:root[data-theme="dark"]) .sidebarFoot { color: var(--cn-muted); }
+:global(:root[data-theme="dark"]) .sidebarFoot span {
+  color: var(--cn-primary-dark);
+  background: var(--cn-tint);
+}
+:global(:root[data-theme="dark"]) .appContent { background: var(--cn-bg); }
+:global(:root[data-theme="dark"]) .appHeading p,
+:global(:root[data-theme="dark"]) .statCardHead,
+:global(:root[data-theme="dark"]) .activityRow { color: var(--cn-muted); }
+:global(:root[data-theme="dark"]) .dateMark b,
+:global(:root[data-theme="dark"]) .statCard > strong,
+:global(:root[data-theme="dark"]) .activityHead { color: var(--cn-text); }
+:global(:root[data-theme="dark"]) .statCard,
+:global(:root[data-theme="dark"]) .activityPanel {
+  border-color: var(--cn-line);
+  background: var(--cn-surface);
+}
+:global(:root[data-theme="dark"]) .activityHead span { color: var(--cn-primary-dark); }
+:global(:root[data-theme="dark"]) .activityIconGreen {
+  color: var(--cn-success);
+  background: var(--cn-success-tint);
+}

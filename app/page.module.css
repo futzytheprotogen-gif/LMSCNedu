@@ -35,7 +35,7 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(var(--cn-white-rgb), 0.86);
+  background: rgba(var(--cn-surface-rgb), 0.86);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
 }
@@ -90,6 +90,9 @@
   gap: 16px;
 }
 
+.desktopTheme { display: block; }
+.mobileTheme { display: none; }
+
 .tombolMasukKecil {
   font-size: 14px;
   font-weight: 600;
@@ -133,16 +136,17 @@
 /* ---------------- HERO ---------------- */
 
 .hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .9fr);
+  align-items: center;
+  gap: 28px;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 86px 24px 100px;
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 72px;
-  align-items: center;
+  padding: 72px 24px 34px;
 }
 
 .heroTeks {
+  max-width: 600px;
   animation: naikMasuk 0.6s ease both;
 }
 
@@ -151,13 +155,13 @@
   display: inline-flex;
   margin-bottom: 18px;
   padding: 7px 10px;
-  border: 1px solid var(--cn-tint);
+  border: 1px solid var(--cn-line);
   border-radius: 999px;
   color: var(--primary-dark);
-  background: var(--tint);
+  background: var(--white);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 1.2px;
+  letter-spacing: 0;
 }
 
 @keyframes naikMasuk {
@@ -172,20 +176,21 @@
 }
 
 .heroJudul {
-  font-size: clamp(36px, 4.5vw, 58px);
-  line-height: 1.15;
-  font-weight: 700;
-  letter-spacing: -1.4px;
-  margin: 0 0 20px;
-  max-width: 15ch;
+  color: var(--navy);
+  font-size: 64px;
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: 0;
+  margin: 0 0 14px;
+  max-width: none;
 }
 
 .heroSub {
-  font-size: 16px;
-  line-height: 1.65;
+  font-size: 17px;
+  line-height: 1.6;
   color: var(--ink-soft);
-  max-width: 46ch;
-  margin: 0 0 32px;
+  max-width: 55ch;
+  margin: 0 0 23px;
 }
 
 .heroTombol {
@@ -203,6 +208,7 @@
   border-radius: 9px;
   text-decoration: none;
   display: inline-block;
+  transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
 .tombolUtama:hover {
@@ -221,6 +227,7 @@
   border-radius: 9px;
   text-decoration: none;
   display: inline-block;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
 .tombolSekunder:hover {
@@ -502,7 +509,7 @@
 /* ---------------- ROLE ---------------- */
 
 .roleSeksi {
-  background: var(--navy);
+  background: #0f172a;
   position: relative;
   overflow: hidden;
   padding: 96px 24px;
@@ -511,14 +518,14 @@
 .judulSeksiTerang {
   font-size: 30px;
   font-weight: 700;
-  color: var(--white);
+  color: #fff;
   text-align: center;
   margin: 0 0 12px;
 }
 
 .subSeksiTerang {
   text-align: center;
-  color: rgba(var(--cn-white-rgb), 0.7);
+  color: rgb(255 255 255 / 78%);
   font-size: 15px;
   max-width: 50ch;
   margin: 0 auto 48px;
@@ -533,8 +540,8 @@
 }
 
 .kartuRole {
-  background: rgba(var(--cn-white-rgb), 0.06);
-  border: 1px solid rgba(var(--cn-white-rgb), 0.12);
+  background: rgba(var(--cn-surface-rgb), 0.08);
+  border: 1px solid rgb(255 255 255 / 16%);
   border-radius: 14px;
   padding: 22px;
   display: flex;
@@ -543,8 +550,8 @@
 }
 
 .kartuRole:hover {
-  background: rgba(var(--cn-white-rgb), 0.12);
-  border-color: rgba(var(--cn-white-rgb), 0.25);
+  background: rgba(var(--cn-surface-rgb), 0.14);
+  border-color: rgb(255 255 255 / 30%);
   transform: translateY(-5px);
 }
 
@@ -553,7 +560,7 @@
   height: 40px;
   border-radius: 10px;
   background: var(--coral);
-  color: var(--white);
+  color: #fff;
   font-family: "Sora", sans-serif;
   font-weight: 700;
   display: flex;
@@ -565,14 +572,14 @@
 .namaRole {
   font-size: 16px;
   font-weight: 700;
-  color: var(--white);
+  color: #fff;
   margin: 0 0 6px;
 }
 
 .deskripsiRole {
   font-size: 13px;
   line-height: 1.55;
-  color: rgba(var(--cn-white-rgb), 0.68);
+  color: rgb(255 255 255 / 76%);
   margin: 0;
 }
 
@@ -746,29 +753,19 @@
     display: flex;
   }
 
-  .navToggleInput:checked ~ .navMobileMenu {
+  .desktopTheme { display: none; }
+  .mobileTheme { display: flex; align-items: center; padding: 4px 0; }
+  .mobileTheme :global(.cn-theme-control) { width: 100%; justify-content: space-between; }
+  .mobileTheme :global(.cn-theme-control select) { min-width: 148px; }
+  .mobileTheme :global(.cn-theme-control span) { color: var(--ink-soft); }
+
+  .navToggleInput:checked ~ .navbar .navMobileMenu {
     display: flex;
   }
 
-  .hero {
-    grid-template-columns: 1fr;
-    padding-top: 48px;
-    padding-bottom: 72px;
-    gap: 44px;
-  }
+  .hero { padding-top: 54px; padding-bottom: 26px; }
 
-  .heroJudul {
-    font-size: 32px;
-    max-width: none;
-  }
-
-  .heroVisual {
-    order: -1;
-  }
-
-  .mockupWindow {
-    transform: none;
-  }
+  .heroJudul { font-size: 54px; max-width: none; }
 
   .baFitur,
   .baFiturTerbalik {
@@ -800,6 +797,15 @@
   }
 }
 
+@media (max-width: 600px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .heroTeks { max-width: none; }
+}
+
 @media (max-width: 520px) {
   .navbarInner,
   .hero,
@@ -812,9 +818,7 @@
     padding-right: 18px;
   }
 
-  .heroJudul {
-    font-size: 35px;
-  }
+  .heroJudul { font-size: 44px; }
 
   .heroSub {
     font-size: 15px;

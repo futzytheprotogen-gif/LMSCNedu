@@ -11,6 +11,71 @@
   min-width: 0;
 }
 
+.halaman {
+  background: #f8fafc !important;
+}
+
+.backgroundGlow1,
+.backgroundGlow2,
+.visualCircleLarge,
+.visualCircleSmall {
+  display: none !important;
+}
+
+.wrapper {
+  max-width: 980px !important;
+  min-height: 600px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 55px rgb(15 23 42 / 9%) !important;
+}
+
+.panelKiri {
+  background-color: #f1f6fd !important;
+  background-image:
+    linear-gradient(rgb(37 99 235 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(37 99 235 / 3%) 1px, transparent 1px) !important;
+  background-size: 28px 28px !important;
+  border-right: 1px solid #e2e8f0 !important;
+}
+
+.panelKanan {
+  background: #fff !important;
+}
+
+.tab {
+  border: 1px solid transparent !important;
+  border-radius: 6px !important;
+}
+
+.tab:hover:not(:disabled) {
+  color: #0f172a !important;
+  background: #f8fafc !important;
+}
+
+.tab:focus-visible,
+.passwordToggle:focus-visible,
+.linkLupa:focus-visible {
+  outline: 3px solid rgb(37 99 235 / 24%) !important;
+  outline-offset: 2px !important;
+}
+
+.input:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 11%);
+}
+
+.tombol {
+  border-radius: 7px !important;
+}
+
+.visual {
+  right: 8px !important;
+  bottom: 40px !important;
+  width: 280px !important;
+  height: 130px !important;
+}
+
 @media (max-width: 900px) {
   .wrapper {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) !important;
@@ -97,4 +162,27 @@
     gap: 4px !important;
     font-size: 10px !important;
   }
+}
+
+:global(:root[data-theme="dark"]) .halaman {
+  background: var(--cn-bg) !important;
+}
+
+:global(:root[data-theme="dark"]) .wrapper {
+  border-color: var(--cn-line) !important;
+  background: var(--cn-surface) !important;
+}
+
+:global(:root[data-theme="dark"]) .panelKiri {
+  background-color: #0e1727 !important;
+  border-color: var(--cn-line) !important;
+}
+
+:global(:root[data-theme="dark"]) .panelKanan {
+  background: var(--cn-surface) !important;
+}
+
+:global(:root[data-theme="dark"]) .tab:hover:not(:disabled) {
+  color: var(--cn-text) !important;
+  background: var(--cn-tint) !important;
 }

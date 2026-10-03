@@ -3,8 +3,11 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "motion/react";
 import { hitungAktivitasBaru } from "@/lib/notifikasiSiswa";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import ThemeSwitchButton from "@/components/ThemeSwitchButton";
+import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 import styles from "./layout.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
@@ -96,25 +99,31 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
 
         <span className="cn-role-brand" style={estilo.namaBrand}>CN Edu — Siswa</span>
         <div style={estilo.navKanan}>
+          <ThemeSwitchButton />
           <Link href="/profil/saya" style={estilo.tombolProfil}>Profil</Link>
         </div>
       </header>
 
-      {sidebarTerbuka && (
-        <div
-          className={`cn-role-overlay ${styles.overlay}`}
-          style={estilo.overlay}
-          onClick={() => setSidebarTerbuka(false)}
-          aria-hidden="true"
-        />
-      )}
+      <AnimatePresence>
+        {sidebarTerbuka && (
+          <motion.div
+            aria-hidden="true"
+            animate={{ opacity: 1 }}
+            className={`cn-role-overlay ${styles.overlay}`}
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+            onClick={() => setSidebarTerbuka(false)}
+            style={estilo.overlay}
+          />
+        )}
+      </AnimatePresence>
 
-      <aside
+      <motion.aside
         className={`cn-role-sidebar ${styles.sidebar}`}
-        style={{
-          ...estilo.sidebar,
-          transform: sidebarTerbuka ? "translateX(0)" : "translateX(-100%)",
-        }}
+        initial={false}
+        animate={{ x: sidebarTerbuka ? 0 : "-100%" }}
+        transition={TRANSISI_DRAWER_ROLE}
+        style={estilo.sidebar}
       >
         <div className={`cn-role-sidebar-header ${styles.sidebarHeader}`} style={estilo.headerSidebar}>
           <span style={estilo.namaBrandSidebar}>CN Edu</span>
@@ -128,26 +137,21 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <nav style={estilo.nav}>
+        <motion.nav style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
           {MENU_SISWA.map((item) => {
             const aktif = item.href === "/siswa"
               ? pathname === item.href
               : pathname.startsWith(item.href);
 
             return (
+              <motion.div key={item.href} variants={VARIAN_ITEM_MENU_ROLE} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
               <Link
-                key={item.href}
                 href={item.href}
                 onClick={() => {
                   setSidebarTerbuka(false);
-                  if (item.notifikasi) {
-                    setTimeout(cekNotifBaru, 500);
-                  }
+                  if (item.notifikasi) setTimeout(cekNotifBaru, 500);
                 }}
-                style={{
-                  ...estilo.linkMenu,
-                  ...(aktif ? estilo.linkMenuAktif : {}),
-                }}
+                style={{ ...estilo.linkMenu, ...(aktif ? estilo.linkMenuAktif : {}) }}
               >
                 <span style={estilo.labelMenu}>{item.label}</span>
 
@@ -160,16 +164,17 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
                   </span>
                 )}
               </Link>
+              </motion.div>
             );
           })}
-        </nav>
+        </motion.nav>
 
         <div className="cn-role-sidebar-footer">
           <button className="cn-role-logout-action" onClick={handleLogout} type="button">
             Keluar dari akun
           </button>
         </div>
-      </aside>
+      </motion.aside>
 
       <main className={`cn-role-main ${styles.content}`} style={estilo.konten}>{children}</main>
     </div>
@@ -208,7 +213,7 @@ const estilo = {
     justifyContent: "center",
   },
   namaBrand: { fontSize: "15px", fontWeight: 700, color: "var(--cn-coral-dark)" },
-  navKanan: { display: "flex", alignItems: "center", marginLeft: "auto" },
+  navKanan: { display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" },
   tombolProfil: { fontSize: "13px", fontWeight: 700, color: WARNA_PRIMARY, textDecoration: "none", padding: "8px 10px" },
   overlay: {
     position: "fixed" as const,
@@ -226,7 +231,6 @@ const estilo = {
     backgroundColor: "var(--cn-surface)",
     borderRight: "1px solid var(--cn-line)",
     zIndex: 50,
-    transition: "transform 0.22s ease-in-out",
     display: "flex",
     flexDirection: "column" as const,
     boxShadow: "8px 0 25px rgba(var(--cn-navy-rgb), 0.08)",

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAppNotice } from "@/components/AppNoticeProvider";
 
 const WARNA = {
   primary: "var(--cn-primary)",
@@ -41,6 +42,7 @@ type FilterStatus = "SEMUA" | "PROSES" | "SELESAI";
 
 export default function HalamanAsesmenGuru() {
   const router = useRouter();
+  const beriNotifikasi = useAppNotice();
 
   const [daftar, setDaftar] = useState<AsesmenRingkas[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
@@ -73,10 +75,10 @@ export default function HalamanAsesmenGuru() {
         setDaftar((prev) => prev.filter((a) => a.id !== asesmenDiHapus.id));
         setAsesmenDiHapus(null);
       } else {
-        alert("Gagal menghapus asesmen. Silakan coba lagi.");
+        beriNotifikasi("Gagal menghapus asesmen. Silakan coba lagi.", "error");
       }
     } catch {
-      alert("Terjadi kesalahan saat menghapus asesmen.");
+      beriNotifikasi("Terjadi kesalahan saat menghapus asesmen.", "error");
     } finally {
       setSedangMenghapus(false);
     }

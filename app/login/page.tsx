@@ -603,7 +603,7 @@ const estilo = {
     gap: "10px",
     padding: "11px 14px",
     borderRadius: "11px",
-    backgroundColor: "rgba(var(--cn-white-rgb), 0.92)",
+    backgroundColor: "var(--cn-surface)",
     border: "1px solid var(--cn-tint)",
     boxShadow:
       "0 10px 25px rgba(var(--cn-primary-rgb), 0.08)",
@@ -618,7 +618,7 @@ const estilo = {
     gap: "10px",
     padding: "11px 14px",
     borderRadius: "11px",
-    backgroundColor: "rgba(var(--cn-white-rgb), 0.92)",
+    backgroundColor: "var(--cn-surface)",
     border: "1px solid var(--cn-tint)",
     boxShadow:
       "0 10px 25px rgba(var(--cn-primary-rgb), 0.08)",

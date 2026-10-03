@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import EmptyStateFox from "@/components/EmptyStateFox";
 import styles from "./page.module.css";
 
 interface KelasSiswa {
@@ -117,7 +118,7 @@ export default function BerandaSiswa() {
                       </Link>
                     ))}
                   </div>
-                ) : <p className={styles.empty}>Tidak ada tugas yang tertunda.</p>}
+                ) : <div className={styles.emptyState}><EmptyStateFox compact /><span>Tidak ada tugas yang tertunda.</span></div>}
 
                 <div className={styles.sectionHeadingSecondary}>
                   <div><p className={styles.sectionEyebrow}>ASESMEN</p><h2>Siap dikerjakan</h2></div>
@@ -133,7 +134,7 @@ export default function BerandaSiswa() {
                       </Link>
                     ))}
                   </div>
-                ) : <p className={styles.empty}>Tidak ada asesmen yang menunggu.</p>}
+                ) : <div className={styles.emptyState}><EmptyStateFox compact /><span>Tidak ada asesmen yang menunggu.</span></div>}
               </section>
 
               <aside className={styles.section}>
@@ -151,7 +152,7 @@ export default function BerandaSiswa() {
                       </Link>
                     ))}
                   </div>
-                ) : <p className={styles.empty}>Kamu belum tergabung di kelas.</p>}
+                ) : <div className={styles.emptyState}><EmptyStateFox compact /><span>Kamu belum tergabung di kelas.</span></div>}
                 <Link className={styles.profileLink} href="/profil/saya">Perbarui profil <span aria-hidden="true">→</span></Link>
               </aside>
             </div>
@@ -190,7 +191,7 @@ export default function BerandaSiswa() {
                   ))}
                 </div>
               ) : (
-                <p className={styles.empty}>Belum ada aktivitas dari kelasmu.</p>
+                <div className={styles.emptyState}><EmptyStateFox compact /><span>Belum ada aktivitas dari kelasmu.</span></div>
               )}
             </section>
           </>

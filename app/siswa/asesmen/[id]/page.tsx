@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
@@ -41,6 +41,10 @@ export default function DetailAsesmenSiswa() {
   const [sedangMuat, setSedangMuat] = useState(true);
   const [sedangKirim, setSedangKirim] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [indeksSoal, setIndeksSoal] = useState(0);
+  const [daftarSoalTerbuka, setDaftarSoalTerbuka] = useState(false);
+  const [skalaTeks, setSkalaTeks] = useState(0);
+  const [waktuBerlalu, setWaktuBerlalu] = useState(0);
 
   const muat = useCallback(async () => {
     setSedangMuat(true);
@@ -62,6 +66,30 @@ export default function DetailAsesmenSiswa() {
     return () => window.clearTimeout(timer);
   }, [muat]);
 
+  useEffect(() => {
+    if (!asesmen || asesmen.submission) return;
+
+    const kunciWaktu = `cnedu-asesmen-${asesmen.id}-dimulai`;
+    const waktuTersimpan = Number(sessionStorage.getItem(kunciWaktu));
+    const waktuMulai = Number.isFinite(waktuTersimpan) && waktuTersimpan > 0
+      ? waktuTersimpan
+      : Date.now();
+
+    if (waktuMulai !== waktuTersimpan) sessionStorage.setItem(kunciWaktu, String(waktuMulai));
+
+    const timerAwal = window.setTimeout(() => {
+      setWaktuBerlalu(Math.max(0, Math.floor((Date.now() - waktuMulai) / 1000)));
+    }, 0);
+    const interval = window.setInterval(() => {
+      setWaktuBerlalu(Math.max(0, Math.floor((Date.now() - waktuMulai) / 1000)));
+    }, 1000);
+
+    return () => {
+      window.clearTimeout(timerAwal);
+      window.clearInterval(interval);
+    };
+  }, [asesmen]);
+
   const jumlahDijawab = useMemo(() => {
     if (!asesmen) return 0;
     return asesmen.soal.filter((soal) => {
@@ -69,6 +97,24 @@ export default function DetailAsesmenSiswa() {
       return Array.isArray(value) ? value.length > 0 : Boolean(value?.trim());
     }).length;
   }, [asesmen, jawaban]);
+
+  const soalAktif = asesmen?.soal[indeksSoal];
+  const durasiDetik = (asesmen?.durasiMenit ?? 0) * 60;
+  const waktuTampil = durasiDetik > 0 ? Math.max(0, durasiDetik - waktuBerlalu) : waktuBerlalu;
+  const jam = String(Math.floor(waktuTampil / 3600)).padStart(2, "0");
+  const menit = String(Math.floor((waktuTampil % 3600) / 60)).padStart(2, "0");
+  const detik = String(waktuTampil % 60).padStart(2, "0");
+
+  function soalSudahDijawab(soalId: string) {
+    const jawabanSoal = jawaban[soalId];
+    return Array.isArray(jawabanSoal) ? jawabanSoal.length > 0 : Boolean(jawabanSoal?.trim());
+  }
+
+  function pilihNomorSoal(nomor: number) {
+    setIndeksSoal(nomor);
+    setDaftarSoalTerbuka(false);
+    setError(null);
+  }
 
   function pilihOpsi(soal: SoalSiswa, opsiId: string) {
     setJawaban((sebelumnya) => {
@@ -86,6 +132,11 @@ export default function DetailAsesmenSiswa() {
   async function kirimJawaban() {
     if (!asesmen || jumlahDijawab !== asesmen.soal.length) {
       setError("Jawab semua soal sebelum mengumpulkan.");
+      const soalKosong = asesmen?.soal.findIndex((soal) => !soalSudahDijawab(soal.id)) ?? -1;
+      if (soalKosong >= 0) {
+        setIndeksSoal(soalKosong);
+        setDaftarSoalTerbuka(false);
+      }
       return;
     }
     if (!(await konfirmasi({
@@ -138,23 +189,29 @@ export default function DetailAsesmenSiswa() {
 
   return (
     <main className={styles.container}>
-      <Link className={styles.backLink} href="/siswa/asesmen">← Kembali ke asesmen</Link>
+      {!asesmen.submission && (
+        <div className={styles.timerBar}>
+          <div className={styles.timerCopy}>
+            <span className={styles.timerDot} />
+            <span>{durasiDetik > 0 ? "Sisa waktu" : `Waktu ${asesmen.tipe === "UJIAN" ? "ujian" : "kuis"}`}</span>
+            <strong>{jam}:{menit}:{detik}</strong>
+          </div>
+          <span className={styles.timeLimit}>{asesmen.durasiMenit ? `Durasi ${asesmen.durasiMenit} menit` : "Tanpa batas waktu"}</span>
+        </div>
+      )}
+
       <header className={styles.header}>
-        <div>
+        <div className={styles.headerTitle}>
+          <Link className={styles.backLink} href="/siswa/asesmen">← Kembali ke asesmen</Link>
           <p className={styles.eyebrow}>{asesmen.tipe === "UJIAN" ? "UJIAN" : "KUIS"} · {asesmen.mapel}</p>
           <h1>{asesmen.judul}</h1>
-          <p className={styles.meta}>
-            {asesmen.guru} <span aria-hidden="true">·</span> {asesmen.soal.length} soal
-            {asesmen.durasiMenit ? <><span aria-hidden="true">·</span> {asesmen.durasiMenit} menit</> : null}
-          </p>
-          <div className={styles.classes}>
-            {asesmen.kelasTujuan.map((kelas) => <span key={kelas.id}>{kelas.judul}</span>)}
-          </div>
+          <p className={styles.meta}>{asesmen.guru} <span aria-hidden="true">·</span> {asesmen.soal.length} soal</p>
         </div>
         {!asesmen.submission && (
-          <div className={styles.progress}>
-            <strong>{jumlahDijawab}/{asesmen.soal.length}</strong>
+          <div className={styles.progress} aria-label={`${jumlahDijawab} dari ${asesmen.soal.length} soal dijawab`}>
+            <strong>{jumlahDijawab}<span>/{asesmen.soal.length}</span></strong>
             <span>soal dijawab</span>
+            <div className={styles.progressTrack}><span style={{ width: `${asesmen.soal.length ? (jumlahDijawab / asesmen.soal.length) * 100 : 0}%` }} /></div>
           </div>
         )}
       </header>
@@ -173,57 +230,106 @@ export default function DetailAsesmenSiswa() {
         </section>
       ) : (
         <>
-          <div className={styles.instructions}>Pilih atau tulis satu jawaban untuk setiap soal, lalu kumpulkan.</div>
-          <div className={styles.questions}>
-            {asesmen.soal.map((soal, index) => {
-              const pilihan = Array.isArray(jawaban[soal.id])
-                ? jawaban[soal.id] as string[]
-                : [jawaban[soal.id] as string | undefined].filter(Boolean) as string[];
-              return (
-                <fieldset className={styles.question} key={soal.id} aria-labelledby={`question-title-${soal.id}`}>
-                  <div className={styles.questionHeading} id={`question-title-${soal.id}`}>
-                    <span className={styles.questionNumber}>{String(index + 1).padStart(2, "0")}</span>
-                    <span>{soal.pertanyaan}</span>
-                  </div>
-                  {soal.gambar && <img className={styles.questionImage} src={soal.gambar} alt={`Ilustrasi soal ${index + 1}`} />}
-                  {soal.tipe === "ESSAY" ? (
-                    <textarea
-                      className={styles.essay}
-                      value={typeof jawaban[soal.id] === "string" ? jawaban[soal.id] : ""}
-                      onChange={(event) => setJawaban((sebelumnya) => ({ ...sebelumnya, [soal.id]: event.target.value }))}
-                      placeholder="Tulis jawabanmu di sini"
-                      rows={5}
-                    />
-                  ) : (
-                    <div className={styles.options}>
-                      {soal.opsi.map((opsi) => {
-                        const dipilih = pilihan.includes(opsi.id);
-                        return (
-                          <label className={dipilih ? styles.optionSelected : styles.option} key={opsi.id}>
-                            <input
-                              type={soal.tipe === "CHECKBOX" ? "checkbox" : "radio"}
-                              name={soal.id}
-                              checked={dipilih}
-                              onChange={() => pilihOpsi(soal, opsi.id)}
-                            />
-                            <span>{opsi.teks}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-                </fieldset>
-              );
-            })}
-          </div>
+          {soalAktif && (
+            <fieldset className={styles.question} key={soalAktif.id} aria-labelledby={`question-title-${soalAktif.id}`}>
+              <div className={styles.questionToolbar}>
+                <span className={styles.questionNumber}>No. {String(indeksSoal + 1).padStart(2, "0")}</span>
+                <div className={styles.textControls} aria-label="Ukuran teks soal">
+                  <button type="button" onClick={() => setSkalaTeks((skala) => Math.max(-2, skala - 1))} aria-label="Kecilkan teks">A−</button>
+                  <button type="button" onClick={() => setSkalaTeks(0)} aria-label="Reset ukuran teks">↻</button>
+                  <button type="button" onClick={() => setSkalaTeks((skala) => Math.min(4, skala + 1))} aria-label="Besarkan teks">A+</button>
+                </div>
+              </div>
+              <legend className={styles.questionHeading} id={`question-title-${soalAktif.id}`} style={{ fontSize: `${16 + skalaTeks * 2}px` }}>
+                {soalAktif.pertanyaan}
+              </legend>
+              {soalAktif.gambar && <img className={styles.questionImage} src={soalAktif.gambar} alt={`Ilustrasi soal ${indeksSoal + 1}`} />}
+              {soalAktif.tipe === "ESSAY" ? (
+                <textarea
+                  className={styles.essay}
+                  style={{ fontSize: `${15 + skalaTeks * 2}px` }}
+                  value={typeof jawaban[soalAktif.id] === "string" ? jawaban[soalAktif.id] : ""}
+                  onChange={(event) => setJawaban((sebelumnya) => ({ ...sebelumnya, [soalAktif.id]: event.target.value }))}
+                  placeholder="Tulis jawabanmu di sini"
+                  rows={5}
+                />
+              ) : (
+                <div className={styles.options} role={soalAktif.tipe === "CHECKBOX" ? "group" : "radiogroup"} aria-label="Pilihan jawaban">
+                  {soalAktif.opsi.map((opsi, index) => {
+                    const pilihanAktif = Array.isArray(jawaban[soalAktif.id])
+                      ? jawaban[soalAktif.id] as string[]
+                      : [jawaban[soalAktif.id] as string | undefined].filter(Boolean) as string[];
+                    const dipilih = pilihanAktif.includes(opsi.id);
+                    return (
+                      <label className={`${styles.option} ${dipilih ? styles.optionSelected : ""}`} key={opsi.id}>
+                        <input
+                          type={soalAktif.tipe === "CHECKBOX" ? "checkbox" : "radio"}
+                          name={soalAktif.id}
+                          checked={dipilih}
+                          onChange={() => pilihOpsi(soalAktif, opsi.id)}
+                        />
+                        <span className={styles.optionLetter}>{String.fromCharCode(65 + index)}</span>
+                        <span className={styles.optionText} style={{ fontSize: `${15 + skalaTeks * 2}px` }}>{opsi.teks}</span>
+                        {dipilih && <span className={styles.optionCheck} aria-hidden="true">✓</span>}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+              <div className={styles.answerState}>
+                <span className={soalSudahDijawab(soalAktif.id) ? styles.answeredDot : styles.unansweredDot} />
+                {soalSudahDijawab(soalAktif.id) ? "Jawaban tersimpan di perangkat ini" : "Belum dijawab"}
+              </div>
+            </fieldset>
+          )}
+
           {error && <p className={styles.inlineError} role="alert">{error}</p>}
-          <div className={styles.submitRow}>
-            <span>{jumlahDijawab} dari {asesmen.soal.length} soal dijawab</span>
-            <button type="button" onClick={kirimJawaban} disabled={sedangKirim || jumlahDijawab !== asesmen.soal.length}>
-              {sedangKirim ? "Mengirim..." : "Kumpulkan jawaban"}
-              <span aria-hidden="true">→</span>
+
+          <nav className={styles.navigationDock} aria-label="Navigasi soal">
+            <button className={styles.dockAction} type="button" onClick={() => pilihNomorSoal(Math.max(0, indeksSoal - 1))} disabled={indeksSoal === 0}>
+              <span aria-hidden="true">←</span><small>Sebelumnya</small>
             </button>
-          </div>
+            <button className={styles.dockAction} type="button" onClick={() => setDaftarSoalTerbuka(true)}>
+              <span aria-hidden="true">☷</span><small>Daftar soal</small><i>{jumlahDijawab}/{asesmen.soal.length}</i>
+            </button>
+            <button className={`${styles.dockAction} ${styles.finishAction}`} type="button" onClick={kirimJawaban} disabled={sedangKirim}>
+              <span aria-hidden="true">{sedangKirim ? "…" : "↗"}</span><small>{sedangKirim ? "Mengirim" : "Selesai"}</small>
+            </button>
+          </nav>
+
+          {daftarSoalTerbuka && (
+            <div className={styles.sheetOverlay} onMouseDown={(event: MouseEvent<HTMLDivElement>) => {
+              if (event.target === event.currentTarget) setDaftarSoalTerbuka(false);
+            }}>
+              <section className={styles.questionSheet} role="dialog" aria-modal="true" aria-labelledby="question-sheet-title">
+                <div className={styles.sheetHandle} />
+                <header className={styles.sheetHeader}>
+                  <div><h2 id="question-sheet-title">Daftar soal</h2><p>{jumlahDijawab} dari {asesmen.soal.length} sudah dijawab</p></div>
+                  <button type="button" onClick={() => setDaftarSoalTerbuka(false)} aria-label="Tutup daftar soal">×</button>
+                </header>
+                <div className={styles.questionGrid}>
+                  {asesmen.soal.map((soal, nomor) => {
+                    const aktif = nomor === indeksSoal;
+                    const terjawab = soalSudahDijawab(soal.id);
+                    return (
+                      <button
+                        aria-current={aktif ? "step" : undefined}
+                        aria-label={`Soal ${nomor + 1}${terjawab ? ", sudah dijawab" : ", belum dijawab"}`}
+                        className={`${styles.questionJump} ${aktif ? styles.questionJumpActive : ""} ${terjawab ? styles.questionJumpAnswered : ""}`}
+                        key={soal.id}
+                        onClick={() => pilihNomorSoal(nomor)}
+                        type="button"
+                      >
+                        {nomor + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className={styles.sheetLegend}><span><i className={styles.legendCurrent} />Soal aktif</span><span><i className={styles.legendAnswered} />Sudah dijawab</span><span><i className={styles.legendEmpty} />Belum dijawab</span></div>
+                <button className={styles.sheetFinish} onClick={() => { setDaftarSoalTerbuka(false); void kirimJawaban(); }} type="button">Selesai dan kumpulkan</button>
+              </section>
+            </div>
+          )}
         </>
       )}
     </main>

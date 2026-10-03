@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import { useAppNotice } from "@/components/AppNoticeProvider";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -45,6 +46,7 @@ export default function HalamanDetailAsesmen() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const konfirmasi = useAppConfirm();
+  const beriNotifikasi = useAppNotice();
 
   const asesmenId = params.id;
 
@@ -274,10 +276,10 @@ export default function HalamanDetailAsesmen() {
         await muatDetail();
       } else {
         const data = await response.json();
-        alert(data.pesan ?? "Gagal menghapus soal.");
+        beriNotifikasi(data.pesan ?? "Gagal menghapus soal.", "error");
       }
     } catch {
-      alert("Tidak dapat terhubung ke server.");
+      beriNotifikasi("Tidak dapat terhubung ke server.", "error");
     }
   }
 
@@ -324,16 +326,13 @@ export default function HalamanDetailAsesmen() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(
-          data.pesan ??
-            "Gagal menambahkan kelas."
-        );
+        beriNotifikasi(data.pesan ?? "Gagal menambahkan kelas.", "error");
         return;
       }
 
       await muatDetail();
     } catch {
-      alert("Tidak dapat terhubung ke server.");
+      beriNotifikasi("Tidak dapat terhubung ke server.", "error");
     }
   }
 
@@ -345,16 +344,12 @@ export default function HalamanDetailAsesmen() {
     if (!asesmen) return;
 
     if (asesmen.soal.length === 0) {
-      alert(
-        "Tambahkan minimal satu soal sebelum finalisasi asesmen."
-      );
+      beriNotifikasi("Tambahkan minimal satu soal sebelum finalisasi asesmen.", "error");
       return;
     }
 
     if (asesmen.kelasTujuan.length === 0) {
-      alert(
-        "Tambahkan minimal satu kelas tujuan sebelum finalisasi asesmen."
-      );
+      beriNotifikasi("Tambahkan minimal satu kelas tujuan sebelum finalisasi asesmen.", "error");
       return;
     }
 
@@ -386,16 +381,13 @@ export default function HalamanDetailAsesmen() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(
-          data.pesan ??
-            "Gagal melakukan finalisasi."
-        );
+        beriNotifikasi(data.pesan ?? "Gagal melakukan finalisasi.", "error");
         return;
       }
 
       await muatDetail();
     } catch {
-      alert("Tidak dapat terhubung ke server.");
+      beriNotifikasi("Tidak dapat terhubung ke server.", "error");
     } finally {
       setSedangFinalisasi(false);
     }

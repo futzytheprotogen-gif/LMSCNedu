@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import { useAppNotice } from "@/components/AppNoticeProvider";
 import styles from "./page.module.css";
 
 /* ==========================================================================
@@ -111,6 +112,7 @@ export default function HalamanDetailKelas() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const konfirmasi = useAppConfirm();
+  const beriNotifikasi = useAppNotice();
 
   const kelasId = params.id;
 
@@ -417,9 +419,7 @@ export default function HalamanDetailKelas() {
     } catch (error) {
       console.error(error);
 
-      alert(
-        "Tidak dapat menyalin link kelas."
-      );
+      beriNotifikasi("Tidak dapat menyalin link kelas.", "error");
     }
   }
 
@@ -453,17 +453,12 @@ export default function HalamanDetailKelas() {
             () => null
           );
 
-        alert(
-          data?.pesan ??
-            "Gagal menghapus kelas."
-        );
+        beriNotifikasi(data?.pesan ?? "Gagal menghapus kelas.", "error");
       }
     } catch (error) {
       console.error(error);
 
-      alert(
-        "Terjadi kesalahan saat menghapus kelas."
-      );
+      beriNotifikasi("Terjadi kesalahan saat menghapus kelas.", "error");
     }
   }
 
@@ -599,10 +594,7 @@ export default function HalamanDetailKelas() {
         );
 
       if (!response.ok) {
-        alert(
-          data?.pesan ??
-            "Gagal menambahkan siswa."
-        );
+        beriNotifikasi(data?.pesan ?? "Gagal menambahkan siswa.", "error");
 
         return;
       }
@@ -620,9 +612,7 @@ export default function HalamanDetailKelas() {
     } catch (error) {
       console.error(error);
 
-      alert(
-        "Terjadi kesalahan saat menambahkan siswa."
-      );
+      beriNotifikasi("Terjadi kesalahan saat menambahkan siswa.", "error");
     } finally {
       setSedangTambahSiswa(null);
     }
@@ -654,7 +644,7 @@ export default function HalamanDetailKelas() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        alert(data?.pesan ?? "Gagal menambahkan semua siswa ke kelas.");
+        beriNotifikasi(data?.pesan ?? "Gagal menambahkan semua siswa ke kelas.", "error");
         return;
       }
 
@@ -666,7 +656,7 @@ export default function HalamanDetailKelas() {
       await muatStatistik();
     } catch (error) {
       console.error(error);
-      alert("Terjadi kesalahan saat menambahkan semua siswa.");
+      beriNotifikasi("Terjadi kesalahan saat menambahkan semua siswa.", "error");
     } finally {
       setSedangTambahSiswa(null);
     }
@@ -707,17 +697,12 @@ export default function HalamanDetailKelas() {
             () => null
           );
 
-        alert(
-          data?.pesan ??
-            "Gagal mengeluarkan siswa."
-        );
+        beriNotifikasi(data?.pesan ?? "Gagal mengeluarkan siswa.", "error");
       }
     } catch (error) {
       console.error(error);
 
-      alert(
-        "Terjadi kesalahan saat mengeluarkan siswa."
-      );
+      beriNotifikasi("Terjadi kesalahan saat mengeluarkan siswa.", "error");
     }
   }
 
@@ -809,10 +794,7 @@ export default function HalamanDetailKelas() {
         );
 
       if (!response.ok) {
-        alert(
-          data?.pesan ??
-            "Gagal menambahkan guru."
-        );
+        beriNotifikasi(data?.pesan ?? "Gagal menambahkan guru.", "error");
 
         return;
       }
@@ -830,9 +812,7 @@ export default function HalamanDetailKelas() {
     } catch (error) {
       console.error(error);
 
-      alert(
-        "Terjadi kesalahan saat menambahkan guru."
-      );
+      beriNotifikasi("Terjadi kesalahan saat menambahkan guru.", "error");
     } finally {
       setSedangTambahGuru(null);
     }
@@ -868,17 +848,12 @@ export default function HalamanDetailKelas() {
             () => null
           );
 
-        alert(
-          data?.pesan ??
-            "Gagal mengeluarkan guru."
-        );
+        beriNotifikasi(data?.pesan ?? "Gagal mengeluarkan guru.", "error");
       }
     } catch (error) {
       console.error(error);
 
-      alert(
-        "Terjadi kesalahan saat mengeluarkan guru."
-      );
+      beriNotifikasi("Terjadi kesalahan saat mengeluarkan guru.", "error");
     }
   }
 

@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import FeatureCarousel from "@/components/FeatureCarousel";
+import LandingFoxScene from "@/components/LandingFoxScene";
+import LandingDashboardPreview from "@/components/LandingDashboardPreview";
+import ThemeSelector from "@/components/ThemeSelector";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -78,6 +82,7 @@ export default function HalamanBeranda() {
           </nav>
 
           <div className={styles.navActions}>
+            <div className={styles.desktopTheme}><ThemeSelector /></div>
             <Link href="/login" className={styles.tombolMasukKecil}>
               Masuk
             </Link>
@@ -90,6 +95,7 @@ export default function HalamanBeranda() {
         </div>
 
         <div className={styles.navMobileMenu}>
+          <div className={styles.mobileTheme}><ThemeSelector /></div>
           <a href="#fitur">Fitur</a>
           <a href="#role">Role</a>
           <a href="#kenapa">Kenapa CN Edu</a>
@@ -100,13 +106,10 @@ export default function HalamanBeranda() {
       {/* ---- HERO ---- */}
       <section className={styles.hero}>
         <div className={styles.heroTeks}>
-          <h1 className={styles.heroJudul}>
-            Satu sistem untuk semua urusan belajar-mengajar di sekolah kamu.
-          </h1>
+          <h1 className={styles.heroJudul}>CN Edu</h1>
           <p className={styles.heroSub}>
-            CN Edu menyatukan materi, tugas, ujian, dan nilai dalam satu tempat —
-            supaya guru tidak perlu bolak-balik grup chat, dan admin tidak perlu
-            rekap manual dari kertas.
+            Ruang belajar terpadu untuk kelas, materi, asesmen, tugas, dan hasil
+            belajar seluruh sekolah.
           </p>
           <div className={styles.heroTombol}>
             <Link href="/login" className={styles.tombolUtama}>
@@ -118,41 +121,10 @@ export default function HalamanBeranda() {
           </div>
         </div>
 
-        <div className={styles.heroVisual} aria-hidden="true">
-          <div className={styles.mockupWindow}>
-            <div className={styles.mockupBar}>
-              <span />
-              <span />
-              <span />
-            </div>
-            <div className={styles.mockupBody}>
-              <div className={styles.mockupSidebar}>
-                <div className={styles.mockupSidebarItemAktif} />
-                <div className={styles.mockupSidebarItem} />
-                <div className={styles.mockupSidebarItem} />
-                <div className={styles.mockupSidebarItem} />
-              </div>
-              <div className={styles.mockupKonten}>
-                <div className={styles.mockupKartuKelas}>
-                  <div className={styles.mockupKartuTitik} />
-                  <div className={styles.mockupKartuGarisPanjang} />
-                  <div className={styles.mockupKartuGarisPendek} />
-                </div>
-                <div className={styles.mockupKartuKelas}>
-                  <div className={styles.mockupKartuTitik} />
-                  <div className={styles.mockupKartuGarisPanjang} />
-                  <div className={styles.mockupKartuGarisPendek} />
-                </div>
-                <div className={styles.mockupKartuKelas}>
-                  <div className={styles.mockupKartuTitik} />
-                  <div className={styles.mockupKartuGarisPanjang} />
-                  <div className={styles.mockupKartuGarisPendek} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <LandingFoxScene />
       </section>
+
+      <LandingDashboardPreview />
 
       {/* ---- STATS ---- */}
       <section className={styles.statsWadah}>
@@ -187,26 +159,7 @@ export default function HalamanBeranda() {
       </section>
 
       {/* ---- FITUR ---- */}
-      <section className={styles.fitur} id="fitur">
-        <h2 className={styles.judulSeksi}>Yang bisa dilakukan di CN Edu</h2>
-
-        <div className={styles.daftarFitur}>
-          {FITUR.map((f, i) => (
-            <div
-              key={f.judul}
-              className={`${styles.baFitur} ${i % 2 === 1 ? styles.baFiturTerbalik : ""}`}
-            >
-              <div className={styles.fiturTeks}>
-                <h3 className={styles.fiturJudul}>{f.judul}</h3>
-                <p className={styles.fiturDeskripsi}>{f.deskripsi}</p>
-              </div>
-              <div className={styles.fiturVisual} aria-hidden="true">
-                <div className={styles.fiturVisualBlok} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <div id="fitur"><FeatureCarousel fitur={FITUR} /></div>
 
       {/* ---- ROLE ---- */}
       <section className={styles.roleSeksi} id="role">

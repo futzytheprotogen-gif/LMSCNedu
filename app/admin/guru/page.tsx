@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import styles from "./page.module.css";
 
-const WARNA_PRIMARY = "var(--cn-primary)";
-
 interface GuruApi {
   id: string;
   nama: string;
@@ -25,12 +23,6 @@ interface GuruApi {
 interface MapelRingkas {
   id: string;
   nama: string;
-}
-
-interface KelompokMapel {
-  mapelId: string;
-  nama: string;
-  guru: GuruApi[];
 }
 
 export default function HalamanDaftarGuru() {
@@ -81,7 +73,11 @@ export default function HalamanDaftarGuru() {
   }, []);
 
   useEffect(() => {
-    muatData();
+    const timeoutId = window.setTimeout(() => {
+      void muatData();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [muatData]);
 
   const kelompok = useMemo(() => {
@@ -194,11 +190,7 @@ export default function HalamanDaftarGuru() {
         body: JSON.stringify({ mapelId }),
       });
 
-      const dataTerbaru = await muatData();
-
-      // muatData tidak mengembalikan data,
-      // jadi ambil dari state pada render berikutnya.
-      setGuruDiedit((current) => current);
+      await muatData();
     } catch (error) {
       console.error(error);
     }

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import EmptyStateFox from "@/components/EmptyStateFox";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -92,7 +93,6 @@ export default function HalamanTugasSiswa() {
               title="Tugas Hari Ini"
               subtitle="Tugas baru yang dikirim hari ini, belum kamu kerjakan."
               daftar={hariIni}
-              emptyIcon="📝"
               emptyText="Belum ada tugas baru hari ini."
               onBuka={(id) => router.push(`/siswa/tugas/${id}`)}
             />
@@ -102,7 +102,6 @@ export default function HalamanTugasSiswa() {
               title="Sudah Dikerjakan"
               subtitle="Tugas yang sudah kamu kumpulkan."
               daftar={sudah}
-              emptyIcon="✅"
               emptyText="Belum ada tugas yang kamu kumpulkan."
               onBuka={(id) => router.push(`/siswa/tugas/${id}`)}
             />
@@ -112,7 +111,6 @@ export default function HalamanTugasSiswa() {
               title="Belum Dikerjakan"
               subtitle="Tugas lama yang belum kamu kumpulkan."
               daftar={belum}
-              emptyIcon="⏳"
               emptyText="Tidak ada tugas yang tertunda. Kerja bagus!"
               onBuka={(id) => router.push(`/siswa/tugas/${id}`)}
             />
@@ -128,7 +126,6 @@ function Kelompok({
   title,
   subtitle,
   daftar,
-  emptyIcon,
   emptyText,
   onBuka,
 }: {
@@ -136,7 +133,6 @@ function Kelompok({
   title: string;
   subtitle: string;
   daftar: TugasSiswa[];
-  emptyIcon: string;
   emptyText: string;
   onBuka: (id: string) => void;
 }) {
@@ -153,7 +149,7 @@ function Kelompok({
 
       {daftar.length === 0 ? (
         <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>{emptyIcon}</div>
+          <EmptyStateFox compact />
           <p style={styles.emptyText}>{emptyText}</p>
         </div>
       ) : (
@@ -306,12 +302,14 @@ const styles = {
   },
   chevron: { color: "var(--cn-coral)", fontSize: "22px", flexShrink: 0 },
   emptyState: {
+    display: "grid",
+    justifyItems: "center",
+    gap: "8px",
     background: "var(--cn-surface)",
-    border: "1px dashed var(--cn-coral-tint)",
+    border: "1px dashed var(--cn-line)",
     borderRadius: "16px",
     padding: "32px 20px",
     textAlign: "center" as const,
   },
-  emptyIcon: { fontSize: "24px", marginBottom: "8px" },
-  emptyText: { margin: 0, color: "var(--cn-coral)", fontSize: "12px" },
+  emptyText: { margin: 0, color: "var(--cn-muted)", fontSize: "12px" },
 };

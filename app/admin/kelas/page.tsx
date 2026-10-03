@@ -4,13 +4,8 @@
   import { useRouter } from "next/navigation";
   import KelasCard, { type DataKelasCard } from "@/components/KelasCard";
   import ModalKelas from "@/components/ModalKelas";
+  import ClassMonitoringCharts from "@/components/ClassMonitoringCharts";
   import styles from "./page.module.css";
-
-  const WARNA = {
-    navy: "var(--cn-primary-dark)",
-    blue: "var(--cn-primary)",
-    teal: "var(--cn-cyan)",
-  };
 
   export default function HalamanBuatKelasAdmin() {
     const router = useRouter();
@@ -42,7 +37,11 @@
     }, []);
 
     useEffect(() => {
-      muatDaftarKelas();
+      const timeoutId = window.setTimeout(() => {
+        void muatDaftarKelas();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     }, [muatDaftarKelas]);
 
     async function handleBuatKelas({
@@ -186,6 +185,10 @@
             </div>
           </div>
         </section>
+
+        {!sedangMuat && daftarKelas.length > 0 && (
+          <ClassMonitoringCharts daftarKelas={daftarKelas} peran="Admin" />
+        )}
 
         {/* =========================
             TOOLBAR

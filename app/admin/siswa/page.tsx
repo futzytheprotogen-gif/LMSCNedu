@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import { useAppNotice } from "@/components/AppNoticeProvider";
 import styles from "./page.module.css";
-
-const WARNA_PRIMARY = "var(--cn-primary)";
 
 interface SiswaApi {
   id: string;
@@ -27,6 +26,7 @@ interface KelompokRombel {
 
 export default function HalamanDaftarSiswa() {
   const konfirmasi = useAppConfirm();
+  const beriNotifikasi = useAppNotice();
   const [kelompok, setKelompok] = useState<KelompokRombel[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
 
@@ -88,7 +88,11 @@ export default function HalamanDaftarSiswa() {
   }, []);
 
   useEffect(() => {
-    muatDaftarSiswa();
+    const timeoutId = window.setTimeout(() => {
+      void muatDaftarSiswa();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [muatDaftarSiswa]);
 
   const totalSiswa = useMemo(() => {
@@ -200,14 +204,14 @@ export default function HalamanDaftarSiswa() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        alert(data?.pesan ?? "Gagal menghapus siswa.");
+        beriNotifikasi(data?.pesan ?? "Gagal menghapus siswa.", "error");
         return;
       }
 
       await muatDaftarSiswa();
     } catch (error) {
       console.error(error);
-      alert("Terjadi kesalahan saat menghapus siswa.");
+      beriNotifikasi("Terjadi kesalahan saat menghapus siswa.", "error");
     }
   }
 

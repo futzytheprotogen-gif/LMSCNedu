@@ -3,7 +3,10 @@
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "motion/react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import ThemeSwitchButton from "@/components/ThemeSwitchButton";
+import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 const TINGGI_NAVBAR = 56;
@@ -47,27 +50,33 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
         </button>
         <span className="cn-role-brand" style={estilo.namaBrand}>CN Edu — Guru</span>
         <div style={estilo.navKanan}>
+          <ThemeSwitchButton />
           <Link href="/profil/saya" style={estilo.tombolProfil}>
             Profil
           </Link>
         </div>
       </header>
 
-      {sidebarTerbuka && (
-        <div
-          className="cn-role-overlay"
-          style={estilo.overlay}
-          onClick={() => setSidebarTerbuka(false)}
-          aria-hidden="true"
-        />
-      )}
+      <AnimatePresence>
+        {sidebarTerbuka && (
+          <motion.div
+            aria-hidden="true"
+            animate={{ opacity: 1 }}
+            className="cn-role-overlay"
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+            onClick={() => setSidebarTerbuka(false)}
+            style={estilo.overlay}
+          />
+        )}
+      </AnimatePresence>
 
-      <aside
+      <motion.aside
         className="cn-role-sidebar"
-        style={{
-          ...estilo.sidebar,
-          transform: sidebarTerbuka ? "translateX(0)" : "translateX(-100%)",
-        }}
+        initial={false}
+        animate={{ x: sidebarTerbuka ? 0 : "-100%" }}
+        transition={TRANSISI_DRAWER_ROLE}
+        style={estilo.sidebar}
       >
         <div className="cn-role-sidebar-header" style={estilo.headerSidebar}>
           <span style={estilo.namaBrandSidebar}>CN Edu</span>
@@ -81,30 +90,28 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <nav style={estilo.nav}>
+        <motion.nav style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
           {MENU_GURU.map((item) => {
             const aktif = pathname.startsWith(item.href);
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarTerbuka(false)}
-                style={{
-                  ...estilo.linkMenu,
-                  ...(aktif ? estilo.linkMenuAktif : {}),
-                }}
-              >
-                {item.label}
-              </Link>
+              <motion.div key={item.href} variants={VARIAN_ITEM_MENU_ROLE} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href={item.href}
+                  onClick={() => setSidebarTerbuka(false)}
+                  style={{ ...estilo.linkMenu, ...(aktif ? estilo.linkMenuAktif : {}) }}
+                >
+                  {item.label}
+                </Link>
+              </motion.div>
             );
           })}
-        </nav>
+        </motion.nav>
         <div className="cn-role-sidebar-footer">
           <button className="cn-role-logout-action" onClick={handleLogout} type="button">
             Keluar dari akun
           </button>
         </div>
-      </aside>
+      </motion.aside>
 
       <main className="cn-role-main" style={estilo.konten}>{children}</main>
     </div>
@@ -158,7 +165,6 @@ const estilo = {
     backgroundColor: "var(--cn-surface)",
     borderRight: "1px solid var(--cn-line)",
     zIndex: 50,
-    transition: "transform 0.2s ease-in-out",
     display: "flex",
     flexDirection: "column" as const,
   },

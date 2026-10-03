@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import { useAppNotice } from "@/components/AppNoticeProvider";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -40,6 +41,7 @@ interface DataPengumpulan {
 
 export default function HalamanTugasGuru() {
   const konfirmasi = useAppConfirm();
+  const beriNotifikasi = useAppNotice();
   const [daftarTugas, setDaftarTugas] = useState<Tugas[]>([]);
   const [kelasSaya, setKelasSaya] = useState<KelasRingkas[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
@@ -138,6 +140,13 @@ export default function HalamanTugasGuru() {
   function tutupModal() {
     if (sedangSimpan) return;
     setModalTerbuka(false);
+  }
+
+  function pilihTipeLampiran(tipe: "PDF" | "LINK") {
+    if (tipe === tipeLampiran) return;
+    setTipeLampiran(tipe);
+    setLampiran("");
+    setFileTerpilih(null);
   }
 
   async function simpanTugas() {
@@ -258,10 +267,10 @@ export default function HalamanTugasGuru() {
         await muatSemua();
       } else {
         const data = await response.json().catch(() => null);
-        alert(data?.pesan ?? "Gagal menghapus tugas.");
+        beriNotifikasi(data?.pesan ?? "Gagal menghapus tugas.", "error");
       }
     } catch {
-      alert("Tidak dapat terhubung ke server.");
+      beriNotifikasi("Tidak dapat terhubung ke server.", "error");
     }
   }
 
@@ -282,10 +291,10 @@ export default function HalamanTugasGuru() {
         await muatSemua();
       } else {
         const data = await response.json().catch(() => null);
-        alert(data?.pesan ?? "Gagal mengirim tugas ke kelas.");
+        beriNotifikasi(data?.pesan ?? "Gagal mengirim tugas ke kelas.", "error");
       }
     } catch {
-      alert("Tidak dapat terhubung ke server.");
+      beriNotifikasi("Tidak dapat terhubung ke server.", "error");
     }
   }
 
@@ -746,12 +755,13 @@ export default function HalamanTugasGuru() {
                   <input
                     type="checkbox"
                     checked={pakaiLampiran}
+                    style={styles.attachmentCheckbox}
                     onChange={(e) =>
                       setPakaiLampiran(e.target.checked)
                     }
                   />
 
-                  <span>
+                  <span style={styles.attachmentHeading}>
                     <strong>Sertakan lampiran</strong>
                     <small>PDF atau link referensi</small>
                   </span>
@@ -763,10 +773,9 @@ export default function HalamanTugasGuru() {
                       {(["LINK", "PDF"] as const).map((tipe) => (
                         <button
                           key={tipe}
+                          data-attachment-mode="true"
                           type="button"
-                          onClick={() =>
-                            setTipeLampiran(tipe)
-                          }
+                          onClick={() => pilihTipeLampiran(tipe)}
                           style={{
                             ...styles.attachmentTab,
                             ...(tipeLampiran === tipe
@@ -794,27 +803,33 @@ export default function HalamanTugasGuru() {
                     )}
 
                     {tipeLampiran === "PDF" && (
-                      <div>
+                      <div style={styles.pdfPicker}>
+                        <label htmlFor="lampiran-pdf" style={styles.filePickerButton}>
+                          <span aria-hidden="true">↑</span>
+                          {fileTerpilih ? "Ganti file PDF" : "Pilih file PDF"}
+                        </label>
                         <input
+                          id="lampiran-pdf"
                           type="file"
                           accept="application/pdf"
+                          aria-label="Pilih lampiran PDF"
                           onChange={(e) =>
                             setFileTerpilih(
                               e.target.files?.[0] ?? null
                             )
                           }
-                          style={styles.fileInput}
+                          style={styles.fileInputHidden}
                         />
 
                         {fileTerpilih && (
                           <div style={styles.fileInfo}>
-                            📄 {fileTerpilih.name}
+                            <span style={styles.fileInfoName}><b aria-hidden="true" style={styles.fileBadge}>PDF</b>{fileTerpilih.name}</span>
+                            <button style={styles.fileRemove} type="button" onClick={() => setFileTerpilih(null)} aria-label="Hapus file yang dipilih">×</button>
                           </div>
                         )}
 
                         {!fileTerpilih && lampiran && (
                           <div style={styles.fileInfo}>
-                            📄 File saat ini:{" "}
                             {lampiran.split("/").pop()}
                           </div>
                         )}
@@ -2206,20 +2221,36 @@ const styles = {
   },
 
   attachmentBox: {
+    display: "grid",
+    gap: "12px",
     padding: "14px",
-    background: "var(--cn-tint)",
-    border: "1px solid var(--cn-coral-tint)",
-    borderRadius: "12px",
+    background: "#f5f8fc",
+    border: "1px solid #e2e8f0",
+    borderRadius: "10px",
     marginBottom: "16px",
   },
 
   checkboxRow: {
     display: "flex",
-    alignItems: "center",
-    gap: "9px",
-    color: "var(--cn-coral-dark)",
+    alignItems: "flex-start",
+    gap: "10px",
+    color: "var(--cn-text)",
     fontSize: "12px",
     cursor: "pointer",
+  },
+
+  attachmentCheckbox: {
+    width: "16px",
+    height: "16px",
+    flex: "0 0 16px",
+    margin: "1px 0 0",
+    accentColor: "var(--cn-primary)",
+  },
+
+  attachmentHeading: {
+    display: "grid",
+    gap: "3px",
+    lineHeight: 1.3,
   },
 
   helperText: {
@@ -2229,42 +2260,109 @@ const styles = {
   },
 
   attachmentTabs: {
-    display: "flex",
-    gap: "5px",
-    marginTop: "12px",
-    marginBottom: "10px",
+    display: "grid",
+    gap: "6px",
+    padding: "4px",
+    border: "1px solid #e2e8f0",
+    borderRadius: "8px",
+    background: "#edf2f7",
   },
 
   attachmentTab: {
-    border: "1px solid var(--cn-coral-tint)",
-    background: "var(--cn-surface)",
-    color: "var(--cn-coral)",
-    borderRadius: "8px",
-    padding: "7px 12px",
-    fontSize: "11px",
+    minHeight: "36px",
+    border: 0,
+    outline: "none",
+    background: "transparent",
+    color: "#64748b",
+    borderRadius: "6px",
+    padding: "7px 10px",
+    fontSize: "10px",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "color 150ms ease, background 150ms ease, border-color 150ms ease, box-shadow 150ms ease",
+  },
+
+  attachmentTabActive: {
+    background: "#fff",
+    color: "var(--cn-primary-dark)",
+    boxShadow: "0 1px 2px rgba(15, 23, 42, 0.06)",
+  },
+
+  pdfPicker: {
+    display: "grid",
+    gap: "8px",
+  },
+
+  filePickerButton: {
+    display: "inline-flex",
+    width: "fit-content",
+    minHeight: "37px",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+    padding: "0 12px",
+    border: "1px solid #c7d9f2",
+    borderRadius: "7px",
+    color: "var(--cn-primary-dark)",
+    background: "#fff",
+    fontSize: "10px",
     fontWeight: 700,
     cursor: "pointer",
   },
 
-  attachmentTabActive: {
-    borderColor: WARNA_PRIMARY,
-    background: "var(--cn-tint)",
-    color: WARNA_PRIMARY,
-  },
-
-  fileInput: {
-    width: "100%",
-    fontSize: "12px",
-    color: "var(--cn-coral)",
+  fileInputHidden: {
+    display: "none",
   },
 
   fileInfo: {
-    marginTop: "8px",
-    padding: "8px 10px",
-    borderRadius: "8px",
-    background: "var(--cn-surface)",
-    color: "var(--cn-coral)",
-    fontSize: "11px",
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+    padding: "9px 10px",
+    border: "1px solid #e2e8f0",
+    borderRadius: "7px",
+    background: "#fff",
+    color: "#475569",
+    fontSize: "10px",
+  },
+
+  fileInfoName: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    gap: "8px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap" as const,
+  },
+
+  fileBadge: {
+    display: "grid",
+    width: "23px",
+    height: "23px",
+    flex: "0 0 23px",
+    placeItems: "center",
+    borderRadius: "5px",
+    color: "#b42318",
+    background: "#fff1f0",
+    fontSize: "7px",
+    fontWeight: 800,
+  },
+
+  fileRemove: {
+    display: "grid",
+    width: "26px",
+    height: "26px",
+    flex: "0 0 26px",
+    placeItems: "center",
+    border: 0,
+    borderRadius: "6px",
+    color: "#64748b",
+    background: "transparent",
+    fontSize: "17px",
+    cursor: "pointer",
   },
 
   classSelector: {

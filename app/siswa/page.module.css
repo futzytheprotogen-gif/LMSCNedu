@@ -318,6 +318,21 @@
   font-size: 12px;
 }
 
+.emptyState {
+  display: grid;
+  min-height: 124px;
+  align-content: center;
+  justify-items: center;
+  gap: 6px;
+  padding: 12px;
+  border: 1px dashed var(--cn-line);
+  border-radius: 8px;
+  color: var(--cn-muted);
+  background: var(--cn-bg);
+  font-size: 11px;
+  text-align: center;
+}
+
 .error {
   padding: 16px;
   border: 1px solid var(--cn-danger-tint);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAppNotice } from "@/components/AppNoticeProvider";
 
 export interface DataKelasCard {
   id: string;
@@ -8,6 +9,7 @@ export interface DataKelasCard {
   deskripsi: string | null;
   kodeKelas: string;
   jumlahSiswa: number;
+  createdAt?: string;
 }
 
 interface PropsKelasCard {
@@ -18,6 +20,7 @@ interface PropsKelasCard {
 const WARNA_PRIMARY = "var(--cn-primary)";
 
 export default function KelasCard({ kelas, onKlik }: PropsKelasCard) {
+  const beriNotifikasi = useAppNotice();
   const [tersalin, setTersalin] = useState(false);
 
   async function salinLinkUndangan(event: React.MouseEvent) {
@@ -30,8 +33,7 @@ export default function KelasCard({ kelas, onKlik }: PropsKelasCard) {
       setTersalin(true);
       setTimeout(() => setTersalin(false), 2000);
     } catch {
-      // Fallback kalau Clipboard API diblokir browser (mis. bukan https)
-      window.prompt("Salin link undangan ini secara manual:", linkUndangan);
+      beriNotifikasi("Link undangan tidak dapat disalin otomatis. Salin link ini secara manual:", "error", linkUndangan);
     }
   }
 

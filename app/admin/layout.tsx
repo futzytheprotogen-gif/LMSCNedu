@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "motion/react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import ThemeSwitchButton from "@/components/ThemeSwitchButton";
+import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 
 // ------------------------------------------------------------
 // Layout Admin
@@ -146,6 +149,7 @@ export default function LayoutAdmin({
         </span>
 
         <div style={estilo.navKanan}>
+          <ThemeSwitchButton />
           <Link href="/profil/saya" style={estilo.tombolProfil}>Profil</Link>
         </div>
       </header>
@@ -154,27 +158,30 @@ export default function LayoutAdmin({
           OVERLAY
       ======================================================= */}
 
-      {sidebarTerbuka && (
-        <div
-          className="cn-role-overlay"
-          style={estilo.overlay}
-          onClick={() => setSidebarTerbuka(false)}
-          aria-hidden="true"
-        />
-      )}
+      <AnimatePresence>
+        {sidebarTerbuka && (
+          <motion.div
+            aria-hidden="true"
+            animate={{ opacity: 1 }}
+            className="cn-role-overlay"
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+            onClick={() => setSidebarTerbuka(false)}
+            style={estilo.overlay}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ======================================================
           SIDEBAR
       ======================================================= */}
 
-      <aside
+      <motion.aside
         className="cn-role-sidebar"
-        style={{
-          ...estilo.sidebar,
-          transform: sidebarTerbuka
-            ? "translateX(0)"
-            : "translateX(-100%)",
-        }}
+        initial={false}
+        animate={{ x: sidebarTerbuka ? 0 : "-100%" }}
+        transition={TRANSISI_DRAWER_ROLE}
+        style={estilo.sidebar}
       >
         {/* HEADER SIDEBAR */}
 
@@ -195,28 +202,19 @@ export default function LayoutAdmin({
 
         {/* MENU */}
 
-        <nav style={estilo.nav}>
+        <motion.nav style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
           {MENU_ADMIN.map((item) => {
             const aktif = pathname.startsWith(item.href);
 
             return (
+              <motion.div key={item.href} variants={VARIAN_ITEM_MENU_ROLE} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
               <Link
-                key={item.href}
                 href={item.href}
                 onClick={() => {
                   setSidebarTerbuka(false);
-
-                  // Kalau masuk ke laporan, cek ulang notifikasi
-                  if (item.notifikasi) {
-                    setTimeout(() => {
-                      cekLaporanBaru();
-                    }, 500);
-                  }
+                  if (item.notifikasi) setTimeout(() => cekLaporanBaru(), 500);
                 }}
-                style={{
-                  ...estilo.linkMenu,
-                  ...(aktif ? estilo.linkMenuAktif : {}),
-                }}
+                style={{ ...estilo.linkMenu, ...(aktif ? estilo.linkMenuAktif : {}) }}
               >
                 {/* Nama menu */}
 
@@ -239,9 +237,10 @@ export default function LayoutAdmin({
                   </span>
                 )}
               </Link>
+              </motion.div>
             );
           })}
-        </nav>
+        </motion.nav>
 
         {/* ======================================================
             INFO NOTIFIKASI
@@ -270,7 +269,7 @@ export default function LayoutAdmin({
             Keluar dari akun
           </button>
         </div>
-      </aside>
+      </motion.aside>
 
       {/* ======================================================
           CONTENT
@@ -334,7 +333,7 @@ const estilo = {
     color: "var(--cn-coral-dark)",
   },
 
-  navKanan: { display: "flex", alignItems: "center", marginLeft: "auto" },
+  navKanan: { display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" },
   tombolProfil: { padding: "8px 10px", color: WARNA_PRIMARY, fontSize: "13px", fontWeight: 700, textDecoration: "none" },
 
   // ==========================================================
@@ -362,7 +361,6 @@ const estilo = {
     backgroundColor: "var(--cn-surface)",
     borderRight: "1px solid var(--cn-line)",
     zIndex: 50,
-    transition: "transform 0.22s ease-in-out",
     display: "flex",
     flexDirection: "column" as const,
     boxShadow: "8px 0 25px rgba(var(--cn-navy-rgb), 0.08)",

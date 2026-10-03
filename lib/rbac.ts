@@ -83,6 +83,9 @@ export const wajibAdminSaja = (request: NextRequest) =>
 export const wajibAdminTier = (request: NextRequest) =>
   wajibRole(request, ROLE_ADMIN_TIER);
 
+export const wajibKurikulum = (request: NextRequest) =>
+  wajibRole(request, ["KURIKULUM"]);
+
 export const wajibGuru = (request: NextRequest) =>
   wajibRole(request, ["GURU"]);
 

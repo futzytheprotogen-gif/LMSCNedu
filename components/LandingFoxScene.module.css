@@ -1,0 +1,151 @@
+.scene {
+  --scene-canvas: #eaf2ff;
+  --scene-orbit: #bfdbfe;
+  --scene-orbit-soft: #dbeafe;
+  --scene-window: #c7e4f7;
+  --scene-hills: #a9c9a8;
+  --scene-trees: #60896c;
+  --scene-plant: #4f8c65;
+  --scene-desk: #c47b46;
+  --scene-desk-dark: #8a542f;
+  --scene-laptop: #334155;
+  --scene-screen: #fff;
+  --scene-panel: #f8fafc;
+  --scene-panel-line: #e2e8f0;
+  --scene-card: #fff;
+  --scene-card-tint: #eff6ff;
+  --scene-card-accent: #2563eb;
+  --scene-sun: #fbbf24;
+  --scene-moon: #e2e8f0;
+  --scene-stars: #fff1a8;
+  --scene-glow: #fef3c7;
+  position: relative;
+  width: min(100%, 500px);
+  justify-self: end;
+  overflow: hidden;
+  border: 1px solid rgb(100 116 139 / 14%);
+  border-radius: 24px;
+  background: var(--scene-canvas);
+  box-shadow: 0 22px 60px rgb(var(--cn-navy-rgb) / 12%);
+}
+
+:global(:root[data-theme="dark"]) .scene {
+  --scene-canvas: #111c2e;
+  --scene-orbit: #213653;
+  --scene-orbit-soft: #192a40;
+  --scene-window: #172b43;
+  --scene-hills: #20384b;
+  --scene-trees: #183b43;
+  --scene-plant: #286057;
+  --scene-desk: #68462f;
+  --scene-desk-dark: #422f29;
+  --scene-laptop: #26374d;
+  --scene-screen: #101b2b;
+  --scene-panel: #172337;
+  --scene-panel-line: #2a3a50;
+  --scene-card: #1c2b41;
+  --scene-card-tint: #203a59;
+  --scene-card-accent: #60a5fa;
+  --scene-stars: #c7ddff;
+  --scene-glow: #243b56;
+}
+
+.illustration {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+}
+
+.canvas { fill: var(--scene-canvas); }
+.orbit { fill: var(--scene-orbit); opacity: .28; }
+.orbitSmall { fill: var(--scene-orbit-soft); opacity: .5; }
+.windowFrame { fill: var(--scene-desk); }
+.windowGlass { fill: var(--scene-window); }
+.windowHills { fill: var(--scene-hills); }
+.windowTrees { fill: var(--scene-trees); }
+.windowBar { stroke: var(--scene-desk-dark); stroke-width: 4; }
+.sun { fill: var(--scene-sun); filter: drop-shadow(0 0 7px var(--scene-glow)); }
+.moon, .moonCutout, .stars { display: none; }
+.moon { fill: var(--scene-moon); filter: drop-shadow(0 0 8px var(--scene-glow)); }
+.moonCutout { fill: var(--scene-window); }
+.stars { fill: var(--scene-stars); }
+.plant { fill: var(--scene-plant); }
+.dashboardCard, .notification { animation: float-card 3.2s ease-in-out infinite; }
+.cardBase, .notificationBase { fill: var(--scene-card); stroke: var(--scene-panel-line); }
+.cardIcon { fill: var(--scene-card-tint); }
+.cardCheck { stroke: var(--scene-card-accent); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
+.cardText, .notificationLine { fill: none; stroke: var(--scene-panel-line); stroke-linecap: round; stroke-width: 3; }
+.cardProgressBg { stroke: var(--scene-panel-line); stroke-linecap: round; stroke-width: 4; }
+.cardProgress { stroke: var(--scene-card-accent); stroke-linecap: round; stroke-width: 4; animation: progress-grow 2.8s ease-in-out infinite alternate; }
+.notification { animation-delay: -1.3s; }
+.notificationDot { fill: var(--cn-success); }
+.desk { fill: var(--scene-desk); }
+.deskLeg, .deskFoot { fill: none; stroke: var(--scene-desk-dark); stroke-linecap: round; stroke-width: 7; }
+.laptop { filter: drop-shadow(0 10px 15px rgb(15 23 42 / 12%)); animation: laptop-glow 3.8s ease-in-out infinite alternate; }
+.laptopShell, .laptopBase { fill: var(--scene-laptop); }
+.screen { fill: var(--scene-screen); }
+.screenTop { fill: var(--scene-panel); }
+.brandDot, .profile { fill: var(--scene-card-accent); }
+.brandLine, .sidebarLine, .screenHeading, .courseLine { fill: none; stroke: var(--scene-panel-line); stroke-linecap: round; stroke-width: 2; }
+.sidebar { fill: var(--scene-panel); }
+.sidebarActive { fill: var(--scene-card-tint); }
+.sidebarActive + .sidebarLine { stroke: var(--scene-card-accent); }
+.screenHeading { stroke: var(--cn-text); opacity: .72; }
+.courseCard, .taskCard { fill: var(--scene-card); stroke: var(--scene-panel-line); }
+.courseThumb { fill: var(--scene-card-tint); }
+.taskIcon { fill: rgb(var(--cn-success-rgb) / 14%); }
+.taskCheck { fill: none; stroke: var(--cn-success); stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
+.trackpad { fill: none; stroke: rgb(255 255 255 / 22%); stroke-linecap: round; stroke-width: 2; }
+.cursor { animation: cursor-work 3.6s ease-in-out infinite; }
+.cursorShape { fill: var(--scene-card-accent); stroke: var(--scene-screen); stroke-linejoin: round; stroke-width: 1.5; }
+.sparkles { fill: var(--scene-stars); opacity: .7; animation: sparkle 2.4s ease-in-out infinite alternate; }
+
+:global(:root[data-theme="dark"]) .scene .sun {
+  display: none;
+}
+
+:global(:root[data-theme="dark"]) .scene .moon,
+:global(:root[data-theme="dark"]) .scene .moonCutout,
+:global(:root[data-theme="dark"]) .scene .stars {
+  display: block;
+}
+
+@keyframes float-card {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes progress-grow {
+  from { stroke-dasharray: 28 77; }
+  to { stroke-dasharray: 51 77; }
+}
+
+@keyframes laptop-glow {
+  from { filter: drop-shadow(0 8px 12px rgb(15 23 42 / 10%)); }
+  to { filter: drop-shadow(0 12px 18px rgb(var(--cn-primary-rgb) / 20%)); }
+}
+
+@keyframes cursor-work {
+  0%, 100% { transform: translate(0, 0); }
+  35% { transform: translate(12px, -5px); }
+  68% { transform: translate(3px, 4px); }
+}
+
+@keyframes sparkle {
+  from { opacity: .3; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboardCard, .notification, .laptop, .cursor, .sparkles, .cardProgress {
+    animation: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .scene {
+    width: min(100%, 420px);
+    justify-self: center;
+  }
+}
