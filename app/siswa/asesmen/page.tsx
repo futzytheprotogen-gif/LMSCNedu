@@ -13,7 +13,7 @@ interface AsesmenSiswa {
   guru: { id: string; nama: string };
   jumlahSoal: number;
   kelasTujuan: { id: string; judul: string }[];
-  submission: { nilai: number | null; waktuSelesai: string | null } | null;
+  submission: { waktuSelesai: string | null } | null;
 }
 
 type FilterAsesmen = "SEMUA" | "BELUM" | "SELESAI";

@@ -231,12 +231,7 @@
   min-height: 94px;
   padding: 18px;
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(var(--cn-white-rgb), 0.98),
-      rgba(var(--cn-white-rgb), 0.98)
-    );
+  background: var(--cn-surface);
 
   border: 1px solid var(--cn-coral-tint);
 
@@ -432,7 +427,7 @@
 
   padding: 0 12px;
 
-  background: rgba(var(--cn-white-rgb), 0.92);
+  background: var(--cn-surface);
 
   border: 1px solid var(--cn-coral-tint);
 
@@ -495,73 +490,6 @@
 
 .searchBox input::placeholder {
   color: var(--cn-muted);
-}
-
-
-/* =========================================================
-   FILTER
-========================================================= */
-
-.filterButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 7px;
-
-  height: 40px;
-
-  padding: 0 13px;
-
-  border: 1px solid var(--cn-coral-tint);
-  border-radius: 9px;
-
-  background: rgba(var(--cn-white-rgb), 0.92);
-
-  color: var(--cn-coral);
-
-  font-family: inherit;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  box-shadow:
-    0 2px 7px rgba(var(--cn-coral-rgb), 0.025);
-
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.filterButton:hover {
-  border-color: var(--cn-coral);
-
-  background: var(--cn-surface);
-
-  transform: translateY(-1px);
-
-  box-shadow:
-    0 5px 12px rgba(var(--cn-coral-rgb), 0.06);
-}
-
-.filterButton:active {
-  transform: translateY(0);
-}
-
-.filterButton svg {
-  width: 16px;
-  height: 16px;
-
-  transition:
-    transform 0.2s ease;
-}
-
-.filterButton:hover svg {
-  transform: rotate(180deg);
 }
 
 
@@ -655,12 +583,7 @@
 
   padding: 40px;
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(var(--cn-white-rgb), 0.95),
-      rgba(var(--cn-white-rgb), 0.95)
-    );
+  background: var(--cn-surface);
 
   border: 1px dashed var(--cn-coral-tint);
 
@@ -971,7 +894,6 @@
 ========================================================= */
 
 .primaryButton:focus-visible,
-.filterButton:focus-visible,
 .emptyButton:focus-visible {
   outline: 3px solid rgba(var(--cn-primary-rgb), 0.22);
   outline-offset: 2px;
@@ -1060,10 +982,6 @@
     width: 100%;
   }
 
-  .filterButton {
-    width: 100%;
-  }
-
   .grid,
   .loadingGrid {
     grid-template-columns: 1fr;
@@ -1095,7 +1013,6 @@
   .primaryButton,
   .statCard,
   .searchBox,
-  .filterButton,
   .emptyButton {
     transition: none;
   }

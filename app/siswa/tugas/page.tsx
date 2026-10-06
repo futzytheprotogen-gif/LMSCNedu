@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import EmptyStateFox from "@/components/EmptyStateFox";
+import responsive from "./page.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -70,17 +71,27 @@ export default function HalamanTugasSiswa() {
     () => daftarTugas.filter((t) => t.status === "BELUM"),
     [daftarTugas]
   );
+  const totalSelesai = sudah.length;
+  const totalPerluDikerjakan = hariIni.length + belum.length;
 
   return (
     <div style={styles.page}>
-      <main style={styles.container}>
-        <header style={styles.header}>
+      <main className={responsive.container} style={styles.container}>
+        <header className={responsive.header} style={styles.header}>
           <div style={styles.breadcrumb}>Siswa <span>/</span> Tugas</div>
           <h1 style={styles.pageTitle}>Tugas</h1>
           <p style={styles.pageSubtitle}>
             Tugas yang dikirim guru ke kelasmu, dikelompokkan berdasarkan status pengumpulan.
           </p>
         </header>
+
+        {!sedangMuat && !error && (
+          <section className={responsive.summary} aria-label="Ringkasan tugas">
+            <RingkasanTugas label="Total tugas" jumlah={daftarTugas.length} ikon="▤" />
+            <RingkasanTugas label="Perlu dikerjakan" jumlah={totalPerluDikerjakan} ikon="◷" />
+            <RingkasanTugas label="Sudah dikumpulkan" jumlah={totalSelesai} ikon="✓" />
+          </section>
+        )}
 
         {sedangMuat ? (
           <div style={styles.loadingBox}>Memuat tugas...</div>
@@ -137,8 +148,8 @@ function Kelompok({
   onBuka: (id: string) => void;
 }) {
   return (
-    <section style={styles.section}>
-      <div style={styles.sectionHeader}>
+    <section className={responsive.section} style={styles.section}>
+      <div className={responsive.sectionHeader} style={styles.sectionHeader}>
         <div>
           <div style={styles.sectionEyebrow}>{eyebrow}</div>
           <h2 style={styles.sectionTitle}>{title}</h2>
@@ -148,12 +159,12 @@ function Kelompok({
       </div>
 
       {daftar.length === 0 ? (
-        <div style={styles.emptyState}>
+        <div className={responsive.emptyState} style={styles.emptyState}>
           <EmptyStateFox compact />
           <p style={styles.emptyText}>{emptyText}</p>
         </div>
       ) : (
-        <div style={styles.taskList}>
+        <div className={responsive.taskList} style={styles.taskList}>
           {daftar.map((t) => (
             <KartuTugas key={t.id} t={t} onBuka={() => onBuka(t.id)} />
           ))}
@@ -163,11 +174,36 @@ function Kelompok({
   );
 }
 
+function RingkasanTugas({ label, jumlah, ikon }: { label: string; jumlah: number; ikon: string }) {
+  return (
+    <div className={responsive.summaryCard}>
+      <span className={responsive.summaryIcon} aria-hidden="true">{ikon}</span>
+      <span className={responsive.summaryText}>
+        <span>{label}</span>
+        <strong>{jumlah}</strong>
+      </span>
+    </div>
+  );
+}
+
 function KartuTugas({ t, onBuka }: { t: TugasSiswa; onBuka: () => void }) {
   const tanggal = new Date(t.dikirimAt);
 
   return (
-    <article style={styles.taskCard} onClick={onBuka}>
+    <article
+      className={responsive.taskCard}
+      style={styles.taskCard}
+      onClick={onBuka}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onBuka();
+        }
+      }}
+      role="link"
+      tabIndex={0}
+      aria-label={`Buka tugas ${t.judul}`}
+    >
       <div style={styles.taskIcon}>📝</div>
 
       <div style={styles.taskMain}>
@@ -178,7 +214,7 @@ function KartuTugas({ t, onBuka }: { t: TugasSiswa; onBuka: () => void }) {
 
         <p style={styles.taskDescription}>{t.deskripsi}</p>
 
-        <div style={styles.taskMeta}>
+        <div className={responsive.taskMeta} style={styles.taskMeta}>
           <span>👤 {t.guru.nama}</span>
           <span>
             📅{" "}
@@ -198,7 +234,7 @@ function KartuTugas({ t, onBuka }: { t: TugasSiswa; onBuka: () => void }) {
         </div>
       </div>
 
-      <span style={styles.chevron}>›</span>
+      <span className={responsive.cardAction} aria-hidden="true">Buka tugas <span>→</span></span>
     </article>
   );
 }
@@ -211,7 +247,7 @@ const styles = {
   },
   container: {
     width: "100%",
-    maxWidth: "1000px",
+    maxWidth: "1160px",
     margin: "0 auto",
     padding: "34px 24px 60px",
   },
@@ -252,11 +288,12 @@ const styles = {
     alignItems: "center",
     gap: "14px",
     background: "var(--cn-surface)",
-    border: "1px solid var(--cn-tint)",
-    borderRadius: "16px",
-    padding: "16px",
+    border: "1px solid var(--cn-line)",
+    borderRadius: "14px",
+    padding: "18px",
     cursor: "pointer",
-    boxShadow: "0 5px 18px rgba(var(--cn-navy-rgb), 0.03)",
+    boxShadow: "0 4px 14px rgba(var(--cn-navy-rgb), 0.05)",
+    transition: "border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease",
   },
   taskIcon: {
     width: "42px",
@@ -290,7 +327,7 @@ const styles = {
     WebkitBoxOrient: "vertical" as const,
     overflow: "hidden",
   },
-  taskMeta: { display: "flex", gap: "12px", color: "var(--cn-coral)", fontSize: "10px", marginBottom: "8px" },
+  taskMeta: { display: "flex", gap: "12px", flexWrap: "wrap" as const, color: "var(--cn-coral)", fontSize: "10px", marginBottom: "8px" },
   chipRow: { display: "flex", gap: "5px", flexWrap: "wrap" as const },
   classChip: {
     padding: "3px 8px",
@@ -300,7 +337,6 @@ const styles = {
     fontSize: "10px",
     fontWeight: 700,
   },
-  chevron: { color: "var(--cn-coral)", fontSize: "22px", flexShrink: 0 },
   emptyState: {
     display: "grid",
     justifyItems: "center",

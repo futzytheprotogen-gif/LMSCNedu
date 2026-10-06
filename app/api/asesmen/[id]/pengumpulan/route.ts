@@ -35,6 +35,10 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
             opsiDipilih: { include: { opsi: { select: { id: true, teks: true } } } },
           },
         },
+        catatanIntegritas: {
+          orderBy: { terdeteksiPada: "asc" },
+          select: { id: true, jenis: true, terdeteksiPada: true, createdAt: true },
+        },
       },
     });
 
@@ -48,7 +52,13 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
           id: submission.id,
           nilai: submission.nilai,
           waktuSelesai: submission.waktuSelesai?.toISOString() ?? null,
+          integritasDicatat: submission.integritasDicatat,
           siswa: { ...submission.siswa, nis: submission.siswa.nis.toString() },
+          catatanIntegritas: submission.catatanIntegritas.map((catatan) => ({
+            ...catatan,
+            terdeteksiPada: catatan.terdeteksiPada.toISOString(),
+            createdAt: catatan.createdAt.toISOString(),
+          })),
           jawaban: asesmen.soal.map((soal) => {
             const jawaban = submission.jawaban.find((item) => item.soalId === soal.id);
             return {

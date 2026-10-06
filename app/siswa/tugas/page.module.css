@@ -1,0 +1,170 @@
+.container {
+  min-width: 0;
+}
+
+.header {
+  position: relative;
+  padding: 22px 24px;
+  border: 1px solid var(--cn-line);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 100% 0, rgb(var(--cn-primary-rgb) / 13%), transparent 38%),
+    var(--cn-surface);
+  box-shadow: 0 8px 24px rgb(var(--cn-navy-rgb) / 5%);
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 30px;
+}
+
+.summaryCard {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 17px;
+  border: 1px solid var(--cn-line);
+  border-radius: 13px;
+  background: var(--cn-surface);
+  box-shadow: 0 4px 14px rgb(var(--cn-navy-rgb) / 4%);
+}
+
+.summaryIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--cn-primary);
+  background: var(--cn-tint);
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.summaryText {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  color: var(--cn-muted);
+  font-size: 11px;
+}
+
+.summaryText strong {
+  color: var(--cn-text);
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.section {
+  margin-bottom: 30px !important;
+}
+
+.sectionHeader {
+  align-items: center !important;
+  gap: 14px;
+  margin-bottom: 12px !important;
+}
+
+.taskList {
+  gap: 10px !important;
+}
+
+.taskCard {
+  position: relative;
+  outline: none;
+}
+
+.taskCard:hover,
+.taskCard:focus-visible {
+  border-color: var(--cn-primary) !important;
+  box-shadow: 0 8px 22px rgb(var(--cn-primary-rgb) / 10%) !important;
+  transform: translateY(-2px);
+}
+
+.taskCard:focus-visible {
+  outline: 3px solid rgb(var(--cn-primary-rgb) / 24%);
+  outline-offset: 2px;
+}
+
+.taskMeta {
+  row-gap: 5px !important;
+}
+
+.cardAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  color: var(--cn-primary-dark);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cardAction span {
+  font-size: 16px;
+}
+
+.emptyState {
+  min-height: 148px;
+  align-content: center;
+  border-style: solid !important;
+  background:
+    radial-gradient(circle at 50% 0, rgb(var(--cn-primary-rgb) / 7%), transparent 65%),
+    var(--cn-surface) !important;
+}
+
+@media (max-width: 760px) {
+  .header {
+    padding: 19px;
+  }
+
+  .summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .summaryCard {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .sectionHeader {
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 17px;
+  }
+
+  .summary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .summaryCard {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .cardAction {
+    align-self: flex-start;
+    margin-left: auto;
+    font-size: 0;
+  }
+
+  .cardAction span {
+    font-size: 20px;
+  }
+
+  .sectionHeader {
+    flex-wrap: wrap;
+  }
+}

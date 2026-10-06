@@ -44,6 +44,17 @@ enum TipeSoal {
   ESSAY
 }
 
+enum JenisPeringatanAsesmen {
+  TAB_HIDDEN
+  WINDOW_BLUR
+  COPY_BLOCKED
+  CUT_BLOCKED
+  PASTE_BLOCKED
+  CONTEXT_MENU_BLOCKED
+  LEAVE_ASSESSMENT
+  LOGOUT_DURING_ASSESSMENT
+}
+
 enum TipeMateri {
   PDF
   LINK
@@ -327,14 +338,29 @@ model SubmissionAsesmen {
   waktuMulai   DateTime  @default(now())
   waktuSelesai DateTime?
   nilai        Float?
+  integritasDicatat Boolean @default(false)
   createdAt    DateTime  @default(now())
 
   asesmen Asesmen @relation(fields: [asesmenId], references: [id], onDelete: Cascade)
   siswa   Siswa   @relation(fields: [siswaId], references: [id], onDelete: Cascade)
   jawaban JawabanSiswa[]
+  catatanIntegritas CatatanIntegritasAsesmen[]
 
   @@unique([asesmenId, siswaId])
   @@map("submission_asesmen")
+}
+
+model CatatanIntegritasAsesmen {
+  id              String                  @id @default(cuid())
+  submissionId    String
+  jenis           JenisPeringatanAsesmen
+  terdeteksiPada  DateTime
+  createdAt       DateTime                @default(now())
+
+  submission SubmissionAsesmen @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId, terdeteksiPada])
+  @@map("catatan_integritas_asesmen")
 }
 
 // Jawaban siswa untuk satu soal dalam satu submission

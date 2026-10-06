@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import { useAppNotice } from "@/components/AppNoticeProvider";
+import responsive from "./page.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -433,13 +434,13 @@ export default function HalamanTugasGuru() {
   }, [dataPengumpulan, filterPengumpulan, pencarianSiswa]);
 
   return (
-    <div style={styles.page}>
+    <div className={responsive.page} style={styles.page}>
       <div style={styles.backgroundGlowOne} />
       <div style={styles.backgroundGlowTwo} />
 
-      <main style={styles.container}>
+      <main className={responsive.container} style={styles.container}>
         {/* HEADER */}
-        <header style={styles.header}>
+        <header className={responsive.header} style={styles.header}>
           <div>
             <div style={styles.breadcrumb}>
               Guru <span>/</span> Tugas
@@ -453,6 +454,7 @@ export default function HalamanTugasGuru() {
           </div>
 
           <button
+            className={responsive.createButton}
             type="button"
             onClick={bukaModalBuat}
             style={styles.primaryButton}
@@ -463,7 +465,7 @@ export default function HalamanTugasGuru() {
         </header>
 
         {/* STATISTIK */}
-        <section style={styles.statsGrid}>
+        <section className={responsive.statsGrid} style={styles.statsGrid}>
           <StatCard
             icon="📚"
             label="Total Tugas"
@@ -494,8 +496,8 @@ export default function HalamanTugasGuru() {
         </section>
 
         {/* TOOLBAR */}
-        <section style={styles.toolbar}>
-          <div style={styles.searchWrapper}>
+        <section className={responsive.toolbar} style={styles.toolbar}>
+          <div className={responsive.searchWrapper} style={styles.searchWrapper}>
             <span style={styles.searchIcon}>⌕</span>
 
             <input
@@ -506,7 +508,7 @@ export default function HalamanTugasGuru() {
             />
           </div>
 
-          <div style={styles.filterGroup}>
+          <div className={responsive.filterGroup} style={styles.filterGroup}>
             {(
               [
                 ["SEMUA", "Semua"],
@@ -538,7 +540,7 @@ export default function HalamanTugasGuru() {
             {/* HASIL FILTER */}
             {pencarian || filterTugas !== "SEMUA" ? (
               <section style={styles.section}>
-                <div style={styles.sectionHeader}>
+                <div className={responsive.sectionHeader} style={styles.sectionHeader}>
                   <div>
                     <h2 style={styles.sectionTitle}>Hasil Tugas</h2>
                     <p style={styles.sectionSubtitle}>
@@ -554,7 +556,7 @@ export default function HalamanTugasGuru() {
                     description="Coba gunakan kata kunci pencarian yang berbeda."
                   />
                 ) : (
-                  <div style={styles.taskList}>
+                  <div className={responsive.taskList} style={styles.taskList}>
                     {tugasTerfilter.map((tugas) => (
                       <KartuTugas
                         key={tugas.id}
@@ -584,7 +586,7 @@ export default function HalamanTugasGuru() {
               <>
                 {/* HARI INI */}
                 <section style={styles.section}>
-                  <div style={styles.sectionHeader}>
+                  <div className={responsive.sectionHeader} style={styles.sectionHeader}>
                     <div>
                       <div style={styles.sectionEyebrow}>
                         AKTIVITAS TERBARU
@@ -611,7 +613,7 @@ export default function HalamanTugasGuru() {
                       onAction={bukaModalBuat}
                     />
                   ) : (
-                    <div style={styles.taskList}>
+                    <div className={responsive.taskList} style={styles.taskList}>
                       {tugasHariIni.map((tugas) => (
                         <KartuTugas
                           key={tugas.id}
@@ -640,7 +642,7 @@ export default function HalamanTugasGuru() {
 
                 {/* RIWAYAT */}
                 <section style={styles.section}>
-                  <div style={styles.sectionHeader}>
+                  <div className={responsive.sectionHeader} style={styles.sectionHeader}>
                     <div>
                       <div style={styles.sectionEyebrow}>
                         ARSIP
@@ -665,7 +667,7 @@ export default function HalamanTugasGuru() {
                       description="Tugas lama akan muncul di bagian ini."
                     />
                   ) : (
-                    <div style={styles.taskList}>
+                    <div className={responsive.taskList} style={styles.taskList}>
                       {riwayat.map((tugas) => (
                         <KartuTugas
                           key={tugas.id}
@@ -699,12 +701,13 @@ export default function HalamanTugasGuru() {
 
       {/* MODAL BUAT / EDIT */}
       {modalTerbuka && (
-        <div style={styles.overlay} onClick={tutupModal}>
+        <div className={responsive.overlay} style={styles.overlay} onClick={tutupModal}>
           <div
+            className={responsive.taskModal}
             style={styles.modal}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={styles.modalHeader}>
+            <div className={responsive.modalHeader} style={styles.modalHeader}>
               <div>
                 <div style={styles.modalEyebrow}>
                   {tugasDiedit ? "KELOLA TUGAS" : "TUGAS BARU"}
@@ -725,7 +728,7 @@ export default function HalamanTugasGuru() {
               </button>
             </div>
 
-            <div style={styles.form}>
+            <div className={responsive.modalForm} style={styles.form}>
               <label style={styles.label}>
                 <span>Judul Tugas</span>
 
@@ -921,14 +924,16 @@ export default function HalamanTugasGuru() {
       {/* MODAL PENGUMPULAN */}
       {tugasPengumpulan && (
         <div
+          className={responsive.overlay}
           style={styles.overlay}
           onClick={tutupPengumpulan}
         >
           <div
+            className={responsive.submissionModal}
             style={styles.submissionModal}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={styles.modalHeader}>
+            <div className={responsive.modalHeader} style={styles.modalHeader}>
               <div>
                 <div style={styles.modalEyebrow}>
                   PENGUMPULAN TUGAS
@@ -977,7 +982,7 @@ export default function HalamanTugasGuru() {
             ) : dataPengumpulan ? (
               <>
                 {/* SUMMARY PENGUMPULAN */}
-                <div style={styles.submissionStats}>
+                <div className={responsive.submissionStats} style={styles.submissionStats}>
                   <SubmissionStat
                     label="Total Siswa"
                     value={dataPengumpulan.totalSiswa}
@@ -1043,8 +1048,8 @@ export default function HalamanTugasGuru() {
                 </div>
 
                 {/* SEARCH SISWA */}
-                <div style={styles.submissionToolbar}>
-                  <div style={styles.submissionSearch}>
+                <div className={responsive.submissionToolbar} style={styles.submissionToolbar}>
+                  <div className={responsive.submissionSearch} style={styles.submissionSearch}>
                     <span>⌕</span>
 
                     <input
@@ -1145,11 +1150,11 @@ function KartuTugas({
   const tanggal = new Date(t.createdAt);
 
   return (
-    <article style={styles.taskCard}>
-      <div style={styles.taskTop}>
+    <article className={responsive.taskCard} style={styles.taskCard}>
+      <div className={responsive.taskTop} style={styles.taskTop}>
         <div style={styles.taskIcon}>📝</div>
 
-        <div style={styles.taskMain}>
+        <div className={responsive.taskMain} style={styles.taskMain}>
           <div style={styles.taskTitleRow}>
             <h3 style={styles.taskTitle}>{t.judul}</h3>
 
@@ -1192,7 +1197,7 @@ function KartuTugas({
           </div>
         </div>
 
-        <div style={styles.taskActions}>
+        <div className={responsive.taskActions} style={styles.taskActions}>
           <button
             type="button"
             onClick={onEdit}
@@ -1211,7 +1216,7 @@ function KartuTugas({
         </div>
       </div>
 
-      <div style={styles.taskBottom}>
+      <div className={responsive.taskBottom} style={styles.taskBottom}>
         <div style={styles.classArea}>
           <span style={styles.classLabel}>Kelas tujuan</span>
 
@@ -1230,7 +1235,7 @@ function KartuTugas({
           </div>
         </div>
 
-        <div style={styles.taskBottomActions}>
+        <div className={responsive.taskBottomActions} style={styles.taskBottomActions}>
           <button
             type="button"
             onClick={onLihatPengumpulan}
@@ -2224,8 +2229,8 @@ const styles = {
     display: "grid",
     gap: "12px",
     padding: "14px",
-    background: "#f5f8fc",
-    border: "1px solid #e2e8f0",
+    background: "var(--cn-tint)",
+    border: "1px solid var(--cn-line)",
     borderRadius: "10px",
     marginBottom: "16px",
   },
@@ -2263,9 +2268,9 @@ const styles = {
     display: "grid",
     gap: "6px",
     padding: "4px",
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--cn-line)",
     borderRadius: "8px",
-    background: "#edf2f7",
+    background: "var(--cn-tint)",
   },
 
   attachmentTab: {
@@ -2273,7 +2278,7 @@ const styles = {
     border: 0,
     outline: "none",
     background: "transparent",
-    color: "#64748b",
+    color: "var(--cn-muted)",
     borderRadius: "6px",
     padding: "7px 10px",
     fontSize: "10px",
@@ -2283,7 +2288,7 @@ const styles = {
   },
 
   attachmentTabActive: {
-    background: "#fff",
+    background: "var(--cn-surface)",
     color: "var(--cn-primary-dark)",
     boxShadow: "0 1px 2px rgba(15, 23, 42, 0.06)",
   },
@@ -2301,10 +2306,10 @@ const styles = {
     justifyContent: "center",
     gap: "8px",
     padding: "0 12px",
-    border: "1px solid #c7d9f2",
+    border: "1px solid var(--cn-line)",
     borderRadius: "7px",
     color: "var(--cn-primary-dark)",
-    background: "#fff",
+    background: "var(--cn-surface)",
     fontSize: "10px",
     fontWeight: 700,
     cursor: "pointer",
@@ -2321,10 +2326,10 @@ const styles = {
     justifyContent: "space-between",
     gap: "10px",
     padding: "9px 10px",
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--cn-line)",
     borderRadius: "7px",
-    background: "#fff",
-    color: "#475569",
+    background: "var(--cn-surface)",
+    color: "var(--cn-text)",
     fontSize: "10px",
   },
 
@@ -2345,8 +2350,8 @@ const styles = {
     flex: "0 0 23px",
     placeItems: "center",
     borderRadius: "5px",
-    color: "#b42318",
-    background: "#fff1f0",
+    color: "var(--cn-danger)",
+    background: "var(--cn-danger-tint)",
     fontSize: "7px",
     fontWeight: 800,
   },

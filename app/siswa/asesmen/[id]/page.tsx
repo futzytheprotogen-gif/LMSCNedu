@@ -1,9 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import {
+  bacaCatatanIntegritas,
+  hapusCatatanIntegritas,
+  rekamCatatanIntegritas,
+  type CatatanIntegritasAsesmen,
+  type JenisPeringatanAsesmen,
+} from "@/lib/asesmenIntegrity";
 import styles from "./page.module.css";
 
 interface OpsiSiswa {
@@ -28,13 +35,23 @@ interface DetailAsesmenSiswa {
   guru: string;
   kelasTujuan: { id: string; judul: string }[];
   soal: SoalSiswa[];
-  submission: { nilai: number | null; waktuSelesai: string | null } | null;
+  submission: { waktuSelesai: string | null } | null;
 }
 
 type JawabanLokal = Record<string, string | string[]>;
 
+function isJawabanLokal(value: unknown): value is JawabanLokal {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  return Object.values(value).every(
+    (jawaban) =>
+      typeof jawaban === "string" ||
+      (Array.isArray(jawaban) && jawaban.every((item) => typeof item === "string"))
+  );
+}
+
 export default function DetailAsesmenSiswa() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const konfirmasi = useAppConfirm();
   const [asesmen, setAsesmen] = useState<DetailAsesmenSiswa | null>(null);
   const [jawaban, setJawaban] = useState<JawabanLokal>({});
@@ -45,6 +62,9 @@ export default function DetailAsesmenSiswa() {
   const [daftarSoalTerbuka, setDaftarSoalTerbuka] = useState(false);
   const [skalaTeks, setSkalaTeks] = useState(0);
   const [waktuBerlalu, setWaktuBerlalu] = useState(0);
+  const [catatanIntegritas, setCatatanIntegritas] = useState<CatatanIntegritasAsesmen[]>([]);
+  const pengirimanAktif = useRef(false);
+  const pengirimanWaktuHabis = useRef(false);
 
   const muat = useCallback(async () => {
     setSedangMuat(true);
@@ -53,7 +73,25 @@ export default function DetailAsesmenSiswa() {
       const response = await fetch(`/api/siswa/asesmen/${params.id}`, { cache: "no-store" });
       const data = await response.json();
       if (!response.ok) throw new Error(data.pesan ?? "Gagal memuat asesmen.");
-      setAsesmen(data.data);
+      const asesmenDimuat: DetailAsesmenSiswa = data.data;
+      const kunciDraft = `cnedu-asesmen-${asesmenDimuat.id}-jawaban`;
+      if (asesmenDimuat.submission) {
+        sessionStorage.removeItem(kunciDraft);
+        sessionStorage.removeItem(`cnedu-asesmen-${asesmenDimuat.id}-dimulai`);
+        hapusCatatanIntegritas(asesmenDimuat.id);
+      } else {
+        setCatatanIntegritas(bacaCatatanIntegritas(asesmenDimuat.id));
+        const draftTersimpan = sessionStorage.getItem(kunciDraft);
+        if (draftTersimpan) {
+          try {
+            const draft: unknown = JSON.parse(draftTersimpan);
+            if (isJawabanLokal(draft)) setJawaban(draft);
+          } catch {
+            sessionStorage.removeItem(kunciDraft);
+          }
+        }
+      }
+      setAsesmen(asesmenDimuat);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Tidak dapat terhubung ke server.");
     } finally {
@@ -90,6 +128,11 @@ export default function DetailAsesmenSiswa() {
     };
   }, [asesmen]);
 
+  useEffect(() => {
+    if (!asesmen || asesmen.submission) return;
+    sessionStorage.setItem(`cnedu-asesmen-${asesmen.id}-jawaban`, JSON.stringify(jawaban));
+  }, [asesmen, jawaban]);
+
   const jumlahDijawab = useMemo(() => {
     if (!asesmen) return 0;
     return asesmen.soal.filter((soal) => {
@@ -101,6 +144,7 @@ export default function DetailAsesmenSiswa() {
   const soalAktif = asesmen?.soal[indeksSoal];
   const durasiDetik = (asesmen?.durasiMenit ?? 0) * 60;
   const waktuTampil = durasiDetik > 0 ? Math.max(0, durasiDetik - waktuBerlalu) : waktuBerlalu;
+  const waktuHabis = durasiDetik > 0 && waktuBerlalu >= durasiDetik;
   const jam = String(Math.floor(waktuTampil / 3600)).padStart(2, "0");
   const menit = String(Math.floor((waktuTampil % 3600) / 60)).padStart(2, "0");
   const detik = String(waktuTampil % 60).padStart(2, "0");
@@ -110,10 +154,28 @@ export default function DetailAsesmenSiswa() {
     return Array.isArray(jawabanSoal) ? jawabanSoal.length > 0 : Boolean(jawabanSoal?.trim());
   }
 
+  function catatPeringatan(jenis: JenisPeringatanAsesmen) {
+    if (!asesmen) return;
+    const catatan = rekamCatatanIntegritas(asesmen.id, jenis);
+    setCatatanIntegritas((sebelumnya) => [...sebelumnya, catatan].slice(-100));
+  }
+
   function pilihNomorSoal(nomor: number) {
     setIndeksSoal(nomor);
     setDaftarSoalTerbuka(false);
     setError(null);
+  }
+
+  async function kembaliKeDaftarAsesmen() {
+    if (asesmen && !asesmen.submission && !(await konfirmasi({
+      title: "Keluar dari ujian?",
+      message: "Jawaban sementara tersimpan di perangkat ini dan waktu ujian tetap berjalan. Kamu bisa kembali mengerjakan sebelum waktunya habis.",
+      confirmLabel: "Keluar dari ujian",
+      cancelLabel: "Lanjutkan ujian",
+      tone: "primary",
+    }))) return;
+    if (asesmen && !asesmen.submission) catatPeringatan("LEAVE_ASSESSMENT");
+    router.push("/siswa/asesmen");
   }
 
   function pilihOpsi(soal: SoalSiswa, opsiId: string) {
@@ -129,17 +191,22 @@ export default function DetailAsesmenSiswa() {
     });
   }
 
-  async function kirimJawaban() {
-    if (!asesmen || jumlahDijawab !== asesmen.soal.length) {
+  const kirimJawaban = useCallback(async (otomatis = false) => {
+    if (!asesmen || pengirimanAktif.current || asesmen.submission) return;
+
+    if (!otomatis && jumlahDijawab !== asesmen.soal.length) {
       setError("Jawab semua soal sebelum mengumpulkan.");
-      const soalKosong = asesmen?.soal.findIndex((soal) => !soalSudahDijawab(soal.id)) ?? -1;
+      const soalKosong = asesmen.soal.findIndex((soal) => {
+        const value = jawaban[soal.id];
+        return Array.isArray(value) ? value.length === 0 : !value?.trim();
+      });
       if (soalKosong >= 0) {
         setIndeksSoal(soalKosong);
         setDaftarSoalTerbuka(false);
       }
       return;
     }
-    if (!(await konfirmasi({
+    if (!otomatis && !(await konfirmasi({
       title: "Kumpulkan jawaban?",
       message: "Pastikan semua jawaban sudah benar. Setelah dikirim, jawaban tidak dapat diubah.",
       confirmLabel: "Kumpulkan jawaban",
@@ -148,7 +215,9 @@ export default function DetailAsesmenSiswa() {
     }))) {
       return;
     }
+    if (pengirimanAktif.current) return;
 
+    pengirimanAktif.current = true;
     setSedangKirim(true);
     setError(null);
     try {
@@ -156,23 +225,82 @@ export default function DetailAsesmenSiswa() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          ...(otomatis ? { autoSubmit: true } : {}),
+          catatanIntegritas: bacaCatatanIntegritas(asesmen.id),
           jawaban: asesmen.soal.map((soal) => ({
             soalId: soal.id,
             ...(soal.tipe === "ESSAY"
-              ? { jawabanEssay: jawaban[soal.id] }
-              : { opsiIds: Array.isArray(jawaban[soal.id]) ? jawaban[soal.id] : [jawaban[soal.id]] }),
+              ? { jawabanEssay: typeof jawaban[soal.id] === "string" ? jawaban[soal.id] : "" }
+              : {
+                  opsiIds: Array.isArray(jawaban[soal.id])
+                    ? jawaban[soal.id]
+                    : jawaban[soal.id]
+                      ? [jawaban[soal.id] as string]
+                      : [],
+                }),
           })),
         }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.pesan ?? "Gagal mengumpulkan asesmen.");
+      hapusCatatanIntegritas(asesmen.id);
       await muat();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Tidak dapat terhubung ke server.");
     } finally {
+      pengirimanAktif.current = false;
       setSedangKirim(false);
     }
-  }
+  }, [asesmen, jumlahDijawab, jawaban, konfirmasi, muat]);
+
+  useEffect(() => {
+    if (!asesmen || asesmen.submission || durasiDetik <= 0 || waktuBerlalu < durasiDetik) return;
+    if (pengirimanWaktuHabis.current) return;
+    pengirimanWaktuHabis.current = true;
+    void kirimJawaban(true).finally(() => {
+      pengirimanWaktuHabis.current = false;
+    });
+  }, [asesmen, durasiDetik, waktuBerlalu, kirimJawaban]);
+
+  useEffect(() => {
+    if (!asesmen || asesmen.submission) return;
+
+    let fokusAktif = true;
+    let blurTimer = 0;
+    const beriPeringatan = (jenis: "TAB_HIDDEN" | "WINDOW_BLUR") => {
+      if (!fokusAktif) return;
+      fokusAktif = false;
+      const catatan = rekamCatatanIntegritas(asesmen.id, jenis);
+      setCatatanIntegritas((sebelumnya) => [...sebelumnya, catatan].slice(-100));
+    };
+    const saatVisibilitasBerubah = () => {
+      window.clearTimeout(blurTimer);
+      if (document.hidden) {
+        beriPeringatan("TAB_HIDDEN");
+      } else {
+        fokusAktif = true;
+      }
+    };
+    const saatKehilanganFokus = () => {
+      blurTimer = window.setTimeout(() => {
+        if (!document.hidden) beriPeringatan("WINDOW_BLUR");
+      }, 250);
+    };
+    const saatMendapatFokus = () => {
+      window.clearTimeout(blurTimer);
+      fokusAktif = true;
+    };
+
+    document.addEventListener("visibilitychange", saatVisibilitasBerubah);
+    window.addEventListener("blur", saatKehilanganFokus);
+    window.addEventListener("focus", saatMendapatFokus);
+    return () => {
+      window.clearTimeout(blurTimer);
+      document.removeEventListener("visibilitychange", saatVisibilitasBerubah);
+      window.removeEventListener("blur", saatKehilanganFokus);
+      window.removeEventListener("focus", saatMendapatFokus);
+    };
+  }, [asesmen]);
 
   if (sedangMuat) return <div className={styles.state} role="status">Memuat asesmen...</div>;
   if (error && !asesmen) {
@@ -199,10 +327,27 @@ export default function DetailAsesmenSiswa() {
           <span className={styles.timeLimit}>{asesmen.durasiMenit ? `Durasi ${asesmen.durasiMenit} menit` : "Tanpa batas waktu"}</span>
         </div>
       )}
+      {!asesmen.submission && (
+        <p className={styles.focusNotice} role="status">
+          {waktuHabis
+            ? (sedangKirim ? "Waktu habis. Jawaban sedang dikirim otomatis..." : "Waktu habis. Periksa koneksi lalu coba kirim ulang.")
+            : `Mode fokus aktif · jangan berpindah tab${catatanIntegritas.length ? ` · ${catatanIntegritas.length} peringatan akan dicatat saat dikumpulkan` : ""}`}
+        </p>
+      )}
 
       <header className={styles.header}>
         <div className={styles.headerTitle}>
-          <Link className={styles.backLink} href="/siswa/asesmen">← Kembali ke asesmen</Link>
+          <Link
+            className={styles.backLink}
+            href="/siswa/asesmen"
+            onClick={(event) => {
+              if (asesmen.submission) return;
+              event.preventDefault();
+              void kembaliKeDaftarAsesmen();
+            }}
+          >
+            ← Kembali ke asesmen
+          </Link>
           <p className={styles.eyebrow}>{asesmen.tipe === "UJIAN" ? "UJIAN" : "KUIS"} · {asesmen.mapel}</p>
           <h1>{asesmen.judul}</h1>
           <p className={styles.meta}>{asesmen.guru} <span aria-hidden="true">·</span> {asesmen.soal.length} soal</p>
@@ -221,17 +366,22 @@ export default function DetailAsesmenSiswa() {
           <span className={styles.resultMark}>✓</span>
           <div>
             <h2>Jawaban terkumpul</h2>
-            <p>
-              {asesmen.submission.nilai === null
-                ? "Jawaban berhasil dikumpulkan. Nilai belum tersedia."
-                : `Nilai kamu ${asesmen.submission.nilai} dari 100.`}
-            </p>
+            <p>Jawaban berhasil dikumpulkan. Nilai akan diinformasikan oleh guru.</p>
           </div>
         </section>
       ) : (
         <>
           {soalAktif && (
-            <fieldset className={styles.question} key={soalAktif.id} aria-labelledby={`question-title-${soalAktif.id}`}>
+            <section
+              className={styles.question}
+              key={soalAktif.id}
+              role="group"
+              aria-labelledby={`question-title-${soalAktif.id}`}
+              onCopy={(event) => { event.preventDefault(); catatPeringatan("COPY_BLOCKED"); }}
+              onCut={(event) => { event.preventDefault(); catatPeringatan("CUT_BLOCKED"); }}
+              onPaste={(event) => { event.preventDefault(); catatPeringatan("PASTE_BLOCKED"); }}
+              onContextMenu={(event) => { event.preventDefault(); catatPeringatan("CONTEXT_MENU_BLOCKED"); }}
+            >
               <div className={styles.questionToolbar}>
                 <span className={styles.questionNumber}>No. {String(indeksSoal + 1).padStart(2, "0")}</span>
                 <div className={styles.textControls} aria-label="Ukuran teks soal">
@@ -240,9 +390,9 @@ export default function DetailAsesmenSiswa() {
                   <button type="button" onClick={() => setSkalaTeks((skala) => Math.min(4, skala + 1))} aria-label="Besarkan teks">A+</button>
                 </div>
               </div>
-              <legend className={styles.questionHeading} id={`question-title-${soalAktif.id}`} style={{ fontSize: `${16 + skalaTeks * 2}px` }}>
+              <h2 className={styles.questionHeading} id={`question-title-${soalAktif.id}`} style={{ fontSize: `${16 + skalaTeks * 2}px` }}>
                 {soalAktif.pertanyaan}
-              </legend>
+              </h2>
               {soalAktif.gambar && <img className={styles.questionImage} src={soalAktif.gambar} alt={`Ilustrasi soal ${indeksSoal + 1}`} />}
               {soalAktif.tipe === "ESSAY" ? (
                 <textarea
@@ -280,7 +430,7 @@ export default function DetailAsesmenSiswa() {
                 <span className={soalSudahDijawab(soalAktif.id) ? styles.answeredDot : styles.unansweredDot} />
                 {soalSudahDijawab(soalAktif.id) ? "Jawaban tersimpan di perangkat ini" : "Belum dijawab"}
               </div>
-            </fieldset>
+            </section>
           )}
 
           {error && <p className={styles.inlineError} role="alert">{error}</p>}
@@ -292,8 +442,8 @@ export default function DetailAsesmenSiswa() {
             <button className={styles.dockAction} type="button" onClick={() => setDaftarSoalTerbuka(true)}>
               <span aria-hidden="true">☷</span><small>Daftar soal</small><i>{jumlahDijawab}/{asesmen.soal.length}</i>
             </button>
-            <button className={`${styles.dockAction} ${styles.finishAction}`} type="button" onClick={kirimJawaban} disabled={sedangKirim}>
-              <span aria-hidden="true">{sedangKirim ? "…" : "↗"}</span><small>{sedangKirim ? "Mengirim" : "Selesai"}</small>
+            <button className={`${styles.dockAction} ${styles.finishAction}`} type="button" onClick={() => void kirimJawaban(waktuHabis)} disabled={sedangKirim}>
+              <span aria-hidden="true">{sedangKirim ? "…" : "↗"}</span><small>{sedangKirim ? "Mengirim" : waktuHabis ? "Coba lagi" : "Selesai"}</small>
             </button>
           </nav>
 
@@ -326,7 +476,7 @@ export default function DetailAsesmenSiswa() {
                   })}
                 </div>
                 <div className={styles.sheetLegend}><span><i className={styles.legendCurrent} />Soal aktif</span><span><i className={styles.legendAnswered} />Sudah dijawab</span><span><i className={styles.legendEmpty} />Belum dijawab</span></div>
-                <button className={styles.sheetFinish} onClick={() => { setDaftarSoalTerbuka(false); void kirimJawaban(); }} type="button">Selesai dan kumpulkan</button>
+                <button className={styles.sheetFinish} onClick={() => { setDaftarSoalTerbuka(false); void kirimJawaban(waktuHabis); }} type="button">{waktuHabis ? "Coba kirim ulang" : "Selesai dan kumpulkan"}</button>
               </section>
             </div>
           )}

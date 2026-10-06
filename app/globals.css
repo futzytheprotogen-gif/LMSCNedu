@@ -417,7 +417,7 @@ pre {
   }
 
   .cn-role-sidebar {
-    width: min(240px, calc(100vw - 32px)) !important;
+    width: min(280px, calc(100vw - 48px)) !important;
     max-width: calc(100vw - 32px);
   }
 

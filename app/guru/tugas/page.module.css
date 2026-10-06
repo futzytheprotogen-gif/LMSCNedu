@@ -1,0 +1,160 @@
+.page {
+  min-width: 0;
+  overflow-x: clip !important;
+}
+
+.container {
+  min-width: 0;
+}
+
+.taskCard {
+  min-width: 0;
+}
+
+.taskList {
+  min-width: 0;
+}
+
+.taskMain {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .container {
+    padding: 28px 20px 48px !important;
+  }
+
+  .page .statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 22px 16px 40px !important;
+  }
+
+  .header {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 16px !important;
+  }
+
+  .createButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .page .statsGrid {
+    gap: 10px !important;
+  }
+
+  .page .statsGrid > * {
+    min-width: 0;
+    padding: 13px !important;
+  }
+
+  .toolbar,
+  .submissionToolbar {
+    align-items: stretch !important;
+    flex-direction: column;
+  }
+
+  .searchWrapper,
+  .submissionSearch {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .filterGroup {
+    justify-content: stretch;
+  }
+
+  .filterGroup > button {
+    flex: 1;
+    padding-right: 8px !important;
+    padding-left: 8px !important;
+  }
+
+  .sectionHeader {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+    gap: 10px !important;
+  }
+
+  .taskCard {
+    padding: 14px !important;
+  }
+
+  .taskTop {
+    flex-wrap: wrap;
+    gap: 10px !important;
+  }
+
+  .taskMain {
+    flex: 1 1 calc(100% - 54px);
+  }
+
+  .taskActions {
+    width: 100%;
+    margin-left: 54px;
+  }
+
+  .taskBottom {
+    align-items: stretch !important;
+    flex-direction: column;
+  }
+
+  .classArea {
+    min-width: 0 !important;
+  }
+
+  .taskBottomActions {
+    justify-content: flex-start !important;
+  }
+
+  .overlay {
+    align-items: flex-start !important;
+    padding: 12px !important;
+  }
+
+  .taskModal,
+  .submissionModal {
+    width: 100% !important;
+    max-height: calc(100dvh - 24px) !important;
+    border-radius: 14px !important;
+  }
+
+  .modalHeader {
+    padding: 17px !important;
+  }
+
+  .modalForm {
+    padding: 17px !important;
+  }
+
+  .submissionStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .container {
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+  }
+
+  .page .statsGrid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .taskActions {
+    margin-left: 0;
+  }
+
+  .submissionStats {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}

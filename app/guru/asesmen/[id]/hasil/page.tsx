@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import type { JenisPeringatanAsesmen } from "@/lib/asesmenIntegrity";
 import styles from "./page.module.css";
 
 interface SoalHasil {
@@ -12,11 +13,29 @@ interface SoalHasil {
   opsi: { id: string; teks: string; benar: boolean }[];
 }
 
+const LABEL_PERINGATAN: Record<JenisPeringatanAsesmen, string> = {
+  TAB_HIDDEN: "Berpindah tab atau menyembunyikan halaman",
+  WINDOW_BLUR: "Jendela asesmen kehilangan fokus",
+  COPY_BLOCKED: "Percobaan menyalin teks",
+  CUT_BLOCKED: "Percobaan memotong teks",
+  PASTE_BLOCKED: "Percobaan menempelkan teks",
+  CONTEXT_MENU_BLOCKED: "Percobaan membuka menu klik kanan",
+  LEAVE_ASSESSMENT: "Meninggalkan halaman asesmen",
+  LOGOUT_DURING_ASSESSMENT: "Keluar akun saat asesmen berlangsung",
+};
+
 interface Pengumpulan {
   id: string;
   nilai: number | null;
   waktuSelesai: string | null;
+  integritasDicatat: boolean;
   siswa: { id: string; nama: string; nis: string };
+  catatanIntegritas: {
+    id: string;
+    jenis: JenisPeringatanAsesmen;
+    terdeteksiPada: string;
+    createdAt: string;
+  }[];
   jawaban: {
     soalId: string;
     jawabanEssay: string | null;
@@ -143,6 +162,37 @@ export default function HasilAsesmenGuru() {
                         {submission.nilai === null ? "Belum dinilai" : `${submission.nilai}/100`}
                       </span>
                     </header>
+
+                    <section className={styles.integrityLog} aria-label="Catatan fokus asesmen">
+                      <h2>
+                        Catatan fokus
+                        <span>
+                          {submission.integritasDicatat
+                            ? `${submission.catatanIntegritas.length} peringatan`
+                            : "Belum tersedia"}
+                        </span>
+                      </h2>
+                      {submission.catatanIntegritas.length > 0 ? (
+                        <ul>
+                          {submission.catatanIntegritas.map((catatan) => (
+                            <li key={catatan.id}>
+                              <strong>{LABEL_PERINGATAN[catatan.jenis] ?? "Aktivitas tidak dikenal"}</strong>
+                              <span>Waktu yang dilaporkan browser: {new Date(catatan.terdeteksiPada).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}</span>
+                              <time dateTime={catatan.createdAt}>
+                                Tercatat di server: {new Date(catatan.createdAt).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+                              </time>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>
+                          {submission.integritasDicatat
+                            ? "Tidak ada peringatan fokus yang terdeteksi."
+                            : "Catatan fokus belum tersedia untuk pengumpulan lama ini."}
+                        </p>
+                      )}
+                      <small>Catatan ini merupakan sinyal dari browser siswa, bukan bukti pasti terjadinya kecurangan.</small>
+                    </section>
 
                     <div className={styles.answers}>
                       {hasil.soal.map((soal, index) => {

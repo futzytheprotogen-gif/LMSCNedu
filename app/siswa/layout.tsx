@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
@@ -8,6 +8,7 @@ import { hitungAktivitasBaru } from "@/lib/notifikasiSiswa";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import ThemeSwitchButton from "@/components/ThemeSwitchButton";
 import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
+import { rekamCatatanIntegritas } from "@/lib/asesmenIntegrity";
 import styles from "./layout.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
@@ -35,6 +36,8 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const konfirmasi = useAppConfirm();
+  const idAsesmenAktif = pathname.match(/^\/siswa\/asesmen\/([^/]+)/)?.[1] ?? null;
+  const sedangAsesmen = idAsesmenAktif !== null;
 
   const cekNotifBaru = useCallback(async () => {
     try {
@@ -74,14 +77,40 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
 
   async function handleLogout() {
     if (!(await konfirmasi({
-      title: "Keluar dari akun?",
-      message: "Sesi CN Edu akan diakhiri pada perangkat ini.",
-      confirmLabel: "Ya, keluar",
-      cancelLabel: "Tetap di sini",
+      title: sedangAsesmen ? "Keluar dari ujian dan akun?" : "Keluar dari akun?",
+      message: sedangAsesmen
+        ? "Ujian masih berlangsung. Jika ada kendala dan tetap ingin keluar, timer tetap berjalan dan jawaban yang belum dikirim dapat hilang."
+        : "Sesi CN Edu akan diakhiri pada perangkat ini.",
+      confirmLabel: sedangAsesmen ? "Keluar dan logout" : "Ya, keluar",
+      cancelLabel: sedangAsesmen ? "Lanjutkan ujian" : "Tetap di sini",
       tone: "primary",
     }))) return;
+    if (idAsesmenAktif) rekamCatatanIntegritas(idAsesmenAktif, "LOGOUT_DURING_ASSESSMENT");
     await fetch("/api/auth", { method: "DELETE" });
     router.push("/login");
+  }
+
+  async function handleMenuNavigation(
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+    hasNotifications?: boolean
+  ) {
+    if (sedangAsesmen) {
+      event.preventDefault();
+      const lanjut = await konfirmasi({
+        title: "Tinggalkan ujian?",
+        message: "Ujian masih berlangsung. Timer tetap berjalan. Pilih “Lanjutkan ujian” untuk kembali mengerjakan, atau lanjutkan hanya jika ada kendala mendesak.",
+        confirmLabel: "Keluar dari ujian",
+        cancelLabel: "Lanjutkan ujian",
+        tone: "primary",
+      });
+      if (!lanjut) return;
+      if (idAsesmenAktif) rekamCatatanIntegritas(idAsesmenAktif, "LEAVE_ASSESSMENT");
+    }
+
+    setSidebarTerbuka(false);
+    if (hasNotifications) setTimeout(cekNotifBaru, 500);
+    router.push(href);
   }
 
   return (
@@ -100,7 +129,16 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
         <span className="cn-role-brand" style={estilo.namaBrand}>CN Edu — Siswa</span>
         <div style={estilo.navKanan}>
           <ThemeSwitchButton />
-          <Link href="/profil/saya" style={estilo.tombolProfil}>Profil</Link>
+          <Link
+            href="/profil/saya"
+            style={estilo.tombolProfil}
+            onClick={(event) => {
+              if (!sedangAsesmen) return;
+              void handleMenuNavigation(event, "/profil/saya");
+            }}
+          >
+            Profil
+          </Link>
         </div>
       </header>
 
@@ -147,7 +185,11 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
               <motion.div key={item.href} variants={VARIAN_ITEM_MENU_ROLE} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
               <Link
                 href={item.href}
-                onClick={() => {
+                onClick={(event) => {
+                  if (sedangAsesmen) {
+                    void handleMenuNavigation(event, item.href, item.notifikasi);
+                    return;
+                  }
                   setSidebarTerbuka(false);
                   if (item.notifikasi) setTimeout(cekNotifBaru, 500);
                 }}

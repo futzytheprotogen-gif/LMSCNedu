@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import styles from "./page.module.css";
 
 type TipeAkun = "ADMIN" | "GURU" | "SISWA";
@@ -183,6 +184,9 @@ export default function HalamanLogin() {
         {/* RIGHT SIDE */}
         <section className={styles.panelKanan} style={estilo.panelKanan}>
           <div style={estilo.formContainer}>
+            <Link className={styles.backLink} href="/">
+              <span aria-hidden="true">←</span> Kembali ke Beranda
+            </Link>
             <div style={estilo.formHeader}>
               <span style={estilo.smallTitle}>
                 WELCOME BACK

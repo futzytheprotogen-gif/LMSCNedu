@@ -101,10 +101,10 @@ export default function MonitoringCharts({
                 <PieChart>
                   <Pie data={dataDonat} dataKey="nilai" nameKey="label" innerRadius="64%" outerRadius="88%" paddingAngle={2} stroke="none">
                     {dataDonat.map((item, indeks) => (
-                      <Cell key={item.label} fill={item.warna ?? WARNA_GRAFIK[indeks % WARNA_GRAFIK.length]} stroke="#fff" strokeWidth={2} />
+                      <Cell key={item.label} fill={item.warna ?? WARNA_GRAFIK[indeks % WARNA_GRAFIK.length]} stroke="var(--cn-surface)" strokeWidth={2} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(nilai) => [`${formatAngka(Number(nilai))} ${satuanDonat}`, "Jumlah"]} contentStyle={{ border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 11 }} />
+                  <Tooltip formatter={(nilai) => [`${formatAngka(Number(nilai))} ${satuanDonat}`, "Jumlah"]} contentStyle={{ border: "1px solid var(--cn-line)", borderRadius: 8, fontSize: 11, backgroundColor: "var(--cn-surface)", color: "var(--cn-text)" }} />
                 </PieChart>
               </ResponsiveContainer>
               <div className={styles.donutCenter}><strong>{formatAngka(totalDonat)}</strong><span>{satuanDonat}</span></div>
@@ -120,10 +120,10 @@ export default function MonitoringCharts({
                 <PieChart>
                   <Pie data={dataPai} dataKey="nilai" nameKey="label" outerRadius="82%" paddingAngle={2} stroke="none">
                     {dataPai.map((item, indeks) => (
-                      <Cell key={item.label} fill={item.warna ?? WARNA_GRAFIK[indeks % WARNA_GRAFIK.length]} stroke="#fff" strokeWidth={2} />
+                      <Cell key={item.label} fill={item.warna ?? WARNA_GRAFIK[indeks % WARNA_GRAFIK.length]} stroke="var(--cn-surface)" strokeWidth={2} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(nilai) => [`${formatAngka(Number(nilai))} ${satuanPai}`, "Jumlah"]} contentStyle={{ border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 11 }} />
+                  <Tooltip formatter={(nilai) => [`${formatAngka(Number(nilai))} ${satuanPai}`, "Jumlah"]} contentStyle={{ border: "1px solid var(--cn-line)", borderRadius: 8, fontSize: 11, backgroundColor: "var(--cn-surface)", color: "var(--cn-text)" }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -135,11 +135,11 @@ export default function MonitoringCharts({
           <div className={styles.lineWrap}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={dataTren} margin={{ top: 10, right: 8, bottom: 0, left: -14 }}>
-                <CartesianGrid stroke="#edf2f7" strokeDasharray="3 4" vertical={false} />
-                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 9 }} dy={7} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 9 }} width={34} />
-                <Tooltip formatter={(nilai) => [`${formatAngka(Number(nilai))} ${satuanTren}`, "Rata-rata"]} contentStyle={{ border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 11 }} />
-                <Line dataKey="nilai" type="monotone" stroke="#2563eb" strokeWidth={2.5} connectNulls={false} dot={{ r: 3, fill: "#fff", stroke: "#2563eb", strokeWidth: 2 }} activeDot={{ r: 5, fill: "#2563eb", stroke: "#fff", strokeWidth: 2 }} />
+                <CartesianGrid stroke="var(--cn-line)" strokeDasharray="3 4" vertical={false} />
+                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "var(--cn-muted)", fontSize: 9 }} dy={7} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--cn-muted)", fontSize: 9 }} width={34} />
+                <Tooltip formatter={(nilai) => [`${formatAngka(Number(nilai))} ${satuanTren}`, "Rata-rata"]} contentStyle={{ border: "1px solid var(--cn-line)", borderRadius: 8, fontSize: 11, backgroundColor: "var(--cn-surface)", color: "var(--cn-text)" }} />
+                <Line dataKey="nilai" type="monotone" stroke="var(--cn-primary)" strokeWidth={2.5} connectNulls={false} dot={{ r: 3, fill: "var(--cn-surface)", stroke: "var(--cn-primary)", strokeWidth: 2 }} activeDot={{ r: 5, fill: "var(--cn-primary)", stroke: "var(--cn-surface)", strokeWidth: 2 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

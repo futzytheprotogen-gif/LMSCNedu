@@ -221,20 +221,6 @@
               />
             </div>
 
-            <button type="button" className={styles.filterButton}>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              >
-                <path d="M4 6h16" />
-                <path d="M7 12h10" />
-                <path d="M10 18h4" />
-              </svg>
-
-              Filter
-            </button>
           </div>
         </section>
 
@@ -318,4 +304,3 @@
       </main>
     );
   }
-

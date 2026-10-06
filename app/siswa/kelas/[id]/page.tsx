@@ -104,7 +104,7 @@ export default function DetailKelasSiswa() {
           ← Kembali ke Kelas
         </button>
 
-        <header style={styles.classHeader}>
+        <header className={layout.classHero} style={styles.classHeader}>
           <h1 style={styles.title}>{kelas.judul}</h1>
           {kelas.deskripsi && <p style={styles.description}>{kelas.deskripsi}</p>}
           <div style={styles.meta}>
@@ -113,7 +113,7 @@ export default function DetailKelasSiswa() {
           </div>
         </header>
 
-        <div style={styles.tabs}>
+        <div className={layout.tabs} style={styles.tabs}>
           {(
             [
               ["FEED", "Feed"],
@@ -125,6 +125,7 @@ export default function DetailKelasSiswa() {
               key={value}
               type="button"
               onClick={() => setTabAktif(value)}
+              className={tabAktif === value ? layout.tabActive : layout.tab}
               style={{
                 ...styles.tabButton,
                 ...(tabAktif === value ? styles.tabButtonActive : {}),
@@ -190,7 +191,7 @@ export default function DetailKelasSiswa() {
         )}
 
         {tabAktif === "GURU" && (
-          <div style={styles.peopleList}>
+          <div className={layout.peopleList} style={styles.peopleList}>
             {kelas.guru.map((g) => (
               <div key={g.id} style={styles.personRow}>
                 <div style={styles.avatar}>
@@ -214,7 +215,7 @@ export default function DetailKelasSiswa() {
         )}
 
         {tabAktif === "SISWA" && (
-          <div style={styles.peopleList}>
+          <div className={layout.peopleList} style={styles.peopleList}>
             {kelas.siswa.map((s) => (
               <div
                 key={s.id}
@@ -250,6 +251,7 @@ function ItemFeedCard({
 
   return (
     <article
+      className={layout.feedCard}
       style={{ ...styles.feedCard, cursor: bisaDiklik ? "pointer" : "default" }}
       onClick={() => {
         if (item.tipe === "TUGAS") router.push(`/siswa/tugas/${item.id}`);

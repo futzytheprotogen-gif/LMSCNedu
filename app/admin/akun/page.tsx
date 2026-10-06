@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import responsive from "./page.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -268,7 +269,7 @@ export default function HalamanBuatAkun() {
               Tipe Akun
             </p>
 
-            <div style={styles.roleTabs}>
+            <div className={responsive.roleTabs} style={styles.roleTabs}>
               {(["SISWA", "GURU", "KEPSEK", "KURIKULUM"] as TipeAkun[]).map((tab) => {
                 const aktif = tipeAkun === tab;
 
@@ -277,6 +278,7 @@ export default function HalamanBuatAkun() {
                     key={tab}
                     type="button"
                     onClick={() => toggleTipeAkun(tab)}
+                    aria-pressed={aktif}
                     style={{
                       ...styles.roleButton,
                       ...(aktif ? styles.roleButtonActive : {}),
@@ -793,7 +795,8 @@ const styles = {
     fontSize: "14px",
     fontWeight: 700,
     cursor: "pointer",
-    transition: "all 0.2s ease",
+    transition:
+      "background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease",
   },
 
   roleButtonActive: {

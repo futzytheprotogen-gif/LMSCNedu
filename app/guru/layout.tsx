@@ -48,7 +48,7 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
         >
           ☰
         </button>
-        <span className="cn-role-brand" style={estilo.namaBrand}>CN Edu — Guru</span>
+        <Link className="cn-role-brand" href="/guru/kelas" style={estilo.namaBrand}>CN Edu — Guru</Link>
         <div style={estilo.navKanan}>
           <ThemeSwitchButton />
           <Link href="/profil/saya" style={estilo.tombolProfil}>
@@ -78,7 +78,7 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
         transition={TRANSISI_DRAWER_ROLE}
         style={estilo.sidebar}
       >
-        <div className="cn-role-sidebar-header" style={estilo.headerSidebar}>
+        <div className="cn-role-sidebar-header" style={estilo.sidebarHeading}>
           <span style={estilo.namaBrandSidebar}>CN Edu</span>
           <button
             onClick={() => setSidebarTerbuka(false)}
@@ -90,12 +90,13 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <motion.nav style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
+        <motion.nav aria-label="Menu Guru" style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
           {MENU_GURU.map((item) => {
-            const aktif = pathname.startsWith(item.href);
+            const aktif = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
               <motion.div key={item.href} variants={VARIAN_ITEM_MENU_ROLE} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
                 <Link
+                  aria-current={aktif ? "page" : undefined}
                   href={item.href}
                   onClick={() => setSidebarTerbuka(false)}
                   style={{ ...estilo.linkMenu, ...(aktif ? estilo.linkMenuAktif : {}) }}
@@ -142,7 +143,12 @@ const estilo = {
     color: "var(--cn-navy)",
     padding: "8px",
   },
-  namaBrand: { fontSize: "15px", fontWeight: 700, color: "var(--cn-navy)" },
+  namaBrand: {
+    fontSize: "15px",
+    fontWeight: 700,
+    color: "var(--cn-navy)",
+    textDecoration: "none",
+  },
   navKanan: { display: "flex", alignItems: "center", gap: "10px" },
   tombolProfil: {
     fontSize: "13px",
@@ -167,31 +173,51 @@ const estilo = {
     zIndex: 50,
     display: "flex",
     flexDirection: "column" as const,
+    boxShadow: "8px 0 25px rgba(var(--cn-navy-rgb), 0.08)",
   },
-  headerSidebar: {
+  sidebarHeading: {
     height: `${TINGGI_NAVBAR}px`,
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     padding: "0 16px",
     borderBottom: "1px solid var(--cn-line)",
+    boxSizing: "border-box" as const,
   },
-  namaBrandSidebar: { fontSize: "16px", fontWeight: 700, color: WARNA_PRIMARY },
+  namaBrandSidebar: {
+    fontSize: "17px",
+    fontWeight: 800,
+    color: WARNA_PRIMARY,
+    letterSpacing: "-0.02em",
+  },
   tombolTutup: {
+    width: "32px",
+    height: "32px",
     fontSize: "16px",
     background: "none",
     border: "none",
+    borderRadius: "7px",
     cursor: "pointer",
-    color: "var(--cn-navy)",
+    color: "var(--cn-coral-dark)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  nav: { display: "flex", flexDirection: "column" as const, padding: "12px", gap: "4px" },
+  nav: { display: "flex", flexDirection: "column" as const, padding: "14px 12px", gap: "4px" },
   linkMenu: {
-    padding: "10px 12px",
-    borderRadius: "8px",
+    minHeight: "43px",
+    padding: "0 12px",
+    borderRadius: "9px",
     fontSize: "14px",
     fontWeight: 600,
     color: "var(--cn-coral-dark)",
     textDecoration: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+    boxSizing: "border-box" as const,
+    transition: "background-color 0.15s ease",
   },
   linkMenuAktif: { backgroundColor: "var(--cn-tint)", color: WARNA_PRIMARY },
   konten: { paddingTop: `${TINGGI_NAVBAR}px` },

@@ -12,6 +12,32 @@
 }
 
 .halaman {
+  min-height: 100dvh !important;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 22px;
+  color: var(--cn-primary-dark);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--cn-primary);
+  text-decoration: underline;
+}
+
+.backLink:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid rgb(var(--cn-primary-rgb) / 24%);
+  outline-offset: 3px;
+}
+
+.halaman {
   background: #f8fafc !important;
 }
 
@@ -46,6 +72,16 @@
 .tab {
   border: 1px solid transparent !important;
   border-radius: 6px !important;
+}
+
+.barisTab {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.tab {
+  min-width: 0;
+  padding-right: 4px !important;
+  padding-left: 4px !important;
 }
 
 .tab:hover:not(:disabled) {
@@ -98,8 +134,10 @@
 
 @media (max-width: 700px) {
   .halaman {
+    min-height: 100dvh !important;
     align-items: flex-start !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     padding: 16px 12px !important;
   }
 
@@ -138,6 +176,10 @@
   .panelKanan {
     align-items: flex-start !important;
     padding: 26px 22px 28px !important;
+  }
+
+  .backLink {
+    margin-bottom: 18px;
   }
 
   .tab {
@@ -180,6 +222,10 @@
 
 :global(:root[data-theme="dark"]) .panelKanan {
   background: var(--cn-surface) !important;
+}
+
+:global(:root[data-theme="dark"]) .backLink {
+  color: var(--cn-primary-dark);
 }
 
 :global(:root[data-theme="dark"]) .tab:hover:not(:disabled) {

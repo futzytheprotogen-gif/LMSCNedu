@@ -6,10 +6,10 @@
 
   --bg: var(--cn-tint);
   --white: var(--cn-surface);
-  --text: var(--cn-coral-dark);
+  --text: var(--cn-text);
   --secondary: var(--cn-text);
-  --muted: var(--cn-coral);
-  --border: var(--cn-coral-tint);
+  --muted: var(--cn-muted);
+  --border: var(--cn-line);
 
   min-height: 100vh;
   background:
@@ -400,7 +400,7 @@
 
   padding: 18px;
 
-  background: white;
+  background: var(--white);
 
   border: 1px solid var(--border);
 
@@ -604,7 +604,7 @@
 
   border-radius: 17px;
 
-  background: white;
+  background: var(--white);
 
   box-shadow:
     0 5px 18px rgba(var(--cn-coral-rgb), 0.035);
@@ -1040,7 +1040,7 @@
 
   margin-bottom: 18px;
 
-  background: white;
+  background: var(--white);
 
   border: 1px solid var(--border);
 
@@ -1769,7 +1769,7 @@
 
   border-radius: 19px;
 
-  background: white;
+  background: var(--white);
 
   box-shadow:
     0 30px 80px rgba(var(--cn-navy-rgb), 0.22);
@@ -1996,7 +1996,7 @@
 
   border-radius: 9px;
 
-  background: white;
+  background: var(--white);
 
   color: var(--text);
 
@@ -2089,7 +2089,7 @@
 
   border-radius: 14px;
 
-  background: white;
+  background: var(--white);
 
   box-shadow:
     0 10px 30px rgba(var(--cn-coral-rgb), 0.06);
@@ -2138,7 +2138,7 @@
 
   border-radius: 17px;
 
-  background: white;
+  background: var(--white);
 
   text-align: center;
 

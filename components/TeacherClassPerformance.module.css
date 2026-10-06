@@ -1,0 +1,281 @@
+.section {
+  margin: 0 0 28px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 13px;
+}
+
+.eyebrow {
+  color: var(--cn-primary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.9px;
+}
+
+.header h2 {
+  margin: 4px 0 0;
+  color: var(--cn-text);
+  font-size: 18px;
+}
+
+.header p {
+  max-width: 390px;
+  margin: 0;
+  color: var(--cn-muted);
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 11px;
+  margin-bottom: 11px;
+}
+
+.summaryCard,
+.rankingCard {
+  min-width: 0;
+  border: 1px solid var(--cn-line);
+  border-radius: 12px;
+  background: var(--cn-surface);
+  box-shadow: 0 5px 16px rgb(var(--cn-navy-rgb) / 4%);
+}
+
+.summaryCard {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 15px;
+}
+
+.summaryCard > span {
+  color: var(--cn-muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.summaryCard strong {
+  overflow: hidden;
+  color: var(--cn-text);
+  font-size: clamp(18px, 2vw, 25px);
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summaryCard small {
+  overflow: hidden;
+  color: var(--cn-muted);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rankingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.rankingCard {
+  padding: 15px;
+}
+
+.rankingCard > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.rankingCard > header h3 {
+  margin: 0;
+  color: var(--cn-text);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.rankingCard > header p {
+  margin: 4px 0 0;
+  color: var(--cn-muted);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.iconScore,
+.iconTask {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--cn-primary);
+  background: var(--cn-tint);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.iconTask {
+  color: var(--cn-success);
+  background: var(--cn-success-tint);
+}
+
+.list {
+  display: grid;
+  gap: 13px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.rank {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--cn-primary-dark);
+  background: var(--cn-tint);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.studentInfo {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 5px;
+}
+
+.studentLine {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.studentLine strong {
+  overflow: hidden;
+  color: var(--cn-text);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.studentLine > span {
+  flex: 0 0 auto;
+  color: var(--cn-text);
+  font-size: 10px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.track {
+  overflow: hidden;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--cn-tint);
+}
+
+.track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.scoreBar {
+  background: var(--cn-primary);
+}
+
+.taskBar {
+  background: var(--cn-success);
+}
+
+.studentInfo small {
+  color: var(--cn-muted);
+  font-size: 8px;
+}
+
+.empty {
+  display: grid;
+  min-height: 112px;
+  place-items: center;
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed var(--cn-line);
+  border-radius: 9px;
+  color: var(--cn-muted);
+  background: var(--cn-tint);
+  font-size: 10px;
+  text-align: center;
+}
+
+.error {
+  display: grid;
+  min-height: 112px;
+  place-items: center;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--cn-danger);
+  border-radius: 9px;
+  color: var(--cn-danger);
+  background: var(--cn-danger-tint);
+  font-size: 10px;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header p {
+    text-align: left;
+  }
+}
+
+@media (max-width: 600px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryCard {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 12px;
+  }
+
+  .summaryCard > span,
+  .summaryCard small {
+    grid-column: 1;
+  }
+
+  .summaryCard strong {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    max-width: 48vw;
+    text-align: right;
+  }
+
+  .rankingGrid {
+    grid-template-columns: 1fr;
+  }
+}

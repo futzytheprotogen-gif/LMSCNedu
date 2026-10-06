@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppNotice } from "@/components/AppNoticeProvider";
+import responsive from "./page.module.css";
 
 const WARNA = {
   primary: "var(--cn-primary)",
@@ -105,12 +106,12 @@ export default function HalamanAsesmenGuru() {
   }, [daftar, filterStatus, kataKunci]);
 
   return (
-    <div style={estilo.halaman}>
+    <div className={responsive.page} style={estilo.halaman}>
       {/* =====================================================
           HEADER
       ====================================================== */}
 
-      <div style={estilo.header}>
+      <div className={responsive.header} style={estilo.header}>
         <div>
           <div style={estilo.labelHalaman}>RUANG GURU</div>
 
@@ -122,6 +123,7 @@ export default function HalamanAsesmenGuru() {
         </div>
 
         <button
+          className={responsive.createButton}
           onClick={() => router.push("/guru/asesmen/baru")}
           style={estilo.tombolBuat}
         >
@@ -134,7 +136,7 @@ export default function HalamanAsesmenGuru() {
           STATISTIK
       ====================================================== */}
 
-      <div style={estilo.statistik}>
+      <div className={responsive.stats} style={estilo.statistik}>
         <StatCard
           icon="📝"
           label="Total Asesmen"
@@ -161,8 +163,8 @@ export default function HalamanAsesmenGuru() {
           TOOLBAR
       ====================================================== */}
 
-      <div style={estilo.toolbar}>
-        <div style={estilo.searchWrapper}>
+      <div className={responsive.toolbar} style={estilo.toolbar}>
+        <div className={responsive.searchWrapper} style={estilo.searchWrapper}>
           <span style={estilo.searchIcon}>🔍</span>
 
           <input
@@ -184,7 +186,7 @@ export default function HalamanAsesmenGuru() {
           )}
         </div>
 
-        <div style={estilo.filterGroup}>
+        <div className={responsive.filters} style={estilo.filterGroup}>
           <FilterButton
             aktif={filterStatus === "SEMUA"}
             onClick={() => setFilterStatus("SEMUA")}
@@ -239,7 +241,7 @@ export default function HalamanAsesmenGuru() {
               onBuat={() => router.push("/guru/asesmen/baru")}
             />
           ) : (
-            <div style={estilo.grid}>
+            <div className={responsive.grid} style={estilo.grid}>
               {daftarTampil.map((a) => (
                 <KartuAsesmen
                   key={a.id}

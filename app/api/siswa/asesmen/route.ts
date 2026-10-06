@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
         },
         submission: {
           where: { siswaId: sesi.userId },
-          select: { nilai: true, waktuSelesai: true },
+          select: { waktuSelesai: true },
         },
       },
     });
@@ -46,7 +46,6 @@ export async function GET(request: NextRequest) {
         kelasTujuan: item.kelasTujuan.map(({ kelas }) => kelas),
         submission: item.submission[0]
           ? {
-              nilai: item.submission[0].nilai,
               waktuSelesai: item.submission[0].waktuSelesai?.toISOString() ?? null,
             }
           : null,
