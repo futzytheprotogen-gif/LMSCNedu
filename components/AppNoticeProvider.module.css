@@ -61,3 +61,23 @@
 @media (prefers-reduced-motion: reduce) {
   .toast { animation-duration: .01ms; }
 }
+
+:global(:root[data-theme="dark"]) .toast {
+  border-color: var(--cn-line);
+  background: var(--cn-surface);
+}
+
+:global(:root[data-theme="dark"]) .content p {
+  color: var(--cn-text);
+}
+
+:global(:root[data-theme="dark"]) .content code {
+  border-color: var(--cn-line);
+  color: var(--cn-primary-dark);
+  background: var(--cn-tint);
+}
+
+:global(:root[data-theme="dark"]) .close:hover {
+  color: var(--cn-text);
+  background: var(--cn-tint);
+}

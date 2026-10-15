@@ -103,3 +103,54 @@
 @media (prefers-reduced-motion: reduce) {
   .classCard, .skeleton i, .skeleton b, .header { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+:global(:root[data-theme="dark"]) .page :is(.search, .classCard, .skeleton, .detailStats > div, .person, .announcement, .tableWrap, .teacherRow) {
+  border-color: var(--cn-line);
+  background-color: var(--cn-surface);
+}
+
+:global(:root[data-theme="dark"]) .page :is(.readOnly, .avatar, .sectionHeading > b, .tag, .secondaryButton) {
+  border-color: var(--cn-line);
+  background-color: var(--cn-tint);
+}
+
+:global(:root[data-theme="dark"]) .page :is(.breadcrumb, .subtitle, .search > span, .count, .classBody p, .cardMeta, .detailStats span, .person small, .sectionEmpty, .announcementMeta time, .announcement p, .table th, .table td, .teacherMain > small, .teacherClasses small, .teacherClasses span) {
+  color: var(--cn-muted);
+}
+
+:global(:root[data-theme="dark"]) .page :is(.table th, .table tbody tr:hover) {
+  background-color: var(--cn-tint);
+}
+
+:global(:root[data-theme="dark"]) .page .skeleton i,
+:global(:root[data-theme="dark"]) .page .skeleton b {
+  background: linear-gradient(90deg, var(--cn-tint) 25%, var(--cn-surface) 45%, var(--cn-tint) 65%);
+  background-size: 240% 100%;
+}
+
+:global(:root[data-theme="dark"]) .page .stateBox {
+  border-color: var(--cn-danger);
+  background: var(--cn-danger-tint);
+}
+
+:global(:root[data-theme="dark"]) .page .stateIcon {
+  color: var(--cn-danger);
+  background: var(--cn-surface);
+}
+
+:global(:root[data-theme="dark"]) .page :is(.readOnly, .avatar, .sectionHeading > b, .detailStats strong, .announcementMeta strong, .cardMeta span:first-child) {
+  color: var(--cn-primary-dark);
+}
+
+:global(:root[data-theme="dark"]) .page .teacherAvatar {
+  color: var(--cn-success);
+}
+
+:global(:root[data-theme="dark"]) .page .stateBox p {
+  color: var(--cn-muted);
+}
+
+:global(:root[data-theme="dark"]) .page .announcementMeta strong,
+:global(:root[data-theme="dark"]) .page .secondaryButton {
+  color: var(--cn-primary-dark);
+}

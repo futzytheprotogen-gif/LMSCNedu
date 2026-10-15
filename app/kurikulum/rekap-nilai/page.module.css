@@ -120,3 +120,58 @@
 @media (prefers-reduced-motion: reduce) {
   .summarySkeleton, .classSkeleton, .classCard, .scoreTrack span, .teacherTrack span { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+:global(:root[data-theme="dark"]) .page :is(.periodFilter select, .summaryCard, .classCard, .metric, .teacherSection, .teacherRow) {
+  border-color: var(--cn-line);
+  background-color: var(--cn-surface);
+}
+
+:global(:root[data-theme="dark"]) .page :is(.metric, .teacherSection) {
+  background-color: var(--cn-tint);
+}
+
+:global(:root[data-theme="dark"]) .page :is(.breadcrumb, .header p, .periodFilter, .summaryTop, .summaryCard p, .summaryEmpty, .summaryCard > strong small, .noGrades p, .sectionHeader > small, .classIdentity p, .metricLabel, .metric strong small, .metric .unavailable, .teacherHeading span, .teacherName small, .teacherMetrics, .teacherMetrics small, .teacherScore > small, .noTeacher) {
+  color: var(--cn-muted);
+}
+
+:global(:root[data-theme="dark"]) .page :is(.noGrades, .rank, .metric, .teacherRow, .errorState button) {
+  border-color: var(--cn-line);
+  background-color: var(--cn-tint);
+}
+
+:global(:root[data-theme="dark"]) .page :is(.metric strong, .teacherHeading h4, .teacherName strong) {
+  color: var(--cn-text);
+}
+
+:global(:root[data-theme="dark"]) .page .periodFilter select {
+  color: var(--cn-text);
+}
+
+:global(:root[data-theme="dark"]) .page .noGrades strong {
+  color: var(--cn-text);
+}
+
+:global(:root[data-theme="dark"]) .page .errorState p {
+  color: var(--cn-muted);
+}
+
+:global(:root[data-theme="dark"]) .page :is(.scoreValue, .teacherScore strong) {
+  color: var(--cn-primary-dark);
+}
+
+:global(:root[data-theme="dark"]) .page .errorState {
+  border-color: var(--cn-danger);
+  background: var(--cn-danger-tint);
+}
+
+:global(:root[data-theme="dark"]) .page .errorState > span {
+  color: var(--cn-danger);
+  background: var(--cn-surface);
+}
+
+:global(:root[data-theme="dark"]) .page .classSkeleton i,
+:global(:root[data-theme="dark"]) .page .classSkeleton b,
+:global(:root[data-theme="dark"]) .page .summarySkeleton {
+  border-color: var(--cn-line);
+  background: var(--cn-tint);
+}

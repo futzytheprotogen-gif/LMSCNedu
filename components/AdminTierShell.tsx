@@ -21,11 +21,11 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
   const konfirmasi = useAppConfirm();
   const awalan = role === "Kepsek" ? "/kepsek" : "/kurikulum";
   const menu = [
-    { label: "Kelas", href: `${awalan}/kelas`, ikon: "▦" },
-    { label: "Siswa", href: `${awalan}/siswa`, ikon: "♙" },
-    { label: "Guru", href: `${awalan}/guru`, ikon: "♟" },
+    { label: "Kelas", href: `${awalan}/kelas` },
+    { label: "Siswa", href: `${awalan}/siswa` },
+    { label: "Guru", href: `${awalan}/guru` },
     ...(role === "Kurikulum"
-      ? [{ label: "Rekap Nilai", href: "/kurikulum/rekap-nilai", ikon: "▤" }]
+      ? [{ label: "Rekap Nilai", href: "/kurikulum/rekap-nilai" }]
       : []),
   ];
 
@@ -48,6 +48,7 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
       <header className={styles.topbar}>
         <button
           aria-label={menuTerbuka ? "Tutup menu" : "Buka menu"}
+          aria-expanded={menuTerbuka}
           className={styles.menuToggle}
           onClick={() => setMenuTerbuka((terbuka) => !terbuka)}
           type="button"
@@ -84,9 +85,16 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
         initial={false}
         transition={TRANSISI_DRAWER_ROLE}
       >
-        <div className={styles.sideHeading}>
-          <span>RUANG {role.toUpperCase()}</span>
-          <span className={styles.roleDot} />
+        <div className={styles.sidebarHeader}>
+          <span className={styles.sidebarBrand}>CN Edu — {role}</span>
+          <button
+            aria-label="Tutup menu"
+            className={styles.closeMenu}
+            onClick={() => setMenuTerbuka(false)}
+            type="button"
+          >
+            ×
+          </button>
         </div>
         <motion.nav
           animate="tampil"
@@ -110,16 +118,13 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
                   href={item.href}
                   onClick={() => setMenuTerbuka(false)}
                 >
-                  <span className={styles.navIcon} aria-hidden="true">{item.ikon}</span>
                   {item.label}
-                  {aktif && <motion.span className={styles.activeMark} layoutId={`active-${role}`} />}
                 </Link>
               </motion.div>
             );
           })}
         </motion.nav>
         <div className={styles.sidebarFooter}>
-          <p>CN Edu <span>•</span> {role}</p>
           <button className={styles.logout} onClick={keluar} type="button">
             <span aria-hidden="true">↪</span> Keluar dari akun
           </button>
