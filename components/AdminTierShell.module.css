@@ -69,6 +69,8 @@
 .profile:hover { color: var(--cn-navy); }
 .profile span { font-size: 15px; }
 .menuToggle { display: none; }
+.brandMark { transition: transform 220ms cubic-bezier(.22, 1, .36, 1); }
+.brand:hover .brandMark { transform: rotate(-5deg) scale(1.06); }
 
 .sidebar {
   position: fixed;
@@ -109,8 +111,10 @@
   color: var(--cn-coral-dark);
   background: transparent;
   font-size: 21px;
+  transition: color 160ms ease, background-color 160ms ease, transform 220ms cubic-bezier(.22, 1, .36, 1);
 }
 
+.closeMenu:hover { background: var(--cn-tint); transform: rotate(90deg); }
 .navigation { display: grid; gap: 4px; padding: 14px 12px; }
 
 .navLink {
