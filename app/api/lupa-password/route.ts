@@ -1,27 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { wajibAdminSaja, tanganiErrorRbac } from "@/lib/rbac";
+import {
+  buatKodeOtp,
+  EMAIL_OTP_TERSEDIA,
+  hashKodeOtp,
+  hitungWaktuKadaluarsaOtp,
+  kirimEmailOtp,
+} from "@/lib/resend";
 
 // ------------------------------------------------------------
 // POST /api/lupa-password — form "Ubah Password" di halaman login
 // Body: { tipeAkun: "GURU"|"SISWA", identifier: string (NIK/NIS),
-//         email: string, tanggalLahir: string, alasan: string }
+//         email: string, alasan?: string }
 //
 // PENTING (anti-enumeration): respons yang dibalikin SELALU SAMA
 // baik datanya cocok atau tidak — supaya endpoint ini gak bisa
-// dipakai buat nebak-nebak NIS/NIK/email orang lain. Laporan cuma
-// beneran dibuat kalau data match; kalau tidak, kita diam-diam
-// gak nyimpen apa-apa tapi tetap balikin pesan sukses yang sama.
+// dipakai buat nebak-nebak NIS/NIK/email orang lain.
 // ------------------------------------------------------------
 
 const PESAN_GENERIK =
-  "Jika data yang kamu masukkan sesuai, laporan sudah diteruskan ke admin sekolah.";
+  "Jika data sesuai, kode OTP akan dikirim ke email terdaftar. Jika email tidak masuk, admin sekolah akan membantu melalui laporan.";
 
 interface BodyLaporLupaPassword {
   tipeAkun?: "GURU" | "SISWA";
   identifier?: string;
   email?: string;
-  tanggalLahir?: string;
   alasan?: string;
 }
 
@@ -33,68 +37,104 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ pesan: "Body request tidak valid" }, { status: 400 });
   }
 
-  const { tipeAkun, identifier, email, tanggalLahir, alasan } = body;
+  const { tipeAkun, identifier, email, alasan } = body;
 
-  if (!tipeAkun || !identifier || !email || !tanggalLahir || !alasan) {
-    return NextResponse.json({ pesan: "Semua field wajib diisi" }, { status: 400 });
+  if (
+    (tipeAkun !== "GURU" && tipeAkun !== "SISWA") ||
+    !identifier?.trim() ||
+    !email?.trim() ||
+    (alasan?.trim().length ?? 0) > 1000
+  ) {
+    return NextResponse.json({ pesan: "Tipe akun, NIS/NIK, dan email wajib diisi" }, { status: 400 });
+  }
+
+  let idBigInt: bigint;
+  try {
+    idBigInt = BigInt(identifier.trim());
+  } catch {
+    return NextResponse.json({ pesan: PESAN_GENERIK });
+  }
+
+  const emailNormal = email.trim().toLowerCase();
+  if (
+    emailNormal.length > 254 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNormal)
+  ) {
+    return NextResponse.json({ pesan: PESAN_GENERIK });
   }
 
   try {
-    let idBigInt: bigint;
-    try {
-      idBigInt = BigInt(identifier);
-    } catch {
-      return NextResponse.json({ pesan: PESAN_GENERIK });
-    }
+    const akun =
+      tipeAkun === "GURU"
+        ? await db.guru.findUnique({
+            where: { nik: idBigInt },
+            select: { id: true, nama: true, email: true, tanggalLahir: true },
+          })
+        : await db.siswa.findUnique({
+            where: { nis: idBigInt },
+            select: { id: true, nama: true, email: true, tanggalLahir: true },
+          });
 
-    const tanggalLahirInput = new Date(tanggalLahir);
+    if (
+      akun &&
+      akun.email.trim().toLowerCase() === emailNormal
+    ) {
+      const recentLimit = new Date(Date.now() - 60 * 60 * 1000);
+      const requestCount = await db.laporanLupaPassword.count({
+        where: {
+          ...(tipeAkun === "GURU" ? { guruId: akun.id } : { siswaId: akun.id }),
+          createdAt: { gte: recentLimit },
+        },
+      });
 
-    if (tipeAkun === "GURU") {
-      const guru = await db.guru.findUnique({ where: { nik: idBigInt } });
-      if (
-        guru &&
-        guru.email.toLowerCase() === email.toLowerCase() &&
-        samaTanggal(guru.tanggalLahir, tanggalLahirInput)
-      ) {
-        await db.laporanLupaPassword.create({
+      if (requestCount < 5) {
+        const laporan = await db.laporanLupaPassword.create({
           data: {
-            tipeAkun: "GURU",
-            guruId: guru.id,
-            email,
-            nikNisInput: identifier,
-            tanggalLahir: tanggalLahirInput,
-            alasan,
+            tipeAkun,
+            ...(tipeAkun === "GURU" ? { guruId: akun.id } : { siswaId: akun.id }),
+            email: akun.email,
+            nikNisInput: identifier.trim(),
+            tanggalLahir: akun.tanggalLahir,
+            alasan:
+              alasan?.trim() ||
+              "Permintaan pemulihan password melalui verifikasi email terdaftar.",
           },
+          select: { id: true },
         });
-      }
-    } else if (tipeAkun === "SISWA") {
-      const siswa = await db.siswa.findUnique({ where: { nis: idBigInt } });
-      if (
-        siswa &&
-        siswa.email.toLowerCase() === email.toLowerCase() &&
-        samaTanggal(siswa.tanggalLahir, tanggalLahirInput)
-      ) {
-        await db.laporanLupaPassword.create({
-          data: {
-            tipeAkun: "SISWA",
-            siswaId: siswa.id,
-            email,
-            nikNisInput: identifier,
-            tanggalLahir: tanggalLahirInput,
-            alasan,
-          },
-        });
+
+        if (EMAIL_OTP_TERSEDIA) {
+          const otp = buatKodeOtp();
+          const otpExpiredAt = hitungWaktuKadaluarsaOtp();
+          try {
+            await db.laporanLupaPassword.update({
+              where: { id: laporan.id },
+              data: { status: "DITERIMA", otp: hashKodeOtp(otp), otpExpiredAt },
+            });
+            await kirimEmailOtp({
+              email: akun.email,
+              nama: akun.nama,
+              kodeOtp: otp,
+              tipeAkun,
+            });
+          } catch (error) {
+            console.error("Pengiriman OTP otomatis gagal; laporan diteruskan ke admin:", error);
+            await db.laporanLupaPassword.update({
+              where: { id: laporan.id },
+              data: { status: "MENUNGGU", otp: null, otpExpiredAt: null },
+            });
+          }
+        }
       }
     }
   } catch (error) {
-    console.error("Gagal proses laporan lupa password:", error);
+    console.error("Gagal memproses permintaan lupa password:", error);
+    return NextResponse.json(
+      { pesan: "Layanan pemulihan password sedang bermasalah. Coba lagi nanti." },
+      { status: 503 }
+    );
   }
 
   return NextResponse.json({ pesan: PESAN_GENERIK });
-}
-
-function samaTanggal(a: Date, b: Date): boolean {
-  return a.toISOString().slice(0, 10) === b.toISOString().slice(0, 10);
 }
 
 // ------------------------------------------------------------

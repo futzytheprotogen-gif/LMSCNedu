@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import ThemeSwitchButton from "@/components/ThemeSwitchButton";
+import BrandMark from "@/components/BrandMark";
 import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 import styles from "./AdminTierShell.module.css";
 
@@ -39,8 +40,10 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
     });
     if (!disetujui) return;
 
-    await fetch("/api/auth", { method: "DELETE" });
-    router.replace("/login");
+    const response = await fetch("/api/auth", { method: "DELETE" });
+    const result = await response.json();
+    if (!response.ok) return;
+    router.replace(result.redirect);
   }
 
   return (
@@ -56,7 +59,7 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
           {menuTerbuka ? "×" : "☰"}
         </button>
         <Link className={styles.brand} href={`${awalan}/kelas`}>
-          <span className={styles.brandMark}>CN</span>
+          <BrandMark className={styles.brandMark} />
           <span>CN Edu <small>— {role}</small></span>
         </Link>
         <div className={styles.topbarActions}>

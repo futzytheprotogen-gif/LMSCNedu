@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { hitungAktivitasBaru } from "@/lib/notifikasiSiswa";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import ThemeSwitchButton from "@/components/ThemeSwitchButton";
+import BrandMark from "@/components/BrandMark";
 import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 import { rekamCatatanIntegritas } from "@/lib/asesmenIntegrity";
 import styles from "./layout.module.css";
@@ -86,8 +87,10 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
       tone: "primary",
     }))) return;
     if (idAsesmenAktif) rekamCatatanIntegritas(idAsesmenAktif, "LOGOUT_DURING_ASSESSMENT");
-    await fetch("/api/auth", { method: "DELETE" });
-    router.push("/login");
+    const response = await fetch("/api/auth", { method: "DELETE" });
+    const result = await response.json();
+    if (!response.ok) return;
+    router.push(result.redirect);
   }
 
   async function handleMenuNavigation(
@@ -126,7 +129,10 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
           ☰
         </button>
 
-        <span className="cn-role-brand" style={estilo.namaBrand}>CN Edu — Siswa</span>
+        <span className="cn-role-brand" style={{ ...estilo.namaBrand, display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <BrandMark style={{ width: 28, height: 28, color: "var(--cn-primary)" }} />
+          CN Edu — Siswa
+        </span>
         <div style={estilo.navKanan}>
           <ThemeSwitchButton />
           <Link
@@ -164,7 +170,10 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
         style={estilo.sidebar}
       >
         <div className={`cn-role-sidebar-header ${styles.sidebarHeader}`} style={estilo.headerSidebar}>
-          <span style={estilo.namaBrandSidebar}>CN Edu</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <BrandMark style={{ width: 25, height: 25, color: "var(--cn-primary)" }} />
+            <span style={estilo.namaBrandSidebar}>CN Edu</span>
+          </div>
           <button
             onClick={() => setSidebarTerbuka(false)}
             style={estilo.tombolTutup}

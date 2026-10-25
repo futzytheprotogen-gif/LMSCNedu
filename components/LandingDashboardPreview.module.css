@@ -13,7 +13,7 @@
 .window { overflow: hidden; border: 1px solid var(--cn-line); border-radius: 10px; background: var(--cn-surface); box-shadow: 0 20px 55px rgb(var(--cn-navy-rgb) / 11%); animation: reveal 260ms ease both; }
 .windowBar { display: grid; height: 46px; grid-template-columns: 1fr minmax(180px, 1.2fr) 1fr; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--cn-line); background: var(--cn-surface); }
 .windowBrand { display: inline-flex; align-items: center; gap: 7px; color: var(--cn-text); font-size: 10px; }
-.windowBrand > span { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 6px; color: #fff; background: #2563eb; font-size: 8px; font-weight: 800; }
+.windowBrand > svg { width: 24px; height: 24px; color: var(--cn-primary); }
 .windowAddress { display: flex; min-width: 0; align-items: center; gap: 7px; padding: 5px 9px; border: 1px solid var(--cn-line); border-radius: 5px; color: var(--cn-muted); background: var(--cn-bg); font-size: 9px; }
 .windowAddress i { width: 5px; height: 5px; flex: 0 0 auto; border-radius: 50%; background: #22a06b; }
 .windowProfile { display: inline-flex; align-items: center; justify-content: flex-end; gap: 7px; color: var(--cn-muted); font-size: 9px; }

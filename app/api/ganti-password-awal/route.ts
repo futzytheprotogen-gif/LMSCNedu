@@ -33,6 +33,13 @@ export async function POST(request: NextRequest) {
   try {
     const sesi = await wajibLogin(request);
 
+    if (sesi.actingAs) {
+      return NextResponse.json(
+        { pesan: "Password akun tidak dapat diubah selama akses sementara." },
+        { status: 403 }
+      );
+    }
+
     if (sesi.role !== "GURU" && sesi.role !== "SISWA") {
       return NextResponse.json(
         { pesan: "Endpoint ini khusus akun Guru & Siswa" },

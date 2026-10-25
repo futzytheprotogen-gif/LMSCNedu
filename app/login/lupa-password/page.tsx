@@ -16,7 +16,6 @@ export default function HalamanLupaPassword() {
   // Form lapor
   const [identifier, setIdentifier] = useState("");
   const [email, setEmail] = useState("");
-  const [tanggalLahir, setTanggalLahir] = useState("");
   const [alasan, setAlasan] = useState("");
 
   // Form OTP + password baru
@@ -39,7 +38,7 @@ export default function HalamanLupaPassword() {
       const response = await fetch("/api/lupa-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tipeAkun, identifier, email, tanggalLahir, alasan }),
+        body: JSON.stringify({ tipeAkun, identifier, email, alasan }),
       });
       const data = await response.json();
 
@@ -101,8 +100,8 @@ export default function HalamanLupaPassword() {
         </h1>
         <p style={estilo.subjudul}>
           {mode === "LAPOR"
-            ? "Isi data kamu, laporan akan diteruskan ke admin sekolah untuk diverifikasi."
-            : "Cek email kamu untuk kode OTP dari admin, lalu buat password baru."}
+            ? "Isi NIS/NIK dan email yang terdaftar. Kode akan dikirim otomatis jika data cocok."
+            : "Masukkan kode OTP 6 digit dari email terdaftar atau dari admin sekolah, lalu buat password baru."}
         </p>
 
         <div style={estilo.baris_tab}>
@@ -142,22 +141,11 @@ export default function HalamanLupaPassword() {
               />
             </label>
             <label style={estilo.label}>
-              Tanggal Lahir
-              <input
-                type="date"
-                value={tanggalLahir}
-                onChange={(e) => setTanggalLahir(e.target.value)}
-                required
-                style={estilo.input}
-              />
-            </label>
-            <label style={estilo.label}>
-              Alasan
+              Alasan <span style={estilo.opsional}>(opsional)</span>
               <textarea
                 value={alasan}
                 onChange={(e) => setAlasan(e.target.value)}
                 rows={3}
-                required
                 style={estilo.textarea}
               />
             </label>
@@ -178,7 +166,17 @@ export default function HalamanLupaPassword() {
               onClick={() => pindahMode("OTP")}
               style={estilo.linkKecil}
             >
-              Sudah dapat kode OTP dari admin?
+              Sudah menerima kode OTP?
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setPesanInfo(null);
+                setPesanError(null);
+              }}
+              style={estilo.linkKecil}
+            >
+              Belum menerima email? Kirim permintaan lagi
             </button>
           </div>
         )}
@@ -201,7 +199,7 @@ export default function HalamanLupaPassword() {
               <input
                 type="text"
                 inputMode="numeric"
-                maxLength={4}
+                maxLength={6}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 required
@@ -327,6 +325,11 @@ const estilo = {
     fontSize: "13px",
     fontWeight: 600,
     color: "var(--cn-navy)",
+  },
+  opsional: {
+    color: "var(--cn-muted)",
+    fontSize: "11px",
+    fontWeight: 400,
   },
   input: {
     padding: "10px 12px",

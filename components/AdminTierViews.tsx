@@ -10,7 +10,6 @@ interface DaftarKelas {
   id: string;
   judul: string;
   deskripsi: string | null;
-  kodeKelas: string;
   jumlahSiswa: number;
   createdAt: string;
 }
@@ -42,10 +41,8 @@ interface DetailKelas {
   id: string;
   judul: string;
   deskripsi: string | null;
-  kodeKelas: string;
   siswa: { id: string; nama: string; nis: string; fotoProfil: string | null }[];
   guru: { id: string; nama: string; fotoProfil: string | null; mapel: { id: string; nama: string } }[];
-  pengumuman: { id: string; isi: string; createdAt: string; guru: { id: string; nama: string } }[];
 }
 
 interface HasilMuat<T> {
@@ -148,7 +145,7 @@ export function DaftarKelasAdminTier({ peran, awalan }: { peran: string; awalan:
                 <div className={styles.classBody}>
                   <h2>{item.judul}</h2>
                   <p>{item.deskripsi || "Belum ada deskripsi kelas."}</p>
-                  <div className={styles.cardMeta}><span>♙ {item.jumlahSiswa} siswa</span><span>Kode {item.kodeKelas}</span></div>
+                  <div className={styles.cardMeta}><span>♙ {item.jumlahSiswa} siswa</span></div>
                 </div>
               </Link>
             ))}
@@ -172,7 +169,6 @@ export function DetailKelasAdminTier({ peran, awalan, id }: { peran: string; awa
           <div className={styles.detailStats}>
             <div><span>Total siswa</span><strong>{kelas.siswa.length}</strong></div>
             <div><span>Guru pengampu</span><strong>{kelas.guru.length}</strong></div>
-            <div><span>Pengumuman</span><strong>{kelas.pengumuman.length}</strong></div>
           </div>
           <section className={styles.section}>
             <div className={styles.sectionHeading}><div><span>01</span><h2>Siswa</h2></div><b>{kelas.siswa.length}</b></div>
@@ -181,10 +177,6 @@ export function DetailKelasAdminTier({ peran, awalan, id }: { peran: string; awa
           <section className={styles.section}>
             <div className={styles.sectionHeading}><div><span>02</span><h2>Guru pengampu</h2></div><b>{kelas.guru.length}</b></div>
             {kelas.guru.length ? <div className={styles.peopleGrid}>{kelas.guru.map((guru) => <article className={styles.person} key={`${guru.id}-${guru.mapel.id}`}><span className={`${styles.avatar} ${styles.teacherAvatar}`}>{guru.nama.charAt(0).toUpperCase()}</span><div><strong>{guru.nama}</strong><small>{guru.mapel.nama}</small></div></article>)}</div> : <p className={styles.sectionEmpty}>Belum ada guru pengampu.</p>}
-          </section>
-          <section className={styles.section}>
-            <div className={styles.sectionHeading}><div><span>03</span><h2>Pengumuman</h2></div><b>{kelas.pengumuman.length}</b></div>
-            {kelas.pengumuman.length ? <div className={styles.announcementList}>{kelas.pengumuman.map((item) => <article className={styles.announcement} key={item.id}><div className={styles.announcementMeta}><strong>{item.guru.nama}</strong><time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleDateString("id-ID", { dateStyle: "medium" })}</time></div><p>{item.isi}</p></article>)}</div> : <p className={styles.sectionEmpty}>Belum ada pengumuman.</p>}
           </section>
         </>
       ) : null} />

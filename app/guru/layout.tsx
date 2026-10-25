@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import ThemeSwitchButton from "@/components/ThemeSwitchButton";
+import BrandMark from "@/components/BrandMark";
 import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
@@ -32,8 +33,10 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
       cancelLabel: "Tetap di sini",
       tone: "primary",
     }))) return;
-    await fetch("/api/auth", { method: "DELETE" });
-    router.push("/login");
+    const response = await fetch("/api/auth", { method: "DELETE" });
+    const result = await response.json();
+    if (!response.ok) return;
+    router.push(result.redirect);
   }
 
   return (
@@ -48,7 +51,10 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
         >
           ☰
         </button>
-        <Link className="cn-role-brand" href="/guru/kelas" style={estilo.namaBrand}>CN Edu — Guru</Link>
+        <Link className="cn-role-brand" href="/guru/kelas" style={{ ...estilo.namaBrand, display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <BrandMark style={{ width: 28, height: 28, color: "var(--cn-primary)" }} />
+          CN Edu — Guru
+        </Link>
         <div style={estilo.navKanan}>
           <ThemeSwitchButton />
           <Link href="/profil/saya" style={estilo.tombolProfil}>
@@ -79,7 +85,10 @@ export default function LayoutGuru({ children }: { children: ReactNode }) {
         style={estilo.sidebar}
       >
         <div className="cn-role-sidebar-header" style={estilo.sidebarHeading}>
-          <span style={estilo.namaBrandSidebar}>CN Edu</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <BrandMark style={{ width: 25, height: 25, color: "var(--cn-primary)" }} />
+            <span style={estilo.namaBrandSidebar}>CN Edu</span>
+          </div>
           <button
             onClick={() => setSidebarTerbuka(false)}
             style={estilo.tombolTutup}

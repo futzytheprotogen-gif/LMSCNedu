@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   NAMA_COOKIE_SESI,
+  NAMA_COOKIE_AKSES_MASTER,
   verifikasiToken,
   ROLE_ADMIN_TIER,
   type PayloadSesi,
@@ -46,7 +47,30 @@ export async function ambilSesi(
 ): Promise<PayloadSesi | null> {
   const token = request.cookies.get(NAMA_COOKIE_SESI)?.value;
   if (!token) return null;
-  return verifikasiToken(token);
+  const sesi = await verifikasiToken(token);
+  if (!sesi || sesi.role !== "MASTER_ADMIN") return sesi;
+
+  const pathname = request.nextUrl.pathname;
+  if (
+    pathname === "/api/auth" ||
+    pathname.startsWith("/api/master") ||
+    pathname.startsWith("/master")
+  ) {
+    return sesi;
+  }
+
+  const tokenAkses = request.cookies.get(NAMA_COOKIE_AKSES_MASTER)?.value;
+  if (!tokenAkses) return sesi;
+  const sesiAkses = await verifikasiToken(tokenAkses);
+  if (
+    !sesiAkses?.actingAs ||
+    sesiAkses.masterActorId !== sesi.userId ||
+    sesiAkses.role === "MASTER_ADMIN"
+  ) {
+    return sesi;
+  }
+
+  return sesiAkses;
 }
 
 // Dipakai di awal tiap route handler yang butuh login (hampir semua,
@@ -77,7 +101,10 @@ export async function wajibRole(
 // ------------------------------------------------------------
 
 export const wajibAdminSaja = (request: NextRequest) =>
-  wajibRole(request, ["ADMIN"]);
+  wajibRole(request, ["ADMIN", "MASTER_ADMIN"]);
+
+export const wajibMasterAdmin = (request: NextRequest) =>
+  wajibRole(request, ["MASTER_ADMIN"]);
 
 // GET kelas/siswa/guru/nilai — boleh 3 role "Admin Tier"
 export const wajibAdminTier = (request: NextRequest) =>

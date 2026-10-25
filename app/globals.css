@@ -140,6 +140,38 @@ body {
   min-height: 100%;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.cn-global-credit {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px clamp(18px, 4vw, 48px);
+  border-top: 1px solid var(--cn-line);
+  color: var(--cn-muted);
+  background: var(--cn-surface);
+  font-size: 11px;
+}
+
+.cn-global-credit strong {
+  color: var(--cn-primary);
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  .cn-global-credit {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 72px;

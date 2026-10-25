@@ -2,6 +2,7 @@
 
 import { useState, type KeyboardEvent } from "react";
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react";
+import BrandMark from "@/components/BrandMark";
 import styles from "./FeatureCarousel.module.css";
 
 interface FiturCarousel {
@@ -86,7 +87,7 @@ export default function FeatureCarousel({ fitur }: { fitur: FiturCarousel[] }) {
                 }}
               >
                 <div className={styles.visualTopbar}>
-                  <div className={styles.brand}><span>CN</span><b>CN Edu</b></div>
+                  <div className={styles.brand}><BrandMark /><b>CN Edu</b></div>
                   <div className={styles.address}><i /> ruang-kelas / {fiturAktif.judul.toLowerCase()}</div>
                   <span className={styles.avatar}>S</span>
                 </div>

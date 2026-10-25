@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import ThemeSwitchButton from "@/components/ThemeSwitchButton";
+import BrandMark from "@/components/BrandMark";
 import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 
 // ------------------------------------------------------------
@@ -40,10 +41,28 @@ export default function LayoutAdmin({
 }) {
   const [sidebarTerbuka, setSidebarTerbuka] = useState(false);
   const [jumlahLaporan, setJumlahLaporan] = useState(0);
+  const [masterAdmin, setMasterAdmin] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
   const konfirmasi = useAppConfirm();
+
+  useEffect(() => {
+    let masihAktif = true;
+    fetch("/api/sesi", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const hasil = await response.json();
+        if (masihAktif) setMasterAdmin(hasil.data?.role === "MASTER_ADMIN");
+      })
+      .catch((error: unknown) => {
+        console.error("Gagal memeriksa role Master Admin:", error);
+      });
+
+    return () => {
+      masihAktif = false;
+    };
+  }, []);
 
   // ============================================================
   // CEK JUMLAH LAPORAN BARU
@@ -105,11 +124,12 @@ export default function LayoutAdmin({
       cancelLabel: "Tetap di sini",
       tone: "primary",
     }))) return;
-    await fetch("/api/auth", {
+    const response = await fetch("/api/auth", {
       method: "DELETE",
     });
 
-    router.push("/login");
+    const result = await response.json();
+    router.push(result.redirect);
   }
 
   // ============================================================
@@ -145,6 +165,7 @@ export default function LayoutAdmin({
         </button>
 
         <span className="cn-role-brand" style={estilo.namaBrand}>
+          <BrandMark style={{ width: 28, height: 28, color: "var(--cn-primary)" }} />
           CN Edu — Admin
         </span>
 
@@ -186,9 +207,10 @@ export default function LayoutAdmin({
         {/* HEADER SIDEBAR */}
 
         <div className="cn-role-sidebar-header" style={estilo.headerSidebar}>
-          <span style={estilo.namaBrandSidebar}>
-            CN Edu
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <BrandMark style={{ width: 25, height: 25, color: "var(--cn-primary)" }} />
+            <span style={estilo.namaBrandSidebar}>CN Edu</span>
+          </div>
 
           <button
             onClick={() => setSidebarTerbuka(false)}
@@ -203,6 +225,20 @@ export default function LayoutAdmin({
         {/* MENU */}
 
         <motion.nav style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
+          {masterAdmin && (
+            <motion.div variants={VARIAN_ITEM_MENU_ROLE} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href="/master"
+                onClick={() => setSidebarTerbuka(false)}
+                style={{
+                  ...estilo.linkMenu,
+                  ...(pathname.startsWith("/master") ? estilo.linkMenuAktif : {}),
+                }}
+              >
+                <span style={estilo.labelMenu}>Kembali ke Master Control</span>
+              </Link>
+            </motion.div>
+          )}
           {MENU_ADMIN.map((item) => {
             const aktif = pathname.startsWith(item.href);
 

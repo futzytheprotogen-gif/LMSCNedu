@@ -19,6 +19,7 @@ generator client {
 
 enum RoleAdmin {
   ADMIN
+  MASTER_ADMIN
   KEPSEK
   KURIKULUM
 }
@@ -85,15 +86,15 @@ enum StatusLaporan {
 // Login pakai Email + Password. Kepsek & Kurikulum dibuat lewat seed,
 // bukan lewat form registrasi, dan tidak pernah punya passwordSementara.
 model Admin {
-  id          String    @id @default(cuid())
-  email       String    @unique
-  password    String
-  nama        String
-  role        RoleAdmin
-  fotoProfil  String?
-  deskripsi   String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String    @id @default(cuid())
+  email      String    @unique
+  password   String
+  nama       String
+  role       RoleAdmin
+  fotoProfil String?
+  deskripsi  String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   laporanDiproses LaporanLupaPassword[] @relation("AdminMemprosesLaporan")
 
@@ -102,25 +103,25 @@ model Admin {
 
 // Login pakai NIK + Password. Password default = NIK saat akun dibuat admin.
 model Guru {
-  id                 String   @id @default(cuid())
-  email              String   @unique
-  nik                BigInt   @unique
-  nama               String
-  tanggalLahir       DateTime
-  jenisKelamin       JenisKelamin?
-  fotoProfil         String?
-  deskripsi          String?
-  password           String
-  passwordSementara  Boolean  @default(true)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                String        @id @default(cuid())
+  email             String        @unique
+  nik               BigInt        @unique
+  nama              String
+  tanggalLahir      DateTime
+  jenisKelamin      JenisKelamin?
+  fotoProfil        String?
+  deskripsi         String?
+  password          String
+  passwordSementara Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
-  mapelDiampu   GuruMapel[]
-  kelasDiajar   KelasGuru[]
-  pengumuman    Pengumuman[]
-  asesmenDibuat Asesmen[]
-  materiDiunggah Materi[]
-  tugasDibuat   Tugas[]
+  mapelDiampu         GuruMapel[]
+  kelasDiajar         KelasGuru[]
+  pengumuman          Pengumuman[]
+  asesmenDibuat       Asesmen[]
+  materiDiunggah      Materi[]
+  tugasDibuat         Tugas[]
   laporanLupaPassword LaporanLupaPassword[]
 
   @@map("guru")
@@ -128,26 +129,26 @@ model Guru {
 
 // Login pakai NIS + Password. Password default = NIS saat akun dibuat admin.
 model Siswa {
-  id                 String   @id @default(cuid())
-  email              String   @unique
-  nis                BigInt   @unique
-  nisn               BigInt?  @unique
-  nama               String
-  tanggalLahir       DateTime
-  jenisKelamin       JenisKelamin?
-  fotoProfil         String?
-  deskripsi          String?
-  password           String
-  passwordSementara  Boolean  @default(true)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                String        @id @default(cuid())
+  email             String        @unique
+  nis               BigInt        @unique
+  nisn              BigInt?       @unique
+  nama              String
+  tanggalLahir      DateTime
+  jenisKelamin      JenisKelamin?
+  fotoProfil        String?
+  deskripsi         String?
+  password          String
+  passwordSementara Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
   rombelId String
   rombel   RombelAkademik @relation(fields: [rombelId], references: [id])
 
-  kelasDiikuti      KelasSiswa[]
-  submissionAsesmen SubmissionAsesmen[]
-  submissionTugas   SubmissionTugas[]
+  kelasDiikuti        KelasSiswa[]
+  submissionAsesmen   SubmissionAsesmen[]
+  submissionTugas     SubmissionTugas[]
   laporanLupaPassword LaporanLupaPassword[]
 
   @@map("siswa")
@@ -162,8 +163,8 @@ model Siswa {
 model RombelAkademik {
   id       String  @id @default(cuid())
   label    String  @unique // contoh: "12 PPLG 2", "10 TJKT PLUS", "SMP", "SMA"
-  jenjang  String  // "SMP" | "SMA" | "SMK"
-  angkatan Int?    // 10 | 11 | 12, null untuk SMP/SMA generik
+  jenjang  String // "SMP" | "SMA" | "SMK"
+  angkatan Int? // 10 | 11 | 12, null untuk SMP/SMA generik
   jurusan  String? // DKV | TJKT | PPLG | PEMASARAN | MPLB, null untuk SMP/SMA
   variasi  String? // "PLUS" | "1" | "2" dst, null untuk SMP/SMA
 
@@ -201,26 +202,26 @@ model GuruMapel {
 // ------------------------------------------------------------
 
 model Kelas {
-  id          String   @id @default(cuid())
-  judul       String
-  deskripsi   String?
-  kodeKelas   String   @unique // dipakai untuk link undangan
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  judul     String
+  deskripsi String?
+  kodeKelas String   @unique // dipakai untuk link undangan
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  siswa       KelasSiswa[]
-  guru        KelasGuru[]
-  pengumuman  Pengumuman[]
-  materi      Materi[]
-  asesmen     AsesmenKelas[]
-  tugas       TugasKelas[]
+  siswa      KelasSiswa[]
+  guru       KelasGuru[]
+  pengumuman Pengumuman[]
+  materi     Materi[]
+  asesmen    AsesmenKelas[]
+  tugas      TugasKelas[]
 
   @@map("kelas")
 }
 
 model KelasSiswa {
-  kelasId String
-  siswaId String
+  kelasId  String
+  siswaId  String
   joinedAt DateTime @default(now())
 
   kelas Kelas @relation(fields: [kelasId], references: [id], onDelete: Cascade)
@@ -269,15 +270,15 @@ model Pengumuman {
 // ------------------------------------------------------------
 
 model Asesmen {
-  id           String        @id @default(cuid())
-  judul        String
-  tipe         TipeAsesmen
-  status       StatusAsesmen @default(PROSES)
-  durasiMenit  Int?
-  mapelId      String
-  guruId       String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id          String        @id @default(cuid())
+  judul       String
+  tipe        TipeAsesmen
+  status      StatusAsesmen @default(PROSES)
+  durasiMenit Int?
+  mapelId     String
+  guruId      String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   mapel MataPelajaran @relation(fields: [mapelId], references: [id])
   guru  Guru          @relation(fields: [guruId], references: [id], onDelete: Cascade)
@@ -302,14 +303,14 @@ model AsesmenKelas {
 }
 
 model Soal {
-  id          String   @id @default(cuid())
-  asesmenId   String
-  tipe        TipeSoal
-  pertanyaan  String   @db.Text
-  gambar      String?
-  urutan      Int      @default(0)
+  id         String   @id @default(cuid())
+  asesmenId  String
+  tipe       TipeSoal
+  pertanyaan String   @db.Text
+  gambar     String?
+  urutan     Int      @default(0)
 
-  asesmen Asesmen @relation(fields: [asesmenId], references: [id], onDelete: Cascade)
+  asesmen Asesmen        @relation(fields: [asesmenId], references: [id], onDelete: Cascade)
   opsi    OpsiJawaban[]
   jawaban JawabanSiswa[]
 
@@ -323,7 +324,7 @@ model OpsiJawaban {
   teks   String
   benar  Boolean @default(false)
 
-  soal Soal @relation(fields: [soalId], references: [id], onDelete: Cascade)
+  soal        Soal                 @relation(fields: [soalId], references: [id], onDelete: Cascade)
   dipilihOleh JawabanOpsiDipilih[]
 
   @@map("opsi_jawaban")
@@ -331,19 +332,19 @@ model OpsiJawaban {
 
 // Satu kali pengerjaan asesmen oleh siswa, dalam konteks kelas tertentu
 model SubmissionAsesmen {
-  id           String    @id @default(cuid())
-  asesmenId    String
-  siswaId      String
-  kelasId      String
-  waktuMulai   DateTime  @default(now())
-  waktuSelesai DateTime?
-  nilai        Float?
-  integritasDicatat Boolean @default(false)
-  createdAt    DateTime  @default(now())
+  id                String    @id @default(cuid())
+  asesmenId         String
+  siswaId           String
+  kelasId           String
+  waktuMulai        DateTime  @default(now())
+  waktuSelesai      DateTime?
+  nilai             Float?
+  integritasDicatat Boolean   @default(false)
+  createdAt         DateTime  @default(now())
 
-  asesmen Asesmen @relation(fields: [asesmenId], references: [id], onDelete: Cascade)
-  siswa   Siswa   @relation(fields: [siswaId], references: [id], onDelete: Cascade)
-  jawaban JawabanSiswa[]
+  asesmen           Asesmen                    @relation(fields: [asesmenId], references: [id], onDelete: Cascade)
+  siswa             Siswa                      @relation(fields: [siswaId], references: [id], onDelete: Cascade)
+  jawaban           JawabanSiswa[]
   catatanIntegritas CatatanIntegritasAsesmen[]
 
   @@unique([asesmenId, siswaId])
@@ -351,11 +352,11 @@ model SubmissionAsesmen {
 }
 
 model CatatanIntegritasAsesmen {
-  id              String                  @id @default(cuid())
-  submissionId    String
-  jenis           JenisPeringatanAsesmen
-  terdeteksiPada  DateTime
-  createdAt       DateTime                @default(now())
+  id             String                 @id @default(cuid())
+  submissionId   String
+  jenis          JenisPeringatanAsesmen
+  terdeteksiPada DateTime
+  createdAt      DateTime               @default(now())
 
   submission SubmissionAsesmen @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
@@ -365,13 +366,13 @@ model CatatanIntegritasAsesmen {
 
 // Jawaban siswa untuk satu soal dalam satu submission
 model JawabanSiswa {
-  id            String  @id @default(cuid())
-  submissionId  String
-  soalId        String
-  jawabanEssay  String? @db.Text
+  id           String  @id @default(cuid())
+  submissionId String
+  soalId       String
+  jawabanEssay String? @db.Text
 
-  submission SubmissionAsesmen @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  soal       Soal              @relation(fields: [soalId], references: [id], onDelete: Cascade)
+  submission  SubmissionAsesmen    @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  soal        Soal                 @relation(fields: [soalId], references: [id], onDelete: Cascade)
   opsiDipilih JawabanOpsiDipilih[]
 
   @@unique([submissionId, soalId])
@@ -415,18 +416,18 @@ model Materi {
 // ------------------------------------------------------------
 
 model Tugas {
-  id            String            @id @default(cuid())
-  guruId        String
-  judul         String
-  deskripsi     String            @db.Text
-  tipeLampiran  TipeLampiranTugas?
-  lampiran      String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  id           String             @id @default(cuid())
+  guruId       String
+  judul        String
+  deskripsi    String             @db.Text
+  tipeLampiran TipeLampiranTugas?
+  lampiran     String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 
-  guru       Guru               @relation(fields: [guruId], references: [id], onDelete: Cascade)
+  guru        Guru              @relation(fields: [guruId], references: [id], onDelete: Cascade)
   kelasTujuan TugasKelas[]
-  submission SubmissionTugas[]
+  submission  SubmissionTugas[]
 
   @@map("tugas")
 }
@@ -480,9 +481,30 @@ model LaporanLupaPassword {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
-  guru           Guru?  @relation(fields: [guruId], references: [id], onDelete: SetNull)
-  siswa          Siswa? @relation(fields: [siswaId], references: [id], onDelete: SetNull)
-  diprosesOleh   Admin? @relation("AdminMemprosesLaporan", fields: [diprosesOlehId], references: [id], onDelete: SetNull)
+  guru         Guru?  @relation(fields: [guruId], references: [id], onDelete: SetNull)
+  siswa        Siswa? @relation(fields: [siswaId], references: [id], onDelete: SetNull)
+  diprosesOleh Admin? @relation("AdminMemprosesLaporan", fields: [diprosesOlehId], references: [id], onDelete: SetNull)
 
   @@map("laporan_lupa_password")
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("system_setting")
+}
+
+model SecurityAuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actorNama String
+  actorRole String
+  action    String
+  details   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("security_audit_log")
 }

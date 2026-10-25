@@ -5,6 +5,8 @@ import {
   verifikasiPassword,
   halamanDashboard,
   NAMA_COOKIE_SESI,
+  NAMA_COOKIE_AKSES_MASTER,
+  verifikasiToken,
   type PayloadSesi,
   type RoleAplikasi,
 } from "@/lib/auth";
@@ -33,6 +35,15 @@ interface BodyLogin {
 }
 
 export async function POST(request: NextRequest) {
+  const sesiUtamaToken = request.cookies.get(NAMA_COOKIE_SESI)?.value;
+  const sesiUtama = sesiUtamaToken ? await verifikasiToken(sesiUtamaToken) : null;
+  if (sesiUtama?.role === "MASTER_ADMIN") {
+    return NextResponse.json(
+      { pesan: "Akhiri sesi Master Admin sebelum masuk menggunakan akun lain." },
+      { status: 409 }
+    );
+  }
+
   let body: BodyLogin;
   try {
     body = await request.json();
@@ -111,6 +122,15 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json({ pesan: "tipeAkun tidak dikenali" }, { status: 400 });
     }
+
+    await db.securityAuditLog.create({
+      data: {
+        actorId: payload.userId,
+        actorNama: payload.nama,
+        actorRole: payload.role,
+        action: "LOGIN_SUCCESS",
+      },
+    });
   } catch (error) {
     console.error("Gagal proses login:", error);
     return NextResponse.json(
@@ -150,10 +170,55 @@ export async function POST(request: NextRequest) {
 // DELETE /api/auth — logout (hapus cookie sesi)
 // ------------------------------------------------------------
 
-export async function DELETE() {
-  const response = NextResponse.json({ pesan: "Berhasil logout" });
+export async function DELETE(request: NextRequest) {
+  const sessionToken = request.cookies.get(NAMA_COOKIE_SESI)?.value;
+  const accessToken = request.cookies.get(NAMA_COOKIE_AKSES_MASTER)?.value;
+  const masterSession = sessionToken ? await verifikasiToken(sessionToken) : null;
+  const accessSession = accessToken ? await verifikasiToken(accessToken) : null;
+  const kembaliKeMaster =
+    request.nextUrl.searchParams.get("scope") !== "all" &&
+    masterSession?.role === "MASTER_ADMIN" &&
+    accessSession?.actingAs === true &&
+    accessSession.masterActorId === masterSession.userId;
+
+  if (kembaliKeMaster && masterSession) {
+    await db.securityAuditLog.create({
+      data: {
+        actorId: masterSession.userId,
+        actorNama: masterSession.nama,
+        actorRole: "MASTER_ADMIN",
+        action: "MASTER_ACTING_AS_ENDED",
+        details: `${accessSession.role}: ${accessSession.nama} (${accessSession.userId}); returned from role logout`,
+      },
+    });
+
+    const response = NextResponse.json({
+      pesan: "Kembali ke Master Admin",
+      redirect: "/master",
+    });
+    response.cookies.set(NAMA_COOKIE_AKSES_MASTER, "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+    });
+    return response;
+  }
+
+  const response = NextResponse.json({
+    pesan: "Berhasil logout",
+    redirect: "/login",
+  });
 
   response.cookies.set(NAMA_COOKIE_SESI, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
+  response.cookies.set(NAMA_COOKIE_AKSES_MASTER, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

@@ -30,17 +30,32 @@ const KUNCI_RAHASIA = new TextEncoder().encode(JWT_SECRET);
 const UMUR_TOKEN = "8h";
 
 export const NAMA_COOKIE_SESI = "cnedu_session";
+export const NAMA_COOKIE_AKSES_MASTER = "cnedu_master_access";
 
-export type RoleAplikasi = "ADMIN" | "KEPSEK" | "KURIKULUM" | "GURU" | "SISWA";
+export type RoleAplikasi =
+  | "MASTER_ADMIN"
+  | "ADMIN"
+  | "KEPSEK"
+  | "KURIKULUM"
+  | "GURU"
+  | "SISWA";
 
 // Role yang setara "Admin Tier" — dipakai rbac.ts nanti untuk endpoint
 // GET yang boleh diakses ketiganya (kelas, siswa, guru, nilai).
-export const ROLE_ADMIN_TIER: RoleAplikasi[] = ["ADMIN", "KEPSEK", "KURIKULUM"];
+export const ROLE_ADMIN_TIER: RoleAplikasi[] = [
+  "MASTER_ADMIN",
+  "ADMIN",
+  "KEPSEK",
+  "KURIKULUM",
+];
 
 export interface PayloadSesi extends JWTPayload {
   userId: string;
   role: RoleAplikasi;
   nama: string;
+  masterActorId?: string;
+  masterActorNama?: string;
+  actingAs?: boolean;
   // Kalau true, semua route selain halaman ganti-password-awal harus
   // ditolak dulu (dipaksa redirect) — cuma relevan buat GURU & SISWA.
   passwordSementara?: boolean;
@@ -50,11 +65,14 @@ export interface PayloadSesi extends JWTPayload {
 // JWT (jose) — edge-safe
 // ------------------------------------------------------------
 
-export async function buatToken(payload: PayloadSesi): Promise<string> {
+export async function buatToken(
+  payload: PayloadSesi,
+  umurToken: string = UMUR_TOKEN
+): Promise<string> {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(UMUR_TOKEN)
+    .setExpirationTime(umurToken)
     .sign(KUNCI_RAHASIA);
 }
 
@@ -95,6 +113,8 @@ export async function verifikasiPassword(
 // halaman dashboard tujuan tiap role.
 export function halamanDashboard(role: RoleAplikasi): string {
   switch (role) {
+    case "MASTER_ADMIN":
+      return "/master";
     case "ADMIN":
       return "/admin/kelas";
     case "KEPSEK":

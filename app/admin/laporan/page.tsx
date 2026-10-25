@@ -53,6 +53,12 @@ export default function HalamanLaporan() {
   const [daftarLaporan, setDaftarLaporan] = useState<Laporan[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
   const [sedangProsesId, setSedangProsesId] = useState<string | null>(null);
+  const [kodeOtpManual, setKodeOtpManual] = useState<{ id: string; kode: string } | null>(null);
+  const [pesanAksi, setPesanAksi] = useState<{
+    id: string;
+    pesan: string;
+    error: boolean;
+  } | null>(null);
 
   const [pencarian, setPencarian] = useState("");
   const [filterStatus, setFilterStatus] = useState<"SEMUA" | Laporan["status"]>(
@@ -104,17 +110,69 @@ export default function HalamanLaporan() {
 
   async function kirimOtp(id: string) {
     setSedangProsesId(id);
+    setPesanAksi(null);
+    setKodeOtpManual(null);
 
     try {
-      await fetch(`/api/lupa-password/${id}/kirim-otp`, {
+      const response = await fetch(`/api/lupa-password/${id}/kirim-otp`, {
         method: "POST",
       });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.pesan ?? "Gagal mengirim OTP.");
 
+      setPesanAksi({ id, pesan: data.pesan, error: false });
       await muatLaporan();
     } catch (error) {
       console.error(error);
+      setPesanAksi({
+        id,
+        pesan: error instanceof Error ? error.message : "Gagal mengirim OTP.",
+        error: true,
+      });
     } finally {
       setSedangProsesId(null);
+    }
+  }
+
+  async function buatOtpManual(id: string) {
+    setSedangProsesId(id);
+    setPesanAksi(null);
+    setKodeOtpManual(null);
+
+    try {
+      const response = await fetch(`/api/lupa-password/${id}/kirim-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "MANUAL" }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.pesan ?? "Gagal membuat OTP.");
+
+      setKodeOtpManual({ id, kode: data.kodeOtp });
+      setPesanAksi({ id, pesan: data.pesan, error: false });
+      await muatLaporan();
+    } catch (error) {
+      console.error(error);
+      setPesanAksi({
+        id,
+        pesan: error instanceof Error ? error.message : "Gagal membuat OTP.",
+        error: true,
+      });
+    } finally {
+      setSedangProsesId(null);
+    }
+  }
+
+  async function salinOtp(kode: string) {
+    try {
+      await navigator.clipboard.writeText(kode);
+      setPesanAksi({ id: kodeOtpManual?.id ?? "", pesan: "Kode OTP disalin.", error: false });
+    } catch {
+      setPesanAksi({
+        id: kodeOtpManual?.id ?? "",
+        pesan: "Tidak dapat menyalin kode. Silakan pilih dan salin kodenya.",
+        error: true,
+      });
     }
   }
 
@@ -571,8 +629,8 @@ export default function HalamanLaporan() {
                     <div style={estilo.footerKartu}>
                       <span style={estilo.petunjuk}>
                         {laporan.status === "MENUNGGU"
-                          ? "Perlu tindakan admin."
-                          : "OTP sudah dikirim ke pengguna."}
+                          ? "Belum ada OTP aktif. Kirim lewat email atau buat kode manual."
+                          : "OTP aktif selama 10 menit; email bisa dikirim ulang atau berikan kode manual."}
                       </span>
 
                       <div style={estilo.aksi}>
@@ -594,7 +652,16 @@ export default function HalamanLaporan() {
                             >
                               {sedangProsesId === laporan.id
                                 ? "Memproses..."
-                                : "✓ Terima & Kirim OTP"}
+                                : "Kirim OTP ke Email"}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => buatOtpManual(laporan.id)}
+                              disabled={sedangProsesId === laporan.id}
+                              style={estilo.tombolSecondary}
+                            >
+                              Buat OTP Manual
                             </button>
 
                             <button
@@ -627,6 +694,15 @@ export default function HalamanLaporan() {
 
                             <button
                               type="button"
+                              onClick={() => buatOtpManual(laporan.id)}
+                              disabled={sedangProsesId === laporan.id}
+                              style={estilo.tombolSecondary}
+                            >
+                              Buat OTP Manual
+                            </button>
+
+                            <button
+                              type="button"
                               onClick={() =>
                                 selesaikanLaporan(laporan.id)
                               }
@@ -640,6 +716,33 @@ export default function HalamanLaporan() {
                           </>
                         )}
                       </div>
+                      {pesanAksi?.id === laporan.id && (
+                        <p
+                          aria-live="polite"
+                          style={{
+                            ...estilo.pesanAksi,
+                            color: pesanAksi.error ? WARNA.danger : WARNA.success,
+                          }}
+                        >
+                          {pesanAksi.pesan}
+                        </p>
+                      )}
+                      {kodeOtpManual?.id === laporan.id && (
+                        <div aria-label="Kode OTP untuk diberikan manual" style={estilo.kodeOtpManual}>
+                          <span>KODE OTP MANUAL</span>
+                          <strong style={estilo.kodeOtpDigit}>{kodeOtpManual.kode}</strong>
+                          <small style={estilo.kodeOtpPetunjuk}>
+                            Berlaku 10 menit. Sampaikan kode ini secara pribadi kepada pemilik akun.
+                          </small>
+                          <button
+                            style={estilo.tombolSalinOtp}
+                            type="button"
+                            onClick={() => void salinOtp(kodeOtpManual.kode)}
+                          >
+                            Salin kode
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1131,6 +1234,48 @@ const estilo = {
     display: "flex",
     gap: "7px",
     flexWrap: "wrap" as const,
+  },
+
+  pesanAksi: {
+    flexBasis: "100%",
+    margin: "4px 0 0",
+    fontSize: "12px",
+    fontWeight: 600,
+  },
+
+  kodeOtpManual: {
+    display: "grid",
+    flexBasis: "100%",
+    justifyItems: "start",
+    gap: "6px",
+    marginTop: "8px",
+    padding: "12px",
+    border: `1px solid ${WARNA.border}`,
+    borderRadius: "9px",
+    backgroundColor: "var(--cn-tint)",
+  },
+
+  kodeOtpDigit: {
+    color: WARNA.text,
+    fontSize: "24px",
+    fontVariantNumeric: "tabular-nums",
+    letterSpacing: "0.18em",
+  },
+
+  kodeOtpPetunjuk: {
+    color: WARNA.muted,
+    fontSize: "11px",
+  },
+
+  tombolSalinOtp: {
+    border: `1px solid ${WARNA.border}`,
+    borderRadius: "7px",
+    padding: "7px 10px",
+    color: WARNA.text,
+    backgroundColor: WARNA.white,
+    fontSize: "11px",
+    fontWeight: 700,
+    cursor: "pointer",
   },
 
   tombolPrimary: {

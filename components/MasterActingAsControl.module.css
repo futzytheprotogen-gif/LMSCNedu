@@ -1,0 +1,52 @@
+.control {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 9px;
+  margin: 0 12px 10px;
+  padding: 11px;
+  border: 1px solid var(--master-line);
+  background: var(--master-panel);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--master-accent);
+}
+
+.heading > span { font-size: 17px; }
+.heading div { display: grid; gap: 4px; }
+.heading strong { color: var(--master-text); font: 700 8px/1 "Sora", sans-serif; letter-spacing: .12em; }
+.heading small, .label { color: var(--master-muted); font-size: 9px; }
+.label { margin-top: 2px; }
+
+.control select {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 7px;
+  border: 1px solid var(--master-line);
+  border-radius: 2px;
+  color: var(--master-text);
+  background: var(--master-surface);
+  font: 500 10px/1.35 "IBM Plex Sans", sans-serif;
+}
+
+.startButton, .activeState button {
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--master-accent) 48%, var(--master-line));
+  border-radius: 2px;
+  color: var(--master-accent);
+  background: var(--master-accent-soft);
+  font: 650 10px/1.3 "IBM Plex Sans", sans-serif;
+  cursor: pointer;
+}
+
+.startButton:disabled, .activeState button:disabled { opacity: .55; cursor: wait; }
+.activeState { display: grid; gap: 9px; }
+.activeState p { display: grid; gap: 4px; margin: 0; color: var(--master-muted); font-size: 9px; }
+.activeState strong { color: var(--master-text); font-size: 11px; }
+.activeState small { color: var(--master-accent); }
+.error, .empty { margin: 0; color: #ff9da8; font-size: 9px; line-height: 1.45; }
+.empty { color: var(--master-muted); }

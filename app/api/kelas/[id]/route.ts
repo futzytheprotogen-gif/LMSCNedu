@@ -14,8 +14,10 @@ interface KonteksRute {
 
 export async function GET(request: NextRequest, { params }: KonteksRute) {
   try {
-    await wajibAdminTier(request);
+    const sesi = await wajibAdminTier(request);
     const { id } = await params;
+    const bolehLihatPengumuman =
+      sesi.role === "ADMIN" || sesi.role === "MASTER_ADMIN";
 
     const kelas = await db.kelas.findUnique({
       where: { id },
@@ -42,12 +44,6 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
             mapel: { select: { id: true, nama: true } },
           },
         },
-        pengumuman: {
-          orderBy: { createdAt: "desc" },
-          include: {
-            guru: { select: { id: true, nama: true, fotoProfil: true } },
-          },
-        },
       },
     });
 
@@ -55,12 +51,21 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
       return NextResponse.json({ pesan: "Kelas tidak ditemukan" }, { status: 404 });
     }
 
+    const pengumuman = bolehLihatPengumuman
+      ? await db.pengumuman.findMany({
+          where: { kelasId: id },
+          orderBy: { createdAt: "desc" },
+          include: {
+            guru: { select: { id: true, nama: true, fotoProfil: true } },
+          },
+        })
+      : undefined;
+
     return NextResponse.json({
       data: {
         id: kelas.id,
         judul: kelas.judul,
         deskripsi: kelas.deskripsi,
-        kodeKelas: kelas.kodeKelas,
         siswa: kelas.siswa.map((ks) => ({
           ...ks.siswa,
           nis: ks.siswa.nis.toString(),
@@ -69,7 +74,7 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
           ...kg.guru,
           mapel: kg.mapel,
         })),
-        pengumuman: kelas.pengumuman,
+        ...(bolehLihatPengumuman ? { pengumuman } : {}),
       },
     });
   } catch (error) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { cocokkanKodeOtp } from "@/lib/resend";
 
 // ------------------------------------------------------------
 // POST /api/verify-otp
@@ -32,7 +33,12 @@ export async function POST(request: NextRequest) {
 
   const { tipeAkun, identifier, otp } = body;
 
-  if (!tipeAkun || !identifier || !otp) {
+  if (
+    (tipeAkun !== "GURU" && tipeAkun !== "SISWA") ||
+    !identifier ||
+    !otp ||
+    !/^\d{6}$/.test(otp)
+  ) {
     return NextResponse.json({ pesan: "Semua field wajib diisi" }, { status: 400 });
   }
 
@@ -57,7 +63,7 @@ export async function POST(request: NextRequest) {
   if (!laporan || !laporan.otp || !laporan.otpExpiredAt) {
     return NextResponse.json({ pesan: PESAN_GAGAL }, { status: 400 });
   }
-  if (laporan.otp !== otp) {
+  if (!cocokkanKodeOtp(otp, laporan.otp)) {
     return NextResponse.json({ pesan: PESAN_GAGAL }, { status: 400 });
   }
   if (laporan.otpExpiredAt.getTime() < Date.now()) {

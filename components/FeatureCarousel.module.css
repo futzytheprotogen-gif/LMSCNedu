@@ -10,7 +10,7 @@
 .visual:active { cursor: grabbing; }
 .visualTopbar { display: flex; height: 40px; align-items: center; justify-content: space-between; gap: 10px; padding: 0 12px; border-bottom: 1px solid var(--cn-line); background: var(--cn-surface); }
 .brand { display: flex; align-items: center; gap: 6px; color: var(--cn-text); font-size: 9px; }
-.brand > span { display: grid; width: 20px; height: 20px; place-items: center; border-radius: 5px; color: #fff; background: var(--cn-primary); font-size: 7px; font-weight: 800; }
+.brand > svg { width: 22px; height: 22px; color: var(--cn-primary); }
 .address { display: flex; min-width: 0; align-items: center; gap: 6px; overflow: hidden; padding: 4px 8px; border: 1px solid var(--cn-line); border-radius: 5px; color: var(--cn-muted); background: var(--cn-bg); font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
 .address i, .visualFooter i { width: 5px; height: 5px; flex: 0 0 auto; border-radius: 50%; background: #1eaa70; }
 .avatar { display: grid; width: 21px; height: 21px; flex: 0 0 auto; place-items: center; border-radius: 50%; color: var(--cn-primary-dark); background: var(--cn-tint); font-size: 8px; font-weight: 700; }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import BrandMark from "@/components/BrandMark";
 import styles from "./LandingDashboardPreview.module.css";
 
 const TAMPILAN_ROLE = [
@@ -110,7 +111,7 @@ export default function LandingDashboardPreview() {
         key={tampilan.role}
       >
         <div className={styles.windowBar}>
-          <div className={styles.windowBrand}><span>CN</span><strong>CN Edu</strong></div>
+          <div className={styles.windowBrand}><BrandMark /><strong>CN Edu</strong></div>
           <div className={styles.windowAddress}><i /> cne.edu.id / {tampilan.role.toLowerCase()}</div>
           <div className={styles.windowProfile}><b>{tampilan.ikon}</b><span>{tampilan.role}</span></div>
         </div>

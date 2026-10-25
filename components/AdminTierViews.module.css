@@ -40,7 +40,7 @@
 .secondaryButton { min-height: 36px; padding: 0 14px; border: 1px solid #b8d8f6; border-radius: 7px; color: #0d62bd; background: #f4faff; font-size: 11px; font-weight: 700; cursor: pointer; }
 .backLink { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; color: #176cb8; font-size: 12px; font-weight: 700; text-decoration: none; }
 .backLink:hover { color: var(--cn-navy); }
-.detailStats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 24px; }
+.detailStats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0 0 24px; }
 .detailStats > div { display: flex; min-height: 68px; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border: 1px solid #e5edf5; border-radius: 11px; background: #fff; box-shadow: 0 6px 20px rgb(15 23 42 / 3.5%); }
 .detailStats span { color: #718399; font-size: 11px; font-weight: 600; }
 .detailStats strong { color: #176cb8; font-family: "Sora", sans-serif; font-size: 20px; }

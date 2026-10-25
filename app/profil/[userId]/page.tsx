@@ -8,7 +8,13 @@ const WARNA_PRIMARY = "var(--cn-primary)";
 const WARNA_NAVY = "var(--cn-primary-dark)";
 const WARNA_AMBER = "var(--cn-coral)";
 
-type RoleProfil = "ADMIN" | "KEPSEK" | "KURIKULUM" | "GURU" | "SISWA";
+type RoleProfil =
+  | "MASTER_ADMIN"
+  | "ADMIN"
+  | "KEPSEK"
+  | "KURIKULUM"
+  | "GURU"
+  | "SISWA";
 
 interface DataProfil {
   id: string;
@@ -24,6 +30,7 @@ interface DataProfil {
 }
 
 const LABEL_ROLE: Record<RoleProfil, string> = {
+  MASTER_ADMIN: "Master Admin",
   ADMIN: "Admin",
   KEPSEK: "Kepala Sekolah",
   KURIKULUM: "Kurikulum",

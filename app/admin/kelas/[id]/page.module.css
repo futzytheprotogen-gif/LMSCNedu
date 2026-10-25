@@ -273,67 +273,6 @@
   line-height: 1.55;
 }
 
-.codeWrapper {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-
-  gap: 8px;
-}
-
-.codeLabel {
-  color: rgba(var(--cn-white-rgb), 0.5);
-
-  font-size: 9px;
-  font-weight: 800;
-
-  letter-spacing: 1px;
-}
-
-.codeWrapper code {
-  padding: 5px 9px;
-
-  border-radius: 7px;
-
-  background: rgba(var(--cn-white-rgb), 0.11);
-
-  border: 1px solid rgba(var(--cn-white-rgb), 0.1);
-
-  color: white;
-
-  font-size: 11px;
-  font-weight: 800;
-
-  letter-spacing: 0.4px;
-}
-
-.copyButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-
-  border: 0;
-  background: transparent;
-
-  color: var(--cn-cyan);
-
-  font-size: 10px;
-  font-weight: 800;
-
-  cursor: pointer;
-
-  padding: 4px;
-
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.copyButton:hover {
-  color: white;
-  transform: translateY(-1px);
-}
-
 .deleteClassButton {
   position: relative;
   z-index: 2;
@@ -2408,12 +2347,6 @@
     width: 100%;
 
     justify-content: center;
-  }
-
-  .codeWrapper {
-    align-items: flex-start;
-
-    flex-direction: column;
   }
 
   .analyticsHeader {

@@ -10,7 +10,13 @@ export async function GET(request: NextRequest) {
   try {
     const sesi = await wajibLogin(request);
     return NextResponse.json({
-      data: { userId: sesi.userId, role: sesi.role, nama: sesi.nama },
+      data: {
+        userId: sesi.userId,
+        role: sesi.role,
+        nama: sesi.nama,
+        actingAs: sesi.actingAs ?? false,
+        masterActorNama: sesi.masterActorNama ?? null,
+      },
     });
   } catch (error) {
     return (

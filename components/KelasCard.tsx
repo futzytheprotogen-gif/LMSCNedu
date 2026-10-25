@@ -1,13 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useAppNotice } from "@/components/AppNoticeProvider";
-
 export interface DataKelasCard {
   id: string;
   judul: string;
   deskripsi: string | null;
-  kodeKelas: string;
   jumlahSiswa: number;
   createdAt?: string;
 }
@@ -20,23 +16,6 @@ interface PropsKelasCard {
 const WARNA_PRIMARY = "var(--cn-primary)";
 
 export default function KelasCard({ kelas, onKlik }: PropsKelasCard) {
-  const beriNotifikasi = useAppNotice();
-  const [tersalin, setTersalin] = useState(false);
-
-  async function salinLinkUndangan(event: React.MouseEvent) {
-    // Cegah klik tombol salin ikut memicu onKlik (buka detail kelas)
-    event.stopPropagation();
-
-    const linkUndangan = `${window.location.origin}/gabung-kelas/${kelas.kodeKelas}`;
-    try {
-      await navigator.clipboard.writeText(linkUndangan);
-      setTersalin(true);
-      setTimeout(() => setTersalin(false), 2000);
-    } catch {
-      beriNotifikasi("Link undangan tidak dapat disalin otomatis. Salin link ini secara manual:", "error", linkUndangan);
-    }
-  }
-
   return (
     <div onClick={onKlik} style={estilo.kartu}>
       <h3 style={estilo.judul}>{kelas.judul}</h3>
@@ -47,12 +26,7 @@ export default function KelasCard({ kelas, onKlik }: PropsKelasCard) {
         <span style={estilo.badge}>
           {kelas.jumlahSiswa} siswa
         </span>
-        <span style={estilo.kode_kelas}>{kelas.kodeKelas}</span>
       </div>
-
-      <button onClick={salinLinkUndangan} style={estilo.tombol_salin} type="button">
-        {tersalin ? "Link tersalin!" : "Salin Link Undangan"}
-      </button>
     </div>
   );
 }
@@ -96,20 +70,5 @@ const estilo = {
     padding: "2px 8px",
     borderRadius: "999px",
     fontWeight: 600,
-  },
-  kode_kelas: {
-    color: "var(--cn-muted)",
-    fontFamily: "monospace",
-  },
-  tombol_salin: {
-    marginTop: "4px",
-    padding: "6px 0",
-    borderRadius: "6px",
-    border: `1px solid ${WARNA_PRIMARY}`,
-    backgroundColor: "transparent",
-    color: WARNA_PRIMARY,
-    fontSize: "12px",
-    fontWeight: 600,
-    cursor: "pointer",
   },
 };

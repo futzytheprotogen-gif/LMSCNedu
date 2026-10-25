@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
+import { cocokkanKodeOtp, hashKodeOtp } from "@/lib/resend";
 
 // ------------------------------------------------------------
 // POST /api/reset-password — publik, langkah terakhir alur lupa
 // password. Body: { tipeAkun, identifier, otp, passwordBaru,
 // konfirmasiPasswordBaru }
 //
-// Validasi OTP DIULANG di sini (bukan cuma percaya /api/verify-otp
-// tadi) — supaya orang gak bisa curang manggil endpoint ini langsung
-// tanpa OTP valid, walau udah lewat /api/verify-otp di step
-// sebelumnya. Laporan TIDAK dihapus di sini — tetap nunggu admin
-// klik "Selesai" di dashboard-nya (sesuai spesifikasi).
+// OTP divalidasi di sini dan dikonsumsi atomically bersama perubahan
+// password supaya kode tidak dapat dipakai ulang atau bersamaan.
 // ------------------------------------------------------------
 
 const PESAN_GAGAL = "Kode OTP tidak valid atau sudah kadaluarsa";
@@ -35,7 +33,13 @@ export async function POST(request: NextRequest) {
 
   const { tipeAkun, identifier, otp, passwordBaru, konfirmasiPasswordBaru } = body;
 
-  if (!tipeAkun || !identifier || !otp || !passwordBaru || !konfirmasiPasswordBaru) {
+  if (
+    (tipeAkun !== "GURU" && tipeAkun !== "SISWA") ||
+    !identifier ||
+    !otp ||
+    !passwordBaru ||
+    !konfirmasiPasswordBaru
+  ) {
     return NextResponse.json({ pesan: "Semua field wajib diisi" }, { status: 400 });
   }
   if (passwordBaru.length < PANJANG_MINIMAL_PASSWORD) {
@@ -46,6 +50,9 @@ export async function POST(request: NextRequest) {
   }
   if (passwordBaru !== konfirmasiPasswordBaru) {
     return NextResponse.json({ pesan: "Konfirmasi password tidak cocok" }, { status: 400 });
+  }
+  if (!/^\d{6}$/.test(otp)) {
+    return NextResponse.json({ pesan: PESAN_GAGAL }, { status: 400 });
   }
 
   let idBigInt: bigint;
@@ -72,7 +79,7 @@ export async function POST(request: NextRequest) {
     !laporan ||
     !laporan.otp ||
     !laporan.otpExpiredAt ||
-    laporan.otp !== otp ||
+    !cocokkanKodeOtp(otp, laporan.otp) ||
     laporan.otpExpiredAt.getTime() < Date.now()
   ) {
     return NextResponse.json({ pesan: PESAN_GAGAL }, { status: 400 });
@@ -80,17 +87,40 @@ export async function POST(request: NextRequest) {
 
   const passwordHash = await hashPassword(passwordBaru);
 
-  if (tipeAkun === "GURU" && laporan.guruId) {
-    await db.guru.update({
-      where: { id: laporan.guruId },
-      data: { password: passwordHash, passwordSementara: false },
+  if (
+    (tipeAkun === "GURU" && !laporan.guruId) ||
+    (tipeAkun === "SISWA" && !laporan.siswaId)
+  ) {
+    return NextResponse.json({ pesan: PESAN_GAGAL }, { status: 400 });
+  }
+
+  const berhasilReset = await db.$transaction(async (tx) => {
+    const otpDipakai = await tx.laporanLupaPassword.updateMany({
+      where: {
+        id: laporan.id,
+        status: "DITERIMA",
+        otp: hashKodeOtp(otp),
+        otpExpiredAt: { gte: new Date() },
+      },
+      data: { otp: null, otpExpiredAt: null },
     });
-  } else if (tipeAkun === "SISWA" && laporan.siswaId) {
-    await db.siswa.update({
-      where: { id: laporan.siswaId },
-      data: { password: passwordHash, passwordSementara: false },
-    });
-  } else {
+    if (otpDipakai.count !== 1) return false;
+
+    if (tipeAkun === "GURU" && laporan.guruId) {
+      await tx.guru.update({
+        where: { id: laporan.guruId },
+        data: { password: passwordHash, passwordSementara: false },
+      });
+    } else if (tipeAkun === "SISWA" && laporan.siswaId) {
+      await tx.siswa.update({
+        where: { id: laporan.siswaId },
+        data: { password: passwordHash, passwordSementara: false },
+      });
+    }
+    return true;
+  });
+
+  if (!berhasilReset) {
     return NextResponse.json({ pesan: PESAN_GAGAL }, { status: 400 });
   }
 

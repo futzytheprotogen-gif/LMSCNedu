@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import BrandMark from "@/components/BrandMark";
 import styles from "./page.module.css";
 
 type TipeAkun = "ADMIN" | "GURU" | "SISWA";
@@ -109,9 +110,7 @@ export default function HalamanLogin() {
         {/* LEFT SIDE */}
         <section className={styles.panelKiri} style={estilo.panelKiri}>
           <div style={estilo.logoArea}>
-            <div style={estilo.logo}>
-              CN
-            </div>
+            <BrandMark style={{ width: 39, height: 39, color: WARNA_PRIMARY }} />
 
             <div>
               <strong style={estilo.logoText}>

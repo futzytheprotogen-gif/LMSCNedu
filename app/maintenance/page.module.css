@@ -1,0 +1,14 @@
+.page { display: grid; min-height: calc(100vh - 58px); place-items: center; padding: 24px; background: radial-gradient(ellipse at 50% 38%, color-mix(in srgb, var(--cn-cyan) 10%, transparent), transparent 55%), var(--cn-bg); }
+.card { width: min(100%, 540px); padding: clamp(24px, 6vw, 45px); border: 1px solid var(--cn-line); border-radius: 14px; background: var(--cn-surface); box-shadow: 0 16px 50px rgb(12 35 47 / 7%); }
+.brand { display: flex; align-items: center; gap: 9px; color: var(--cn-navy); font: 750 12px "Sora", sans-serif; letter-spacing: .08em; }
+.brand > svg { width: 34px; height: 34px; color: var(--cn-primary); }
+.brand small { margin-left: auto; color: var(--cn-muted); font: 700 8px "IBM Plex Sans", sans-serif; letter-spacing: .1em; }
+.status { display: flex; align-items: center; gap: 8px; margin-top: 42px; color: #9a5d16; font: 700 8px "IBM Plex Sans", sans-serif; letter-spacing: .13em; }
+.status i { width: 6px; height: 6px; border-radius: 50%; background: #d89128; }
+.card h1 { max-width: 390px; margin: 13px 0 9px; color: var(--cn-navy); font: 750 clamp(25px, 5vw, 35px)/1.2 "Sora", sans-serif; letter-spacing: -.04em; }
+.card > p { margin: 0; color: var(--cn-muted); font-size: 12px; line-height: 1.7; }
+.note { margin-top: 25px; padding: 13px 14px; border: 1px solid var(--cn-line); border-left: 3px solid #087f8c; border-radius: 7px; background: var(--cn-tint); }
+.note span { color: #087f8c; font: 700 8px "IBM Plex Sans", sans-serif; letter-spacing: .1em; }
+.note p { margin: 5px 0 0; color: var(--cn-muted); font-size: 10px; line-height: 1.6; }
+.card > a { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; color: var(--cn-primary-dark); font-size: 10px; font-weight: 700; text-decoration: none; }
+.card > a:hover { text-decoration: underline; }

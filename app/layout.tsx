@@ -3,6 +3,7 @@ import "./globals.css";
 import { ConfirmDialogProvider } from "@/components/ConfirmDialogProvider";
 import { AppNoticeProvider } from "@/components/AppNoticeProvider";
 import { AppThemeProvider } from "@/components/AppThemeProvider";
+import MasterActingAsBanner from "@/components/MasterActingAsBanner";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -25,9 +26,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </Script>
         <AppThemeProvider>
           <ConfirmDialogProvider>
-            <AppNoticeProvider>{children}</AppNoticeProvider>
+            <AppNoticeProvider>
+              {children}
+              <MasterActingAsBanner />
+            </AppNoticeProvider>
           </ConfirmDialogProvider>
         </AppThemeProvider>
+        <footer className="cn-global-credit">
+          <span>CN Edu <span aria-hidden="true">·</span> Sistem Belajar Terpadu</span>
+          <span>Dibuat oleh <strong>@AhmadFakhriPPLG2</strong></span>
+        </footer>
       </body>
     </html>
   );

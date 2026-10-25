@@ -76,7 +76,6 @@ interface DetailKelas {
   id: string;
   judul: string;
   deskripsi: string | null;
-  kodeKelas: string;
   siswa: SiswaKelas[];
   guru: GuruKelas[];
   pengumuman: Pengumuman[];
@@ -127,7 +126,6 @@ export default function HalamanDetailKelas() {
      GENERAL
   ------------------------------------------------------------------------ */
 
-  const [tersalin, setTersalin] = useState(false);
   const [pencarianSiswa, setPencarianSiswa] = useState("");
 
   /* ------------------------------------------------------------------------
@@ -395,33 +393,6 @@ export default function HalamanDetailKelas() {
       0
     );
   }, [statistik.aktivitasGuru]);
-
-  /* ==========================================================================
-     COPY INVITATION LINK
-  ========================================================================== */
-
-  async function salinLinkUndangan() {
-    if (!kelas) return;
-
-    try {
-      const link =
-        `${window.location.origin}/gabung-kelas/${kelas.kodeKelas}`;
-
-      await navigator.clipboard.writeText(
-        link
-      );
-
-      setTersalin(true);
-
-      setTimeout(() => {
-        setTersalin(false);
-      }, 2200);
-    } catch (error) {
-      console.error(error);
-
-      beriNotifikasi("Tidak dapat menyalin link kelas.", "error");
-    }
-  }
 
   /* ==========================================================================
      DELETE CLASS
@@ -1030,45 +1001,6 @@ export default function HalamanDetailKelas() {
                   "Tidak ada deskripsi untuk kelas ini."}
               </p>
 
-              <div
-                className={
-                  styles.codeWrapper
-                }
-              >
-                <span
-                  className={
-                    styles.codeLabel
-                  }
-                >
-                  KODE KELAS
-                </span>
-
-                <code>
-                  {kelas.kodeKelas}
-                </code>
-
-                <button
-                  type="button"
-                  onClick={
-                    salinLinkUndangan
-                  }
-                  className={
-                    styles.copyButton
-                  }
-                >
-                  {tersalin ? (
-                    <>
-                      <span>✓</span>
-                      Tersalin
-                    </>
-                  ) : (
-                    <>
-                      <span>⧉</span>
-                      Salin Link
-                    </>
-                  )}
-                </button>
-              </div>
             </div>
           </div>
 

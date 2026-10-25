@@ -4,6 +4,7 @@ import FeatureCarousel from "@/components/FeatureCarousel";
 import LandingFoxScene from "@/components/LandingFoxScene";
 import LandingDashboardPreview from "@/components/LandingDashboardPreview";
 import ThemeSelector from "@/components/ThemeSelector";
+import BrandMark from "@/components/BrandMark";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -73,7 +74,7 @@ export default function HalamanBeranda() {
 
       <header className={styles.navbar}>
         <div className={styles.navbarInner}>
-          <span className={styles.logo}>CN Edu</span>
+          <span className={styles.logo}><BrandMark className={styles.logoMark} />CN Edu</span>
 
           <nav className={styles.navLinks}>
             <a href="#fitur">Fitur</a>
@@ -121,7 +122,19 @@ export default function HalamanBeranda() {
           </div>
         </div>
 
-        <LandingFoxScene />
+        <div className={styles.heroSceneWrap}>
+          <div className={styles.heroSceneOrbit} aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <LandingFoxScene />
+          <div className={styles.heroSignal}>
+            <BrandMark className={styles.heroSignalMark} />
+            <span><strong>CN EDU</strong><small>RUANG BELAJAR TERPADU</small></span>
+            <i aria-hidden="true" />
+          </div>
+        </div>
       </section>
 
       <LandingDashboardPreview />
@@ -231,11 +244,6 @@ export default function HalamanBeranda() {
         </Link>
       </section>
 
-      <footer className={styles.footer}>
-        <span>CN Edu — Sistem Belajar Terpadu</span>
-        <span className={styles.footerTitik}>·</span>
-        <span>Dibuat untuk kebutuhan belajar-mengajar sekolah</span>
-      </footer>
     </div>
   );
 }

@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
         id: kelas.id,
         judul: kelas.judul,
         deskripsi: kelas.deskripsi,
-        kodeKelas: kelas.kodeKelas,
         jumlahSiswa: kelas._count.siswa,
         createdAt: kelas.createdAt,
       })),
@@ -73,7 +72,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ data: kelasBaru }, { status: 201 });
+    return NextResponse.json({
+      data: {
+        id: kelasBaru.id,
+        judul: kelasBaru.judul,
+        deskripsi: kelasBaru.deskripsi,
+      },
+    }, { status: 201 });
   } catch (error) {
     return (
       tanganiErrorRbac(error) ??

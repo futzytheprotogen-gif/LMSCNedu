@@ -1,22 +1,15 @@
+import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { Resend } from "resend";
 
 // ------------------------------------------------------------
 // Dipakai khusus untuk alur "Lupa Password" (lihat catatan di
 // /areas/project-lms-sekolah.md bagian Autentikasi & Login):
-// admin klik "Terima & Kirim OTP" di tab Laporan -> OTP 4 digit
-// digenerate & dikirim ke email siswa/guru lewat Resend, berlaku
-// 10 menit, dan bisa dikirim ulang selama laporan masih "Diterima".
+// Permintaan yang datanya cocok mengirim OTP otomatis; admin juga dapat
+// mengirim ulang lewat email atau membuat OTP manual. Kode berlaku 10 menit.
 // ------------------------------------------------------------
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-
-if (!RESEND_API_KEY) {
-  throw new Error(
-    "RESEND_API_KEY belum diatur di .env — wajib diisi sebelum fitur email jalan."
-  );
-}
-
-const resend = new Resend(RESEND_API_KEY);
+const RESEND_API_KEY = process.env.RESEND_API_KEY?.trim();
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 // Ganti ke domain sekolah yang sudah diverifikasi di dashboard Resend
 // kalau sudah production. Selama masih pakai domain sandbox Resend,
@@ -25,16 +18,30 @@ const EMAIL_PENGIRIM =
   process.env.RESEND_FROM_EMAIL ?? "CN Edu <onboarding@resend.dev>";
 
 export const MENIT_KADALUARSA_OTP = 10;
+export const EMAIL_OTP_TERSEDIA = Boolean(resend);
 
 // ------------------------------------------------------------
-// Generate kode OTP 4 digit (dipanggil route handler saat admin
-// klik "Terima & Kirim OTP" atau "Kirim Ulang OTP")
+// Generate kode OTP enam digit dengan sumber acak kriptografis.
 // ------------------------------------------------------------
 
 export function buatKodeOtp(): string {
-  // 1000-9999, selalu 4 digit, tidak pernah diawali 0 (biar gak
-  // ambigu kalau ditampilkan sebagai angka di suatu tempat)
-  return Math.floor(1000 + Math.random() * 9000).toString();
+  return randomInt(100000, 1000000).toString();
+}
+
+export function hashKodeOtp(kodeOtp: string): string {
+  const rahasia = process.env.JWT_SECRET?.trim();
+  if (!rahasia) throw new Error("JWT_SECRET wajib tersedia untuk melindungi OTP.");
+  return createHmac("sha256", rahasia)
+    .update("cnedu-password-reset:")
+    .update(kodeOtp)
+    .digest("hex");
+}
+
+export function cocokkanKodeOtp(kodeOtp: string, hashTersimpan: string): boolean {
+  if (!/^[a-f\d]{64}$/i.test(hashTersimpan)) return false;
+  const hashInput = Buffer.from(hashKodeOtp(kodeOtp), "hex");
+  const hashTersimpanBuffer = Buffer.from(hashTersimpan, "hex");
+  return timingSafeEqual(hashInput, hashTersimpanBuffer);
 }
 
 export function hitungWaktuKadaluarsaOtp(): Date {
@@ -58,7 +65,21 @@ export async function kirimEmailOtp({
   kodeOtp,
   tipeAkun,
 }: ParamKirimOtp): Promise<void> {
+  if (!resend) {
+    throw new Error("RESEND_API_KEY belum diatur; email OTP tidak tersedia.");
+  }
+
   const labelAkun = tipeAkun === "GURU" ? "guru" : "siswa";
+  const namaAman = nama.replace(/[&<>"']/g, (karakter) => {
+    const entitas: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entitas[karakter];
+  });
 
   const { error } = await resend.emails.send({
     from: EMAIL_PENGIRIM,
@@ -67,7 +88,7 @@ export async function kirimEmailOtp({
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <h2 style="color: #1677ff;">Reset Password CN Edu</h2>
-        <p>Halo ${nama},</p>
+        <p>Halo ${namaAman},</p>
         <p>
           Kami menerima permintaan reset password untuk akun ${labelAkun}
           kamu di CN Edu. Gunakan kode berikut untuk melanjutkan:
