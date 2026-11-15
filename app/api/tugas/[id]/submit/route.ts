@@ -53,9 +53,29 @@ export async function POST(request: NextRequest, { params }: KonteksRute) {
       throw new ForbiddenError("Tugas ini tidak dikirim ke kelasmu");
     }
 
+    const sekarang = new Date();
+    if (tugas.deadlineAt && sekarang > tugas.deadlineAt) {
+      const deadlineMasuk = tugas.susulanAktif ? tugas.deadlineSusulan : null;
+      if (!deadlineMasuk || sekarang > deadlineMasuk) {
+        return NextResponse.json(
+          {
+            pesan: tugas.susulanAktif
+              ? "Batas pengumpulan susulan telah berakhir."
+              : "Deadline tugas telah berakhir dan pengumpulan susulan belum diaktifkan.",
+          },
+          { status: 403 }
+        );
+      }
+    }
+
     const submission = await db.submissionTugas.upsert({
       where: { tugasId_siswaId: { tugasId: id, siswaId: sesi.userId } },
-      update: { fileUrl: body.fileUrl, waktuKumpul: new Date() },
+      update: {
+        fileUrl: body.fileUrl,
+        waktuKumpul: sekarang,
+        nilai: null,
+        catatanNilai: null,
+      },
       create: { tugasId: id, siswaId: sesi.userId, fileUrl: body.fileUrl },
     });
 

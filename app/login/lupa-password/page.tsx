@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import BackAction from "@/components/BackAction";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -258,9 +259,7 @@ export default function HalamanLupaPassword() {
           {mode === "LAPOR" ? "Sudah punya kode OTP?" : "Belum lapor? Isi form laporan"}
         </button>
 
-        <button type="button" onClick={() => router.push("/login")} style={estilo.linkBawah}>
-          ← Kembali ke Login
-        </button>
+        <BackAction as="button" onClick={() => router.push("/login")}>Kembali ke Login</BackAction>
       </div>
     </div>
   );

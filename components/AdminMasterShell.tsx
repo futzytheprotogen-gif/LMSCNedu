@@ -4,22 +4,16 @@ import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import ThemePaletteButton from "@/components/ThemePaletteButton";
 import ThemeSwitchButton from "@/components/ThemeSwitchButton";
 import BrandMark from "@/components/BrandMark";
+import UiIcon, { type UiIconName } from "@/components/UiIcon";
 import MasterActingAsControl from "@/components/MasterActingAsControl";
 import styles from "./AdminMasterShell.module.css";
 
-const MENU_MASTER = [
-  { label: "Ringkasan", href: "/master", icon: "◈" },
-  { label: "Administrator", href: "/master/admins", icon: "⌘" },
-];
-
-const MENU_OPERASIONAL = [
-  { label: "Kelas", href: "/admin/kelas" },
-  { label: "Akun sekolah", href: "/admin/akun" },
-  { label: "Guru", href: "/admin/guru" },
-  { label: "Siswa", href: "/admin/siswa" },
-  { label: "Laporan", href: "/admin/laporan" },
+const MENU_MASTER: { label: string; href: string; icon: UiIconName }[] = [
+  { label: "Ringkasan", href: "/master", icon: "chart" },
+  { label: "Administrator", href: "/master/admins", icon: "user-plus" },
 ];
 
 export default function AdminMasterShell({ children }: { children: ReactNode }) {
@@ -95,6 +89,7 @@ export default function AdminMasterShell({ children }: { children: ReactNode }) 
         </Link>
         <div className={styles.topActions}>
           <span className={styles.secureBadge}><i /> ENCRYPTED SESSION</span>
+          <ThemePaletteButton />
           <ThemeSwitchButton />
           <Link className={styles.profile} href="/profil/saya">Profil</Link>
         </div>
@@ -125,26 +120,17 @@ export default function AdminMasterShell({ children }: { children: ReactNode }) 
               key={item.href}
               onClick={() => setMenuTerbuka(false)}
             >
-              <span className={styles.navIcon}>{item.icon}</span>{item.label}
-            </Link>
-          ))}
-          <span className={styles.navLabel}>OPERASIONAL</span>
-          {MENU_OPERASIONAL.map((item) => (
-            <Link
-              aria-current={tautanMenu(item.href) ? "page" : undefined}
-              className={`${styles.navLink} ${tautanMenu(item.href) ? styles.active : ""}`}
-              href={item.href}
-              key={item.href}
-              onClick={() => setMenuTerbuka(false)}
-            >
-              <span className={styles.navIcon}>↗</span>{item.label}
+              <span className={styles.navIcon}><UiIcon name={item.icon} size={16} /></span>{item.label}
             </Link>
           ))}
         </nav>
         <MasterActingAsControl />
         <div className={styles.sideFooter}>
           <div className={styles.accessNote}><span>●</span><div><strong>Root access active</strong><small>Actions are logged</small></div></div>
-          <button className={styles.logout} onClick={keluar} type="button">↪ <span>Keluar dengan aman</span></button>
+          <button className={styles.logout} onClick={keluar} type="button">
+            <UiIcon name="logout" size={16} />
+            <span>Keluar dengan aman</span>
+          </button>
         </div>
       </aside>
 

@@ -34,7 +34,7 @@ interface MonitoringChartsProps {
   satuanTren: string;
 }
 
-const WARNA_GRAFIK = ["#2563eb", "#0f766e", "#f59e0b", "#8b5cf6", "#ec4899", "#dc2626"];
+const WARNA_GRAFIK = ["var(--cn-primary)", "#0f766e", "#f59e0b", "#8b5cf6", "#ec4899", "#dc2626"];
 
 function formatAngka(nilai: number) {
   return nilai.toLocaleString("id-ID", { maximumFractionDigits: 1 });

@@ -17,6 +17,10 @@ interface TugasSiswa {
   judul: string;
   status: "SUDAH" | "HARI_INI" | "BELUM";
   dikirimAt: string;
+  deadlineAt: string | null;
+  susulanAktif: boolean;
+  deadlineSusulan: string | null;
+  statusDeadline: "TANPA_DEADLINE" | "TERBUKA" | "SUSULAN" | "TUTUP";
   guru: { nama: string };
   kelasTujuan: { id: string; judul: string }[];
 }
@@ -69,6 +73,13 @@ export default function BerandaSiswa() {
   }, [muat]);
 
   const tugasBelum = ringkasan.tugas.filter((item) => item.status !== "SUDAH");
+  const tugasDenganDeadline = tugasBelum
+    .filter((item) => item.deadlineAt)
+    .sort((a, b) => {
+      const batasA = a.statusDeadline === "SUSULAN" ? a.deadlineSusulan : a.deadlineAt;
+      const batasB = b.statusDeadline === "SUSULAN" ? b.deadlineSusulan : b.deadlineAt;
+      return new Date(batasA ?? 0).getTime() - new Date(batasB ?? 0).getTime();
+    });
   const asesmenBelum = ringkasan.asesmen.filter((item) => !item.submission);
   const aktivitasTerbaru = ringkasan.kelas
     .flatMap((kelas) => kelas.aktivitasTerbaru.map((aktivitas) => ({ ...aktivitas, kelasId: kelas.id, kelasJudul: kelas.judul })))
@@ -153,6 +164,35 @@ export default function BerandaSiswa() {
                     ))}
                   </div>
                 ) : <div className={styles.emptyState}><EmptyStateFox compact /><span>Kamu belum tergabung di kelas.</span></div>}
+
+                <div className={styles.sectionHeadingSecondary}>
+                  <div><p className={styles.sectionEyebrow}>PENGINGAT</p><h2>Deadline terdekat</h2></div>
+                  <Link href="/siswa/tugas">Semua tugas <span aria-hidden="true">→</span></Link>
+                </div>
+                {tugasDenganDeadline.length ? (
+                  <div className={styles.deadlineList}>
+                    {tugasDenganDeadline.slice(0, 4).map((item) => {
+                      const deadlineTampil = item.statusDeadline === "SUSULAN"
+                        ? item.deadlineSusulan
+                        : item.deadlineAt;
+                      const sudahLewat = item.statusDeadline === "TUTUP";
+                      return (
+                        <Link className={styles.deadlineItem} href={`/siswa/tugas/${item.id}`} key={item.id}>
+                          <span className={sudahLewat ? styles.deadlineExpired : styles.deadlineMark}>◷</span>
+                          <span>
+                            <strong>{item.judul}</strong>
+                            <small>{sudahLewat ? "Deadline lewat" : item.statusDeadline === "SUSULAN" ? "Deadline susulan" : "Batas pengumpulan"}</small>
+                          </span>
+                          <time dateTime={deadlineTampil ?? undefined}>
+                            {deadlineTampil ? new Date(deadlineTampil).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}
+                          </time>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className={styles.deadlineEmpty}>Belum ada tugas dengan deadline yang perlu dikerjakan.</div>
+                )}
                 <Link className={styles.profileLink} href="/profil/saya">Perbarui profil <span aria-hidden="true">→</span></Link>
               </aside>
             </div>

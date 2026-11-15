@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { tanganiErrorRbac, wajibGuru, wajibGuruPemilik } from "@/lib/rbac";
 
 interface Params {
   params: Promise<{
@@ -8,10 +9,11 @@ interface Params {
 }
 
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: Params
 ) {
   try {
+    const sesi = await wajibGuru(request);
     const { id } = await params;
 
     const tugas = await db.tugas.findUnique({
@@ -55,6 +57,7 @@ export async function GET(
         }
       );
     }
+    wajibGuruPemilik(sesi, tugas.guruId);
 
     /*
      * Gabungkan semua siswa dari semua kelas
@@ -109,6 +112,9 @@ export async function GET(
             : ("BELUM" as const),
 
           fileUrl: submission?.fileUrl ?? null,
+          submissionId: submission?.id ?? null,
+          nilai: submission?.nilai ?? null,
+          catatanNilai: submission?.catatanNilai ?? null,
 
           waktuKumpul:
             submission?.waktuKumpul
@@ -149,19 +155,65 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error(
-      "GET /api/tugas/[id]/pengumpulan:",
-      error
+    return (
+      tanganiErrorRbac(error) ??
+      NextResponse.json({ pesan: "Gagal mengambil data pengumpulan tugas." }, { status: 500 })
     );
+  }
+}
 
-    return NextResponse.json(
-      {
-        pesan:
-          "Gagal mengambil data pengumpulan tugas.",
+export async function PATCH(request: NextRequest, { params }: Params) {
+  try {
+    const sesi = await wajibGuru(request);
+    const { id } = await params;
+    const tugas = await db.tugas.findUnique({ where: { id }, select: { id: true, guruId: true } });
+    if (!tugas) {
+      return NextResponse.json({ pesan: "Tugas tidak ditemukan." }, { status: 404 });
+    }
+    wajibGuruPemilik(sesi, tugas.guruId);
+
+    const body: unknown = await request.json().catch(() => null);
+    if (
+      !body ||
+      typeof body !== "object" ||
+      !("submissionId" in body) ||
+      typeof body.submissionId !== "string" ||
+      !("nilai" in body) ||
+      typeof body.nilai !== "number" ||
+      !Number.isFinite(body.nilai) ||
+      body.nilai < 0 ||
+      body.nilai > 100 ||
+      ("catatanNilai" in body && body.catatanNilai !== null && typeof body.catatanNilai !== "string")
+    ) {
+      return NextResponse.json(
+        { pesan: "Submission dan nilai 0–100 wajib diisi; catatan harus berupa teks." },
+        { status: 400 }
+      );
+    }
+
+    const pengumpulan = await db.submissionTugas.findFirst({
+      where: { id: body.submissionId, tugasId: id },
+      select: { id: true },
+    });
+    if (!pengumpulan) {
+      return NextResponse.json({ pesan: "Pengumpulan tidak ditemukan." }, { status: 404 });
+    }
+
+    const data = await db.submissionTugas.update({
+      where: { id: pengumpulan.id },
+      data: {
+        nilai: body.nilai,
+        catatanNilai: "catatanNilai" in body
+          ? typeof body.catatanNilai === "string" ? body.catatanNilai.trim() || null : null
+          : undefined,
       },
-      {
-        status: 500,
-      }
+      select: { id: true, nilai: true, catatanNilai: true },
+    });
+    return NextResponse.json({ data });
+  } catch (error) {
+    return (
+      tanganiErrorRbac(error) ??
+      NextResponse.json({ pesan: "Gagal menyimpan nilai tugas." }, { status: 500 })
     );
   }
 }

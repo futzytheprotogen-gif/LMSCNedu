@@ -355,7 +355,7 @@ export default function HalamanKelasGuru() {
 const estilo = {
   halaman: {
     minHeight: "100vh",
-    backgroundColor: WARNA.background,
+    backgroundColor: "transparent",
     padding: "32px",
     color: WARNA.text,
   },

@@ -456,7 +456,7 @@ export default function HalamanBuatAkun() {
             {tipeAkun === "SISWA" && (
               <div style={styles.field}>
                 <label style={styles.label}>
-                  Jurusan / Kelas Jenjang
+                  Rombel akademik
                   <span style={styles.required}>*</span>
                 </label>
 
@@ -467,7 +467,7 @@ export default function HalamanBuatAkun() {
                   style={styles.input}
                 >
                   <option value="">
-                    Pilih jurusan...
+                    Pilih rombel...
                   </option>
 
                   {daftarRombel.map((r) => (
@@ -481,7 +481,7 @@ export default function HalamanBuatAkun() {
                 </select>
 
                 <span style={styles.helper}>
-                  Tentukan jurusan atau jenjang siswa.
+                  Jurusan, tingkat, dan rombel dikelola terpisah di Data Akademik.
                 </span>
               </div>
             )}
@@ -630,7 +630,7 @@ export default function HalamanBuatAkun() {
 const styles = {
   page: {
     minHeight: "100vh",
-    backgroundColor: "var(--cn-tint)",
+    backgroundColor: "transparent",
     padding: "40px 20px",
     boxSizing: "border-box" as const,
   },

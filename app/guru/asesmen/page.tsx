@@ -51,7 +51,8 @@ export default function HalamanAsesmenGuru() {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("SEMUA");
 
   // State untuk konfirmasi hapus
-  const [asesmenDiHapus, setAsesmenDiHapus] = useState<AsesmenRingkas | null>(null);
+  const [asesmenDiHapus, setAsesmenDiHapus] = useState<AsesmenRingkas[]>([]);
+  const [asesmenTerpilih, setAsesmenTerpilih] = useState<Set<string>>(new Set());
   const [sedangMenghapus, setSedangMenghapus] = useState(false);
 
   useEffect(() => {
@@ -62,27 +63,59 @@ export default function HalamanAsesmenGuru() {
       .finally(() => setSedangMuat(false));
   }, []);
 
-  // Fungsi untuk menangani proses hapus
+  const bukaKonfirmasiHapus = (asesmen: AsesmenRingkas) => {
+    setAsesmenDiHapus([asesmen]);
+  };
+
+  const bukaKonfirmasiHapusTerpilih = () => {
+    const dipilih = daftar.filter((asesmen) => asesmenTerpilih.has(asesmen.id));
+    if (dipilih.length > 0) setAsesmenDiHapus(dipilih);
+  };
+
+  // Menghapus satu per satu agar hasil parsial tetap bisa dilaporkan dengan tepat.
   const tanganiHapus = async () => {
-    if (!asesmenDiHapus) return;
+    if (asesmenDiHapus.length === 0) return;
 
     setSedangMenghapus(true);
-    try {
-      const res = await fetch(`/api/asesmen/${asesmenDiHapus.id}`, {
-        method: "DELETE",
-      });
+    const berhasilDihapus: string[] = [];
 
-      if (res.ok) {
-        setDaftar((prev) => prev.filter((a) => a.id !== asesmenDiHapus.id));
-        setAsesmenDiHapus(null);
-      } else {
-        beriNotifikasi("Gagal menghapus asesmen. Silakan coba lagi.", "error");
+    for (const asesmen of asesmenDiHapus) {
+      try {
+        const res = await fetch(`/api/asesmen/${asesmen.id}`, {
+          method: "DELETE",
+        });
+        if (res.ok) berhasilDihapus.push(asesmen.id);
+      } catch {
+        // Kegagalan jaringan untuk satu asesmen tidak menghentikan penghapusan lainnya.
       }
-    } catch {
-      beriNotifikasi("Terjadi kesalahan saat menghapus asesmen.", "error");
-    } finally {
-      setSedangMenghapus(false);
     }
+
+    const gagalDihapus = asesmenDiHapus.filter(
+      (asesmen) => !berhasilDihapus.includes(asesmen.id)
+    );
+    setDaftar((sebelumnya) =>
+      sebelumnya.filter((asesmen) => !berhasilDihapus.includes(asesmen.id))
+    );
+    setAsesmenTerpilih((sebelumnya) => {
+      const berikutnya = new Set(sebelumnya);
+      berhasilDihapus.forEach((id) => berikutnya.delete(id));
+      return berikutnya;
+    });
+
+    if (gagalDihapus.length === 0) {
+      setAsesmenDiHapus([]);
+      beriNotifikasi(
+        `${berhasilDihapus.length} asesmen berhasil dihapus.`,
+        "sukses"
+      );
+    } else {
+      setAsesmenDiHapus(gagalDihapus);
+      beriNotifikasi(
+        `${berhasilDihapus.length} asesmen berhasil dihapus; ${gagalDihapus.length} gagal. Anda dapat mencoba lagi.`,
+        "error"
+      );
+    }
+    setSedangMenghapus(false);
   };
 
   const totalProses = daftar.filter((a) => a.status === "PROSES").length;
@@ -104,6 +137,22 @@ export default function HalamanAsesmenGuru() {
       return cocokStatus && cocokPencarian;
     });
   }, [daftar, filterStatus, kataKunci]);
+
+  const semuaTampilTerpilih =
+    daftarTampil.length > 0 &&
+    daftarTampil.every((asesmen) => asesmenTerpilih.has(asesmen.id));
+
+  const pilihSemuaTampil = () => {
+    setAsesmenTerpilih((sebelumnya) => {
+      const berikutnya = new Set(sebelumnya);
+      if (semuaTampilTerpilih) {
+        daftarTampil.forEach((asesmen) => berikutnya.delete(asesmen.id));
+      } else {
+        daftarTampil.forEach((asesmen) => berikutnya.add(asesmen.id));
+      }
+      return berikutnya;
+    });
+  };
 
   return (
     <div className={responsive.page} style={estilo.halaman}>
@@ -229,6 +278,30 @@ export default function HalamanAsesmenGuru() {
                 {daftarTampil.length} asesmen ditampilkan
               </p>
             </div>
+            <div style={estilo.aksiSeleksi}>
+              <label style={estilo.labelPilihSemua}>
+                <input
+                  type="checkbox"
+                  checked={semuaTampilTerpilih}
+                  onChange={pilihSemuaTampil}
+                  disabled={sedangMenghapus}
+                  style={estilo.checkbox}
+                  aria-label="Pilih semua asesmen yang ditampilkan"
+                />
+                Pilih semua ditampilkan
+              </label>
+              {asesmenTerpilih.size > 0 && (
+                <button
+                  type="button"
+                  onClick={bukaKonfirmasiHapusTerpilih}
+                  disabled={sedangMenghapus}
+                  style={estilo.tombolHapusTerpilih}
+                >
+                  <IkonSampah ukuran={15} />
+                  Hapus terpilih ({asesmenTerpilih.size})
+                </button>
+              )}
+            </div>
           </div>
 
           {daftarTampil.length === 0 ? (
@@ -247,7 +320,17 @@ export default function HalamanAsesmenGuru() {
                   key={a.id}
                   a={a}
                   onKlik={() => router.push(`/guru/asesmen/${a.id}`)}
-                  onHapus={() => setAsesmenDiHapus(a)}
+                  onHapus={() => bukaKonfirmasiHapus(a)}
+                  terpilih={asesmenTerpilih.has(a.id)}
+                  onTogglePilih={() => {
+                    setAsesmenTerpilih((sebelumnya) => {
+                      const berikutnya = new Set(sebelumnya);
+                      if (berikutnya.has(a.id)) berikutnya.delete(a.id);
+                      else berikutnya.add(a.id);
+                      return berikutnya;
+                    });
+                  }}
+                  pilihanDinonaktifkan={sedangMenghapus}
                 />
               ))}
             </div>
@@ -259,20 +342,44 @@ export default function HalamanAsesmenGuru() {
           MODAL KONFIRMASI HAPUS
       ====================================================== */}
 
-      {asesmenDiHapus && (
+      {asesmenDiHapus.length > 0 && (
         <div style={estilo.modalOverlay}>
           <div style={estilo.modalContainer}>
-            <div style={estilo.modalIcon}>🗑️</div>
-            <h3 style={estilo.modalJudul}>Hapus Asesmen</h3>
+            <div style={estilo.modalIcon}>
+              <IkonSampah ukuran={21} />
+            </div>
+            <h3 style={estilo.modalJudul}>
+              {asesmenDiHapus.length === 1
+                ? "Hapus Asesmen"
+                : `Hapus ${asesmenDiHapus.length} Asesmen`}
+            </h3>
             <p style={estilo.modalTeks}>
-              Apakah Anda yakin ingin menghapus asesmen{" "}
-              <strong>"{asesmenDiHapus.judul}"</strong>? Tindakan ini tidak
-              dapat dibatalkan.
+              {asesmenDiHapus.length === 1 ? (
+                <>
+                  Apakah Anda yakin ingin menghapus asesmen{" "}
+                  <strong>&ldquo;{asesmenDiHapus[0].judul}&rdquo;</strong>? Tindakan ini
+                  tidak dapat dibatalkan.
+                </>
+              ) : (
+                <>
+                  Apakah Anda yakin ingin menghapus{" "}
+                  <strong>{asesmenDiHapus.length} asesmen</strong> berikut?
+                  Tindakan ini tidak dapat dibatalkan.
+                  <span style={estilo.daftarKonfirmasi}>
+                    {asesmenDiHapus
+                      .slice(0, 3)
+                      .map((asesmen) => asesmen.judul)
+                      .join(", ")}
+                    {asesmenDiHapus.length > 3 &&
+                      `, dan ${asesmenDiHapus.length - 3} lainnya`}
+                  </span>
+                </>
+              )}
             </p>
             <div style={estilo.modalAksi}>
               <button
                 type="button"
-                onClick={() => setAsesmenDiHapus(null)}
+                onClick={() => setAsesmenDiHapus([])}
                 disabled={sedangMenghapus}
                 style={estilo.tombolBatal}
               >
@@ -384,16 +491,29 @@ function KartuAsesmen({
   a,
   onKlik,
   onHapus,
+  terpilih,
+  onTogglePilih,
+  pilihanDinonaktifkan,
 }: {
   a: AsesmenRingkas;
   onKlik: () => void;
   onHapus: () => void;
+  terpilih: boolean;
+  onTogglePilih: () => void;
+  pilihanDinonaktifkan: boolean;
 }) {
   const adalahKuis = a.tipe === "KUIS";
 
   return (
     <div style={estilo.kartuWrapper}>
-      <button onClick={onKlik} type="button" style={estilo.kartu}>
+      <button
+        onClick={onKlik}
+        type="button"
+        style={{
+          ...estilo.kartu,
+          ...(terpilih ? estilo.kartuTerpilih : {}),
+        }}
+      >
         {/* Garis warna di atas kartu */}
         <div
           style={{
@@ -487,19 +607,51 @@ function KartuAsesmen({
         </div>
       </button>
 
-      {/* Tombol Hapus */}
+      <label style={estilo.kontrolPilihKartu}>
+        <input
+          type="checkbox"
+          checked={terpilih}
+          onChange={onTogglePilih}
+          disabled={pilihanDinonaktifkan}
+          style={estilo.checkbox}
+          aria-label={`Pilih asesmen ${a.judul} untuk dihapus`}
+        />
+        <span>Pilih</span>
+      </label>
+
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onHapus();
-        }}
+        onClick={onHapus}
+        disabled={pilihanDinonaktifkan}
         title="Hapus Asesmen"
+        aria-label={`Hapus asesmen ${a.judul}`}
         style={estilo.tombolHapusKartu}
       >
-        🗑️
+        <IkonSampah ukuran={14} />
+        Hapus
       </button>
     </div>
+  );
+}
+
+function IkonSampah({ ukuran }: { ukuran: number }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width={ukuran}
+      height={ukuran}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="m19 6-1 14H6L5 6" />
+      <path d="M10 11v5M14 11v5" />
+    </svg>
   );
 }
 
@@ -551,7 +703,7 @@ const estilo = {
   halaman: {
     minHeight: "100vh",
     padding: "28px",
-    backgroundColor: WARNA.background,
+    backgroundColor: "transparent",
     boxSizing: "border-box" as const,
   },
 
@@ -751,6 +903,11 @@ const estilo = {
 
   headerDaftar: {
     marginBottom: "13px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "14px",
+    flexWrap: "wrap" as const,
   },
 
   judulDaftar: {
@@ -764,6 +921,46 @@ const estilo = {
     margin: "3px 0 0",
     fontSize: "11px",
     color: WARNA.textMuted,
+  },
+
+  aksiSeleksi: {
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap" as const,
+    gap: "10px",
+  },
+
+  labelPilihSemua: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "7px",
+    color: WARNA.textSecondary,
+    fontSize: "12px",
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+
+  checkbox: {
+    width: "16px",
+    height: "16px",
+    margin: 0,
+    accentColor: WARNA.primary,
+    cursor: "pointer",
+  },
+
+  tombolHapusTerpilih: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "7px",
+    border: `1px solid ${WARNA.red}`,
+    borderRadius: "8px",
+    padding: "8px 11px",
+    backgroundColor: WARNA.red,
+    color: WARNA.white,
+    fontSize: "12px",
+    fontWeight: 700,
+    cursor: "pointer",
   },
 
   grid: {
@@ -789,8 +986,7 @@ const estilo = {
     border: `1px solid ${WARNA.border}`,
     borderRadius: "14px",
     backgroundColor: WARNA.white,
-    padding: "17px",
-    paddingRight: "42px",
+    padding: "50px 17px 17px",
     cursor: "pointer",
     boxSizing: "border-box" as const,
     boxShadow: "0 2px 8px rgba(var(--cn-navy-rgb), 0.035)",
@@ -798,23 +994,43 @@ const estilo = {
       "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease",
   },
 
+  kartuTerpilih: {
+    borderColor: WARNA.primary,
+    boxShadow: "0 0 0 2px rgba(var(--cn-primary-rgb), 0.12)",
+  },
+
   tombolHapusKartu: {
     position: "absolute" as const,
-    top: "14px",
-    right: "12px",
+    top: "10px",
+    right: "10px",
     zIndex: 2,
-    border: "none",
-    backgroundColor: "transparent",
-    borderRadius: "6px",
-    width: "28px",
-    height: "28px",
-    display: "flex",
+    border: `1px solid ${WARNA.red}`,
+    backgroundColor: WARNA.redSoft,
+    borderRadius: "7px",
+    padding: "6px 9px",
+    display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
+    gap: "5px",
+    color: WARNA.red,
     cursor: "pointer",
-    fontSize: "13px",
-    opacity: 0.7,
-    transition: "opacity 0.2s, background-color 0.2s",
+    fontSize: "11px",
+    fontWeight: 700,
+    transition: "background-color 0.2s",
+  },
+
+  kontrolPilihKartu: {
+    position: "absolute" as const,
+    top: "13px",
+    left: "13px",
+    zIndex: 2,
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    color: WARNA.textSecondary,
+    fontSize: "11px",
+    fontWeight: 600,
+    cursor: "pointer",
   },
 
   garisKartu: {
@@ -1062,7 +1278,7 @@ const estilo = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "22px",
+    color: WARNA.red,
     margin: "0 auto 14px",
   },
 
@@ -1078,6 +1294,13 @@ const estilo = {
     fontSize: "13px",
     color: WARNA.textSecondary,
     lineHeight: 1.5,
+  },
+
+  daftarKonfirmasi: {
+    display: "block",
+    marginTop: "8px",
+    fontSize: "12px",
+    fontWeight: 600,
   },
 
   modalAksi: {

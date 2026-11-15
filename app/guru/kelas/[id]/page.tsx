@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import BackAction from "@/components/BackAction";
 
 const WARNA = {
   primary: "var(--cn-primary)",
@@ -94,32 +95,45 @@ export default function HalamanDetailKelasGuru() {
     "beranda" | "siswa" | "pengajar"
   >("beranda");
 
+  const ambilDetail = useCallback(async () => {
+    const response = await fetch(`/api/guru/kelas/${kelasId}`);
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.pesan ?? "Gagal memuat detail kelas.");
+    }
+    return data.data;
+  }, [kelasId]);
+
   const muatDetail = useCallback(async () => {
+    setSedangMuat(true);
     try {
-      setSedangMuat(true);
-
-      const response = await fetch(
-        `/api/guru/kelas/${kelasId}`
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setKelas(data.data);
-      }
+      setKelas(await ambilDetail());
     } catch (error) {
-      console.error(
-        "Gagal memuat detail kelas:",
-        error
-      );
+      console.error("Gagal memuat detail kelas:", error);
     } finally {
       setSedangMuat(false);
     }
-  }, [kelasId]);
+  }, [ambilDetail]);
 
   useEffect(() => {
-    muatDetail();
-  }, [muatDetail]);
+    let aktif = true;
+
+    async function muatKelas() {
+      try {
+        const data = await ambilDetail();
+        if (aktif) setKelas(data);
+      } catch (error) {
+        console.error("Gagal memuat detail kelas:", error);
+      } finally {
+        if (aktif) setSedangMuat(false);
+      }
+    }
+
+    void muatKelas();
+    return () => {
+      aktif = false;
+    };
+  }, [ambilDetail]);
 
   useEffect(() => {
     fetch("/api/sesi")
@@ -269,12 +283,7 @@ export default function HalamanDetailKelasGuru() {
           Kelas tidak ditemukan
         </h3>
 
-        <button
-          onClick={() => router.push("/guru/kelas")}
-          style={style.tombolKembaliEmpty}
-        >
-          ← Kembali ke Kelas
-        </button>
+        <BackAction as="button" onClick={() => router.push("/guru/kelas")}>Kembali ke Kelas</BackAction>
       </div>
     );
   }
@@ -285,20 +294,7 @@ export default function HalamanDetailKelasGuru() {
           BACK
       ====================================================== */}
 
-      <button
-        onClick={() => router.push("/guru/kelas")}
-        style={style.tombolKembali}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor =
-            WARNA.primarySoft;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor =
-            "transparent";
-        }}
-      >
-        ← Kembali ke Kelas
-      </button>
+      <BackAction as="button" onClick={() => router.push("/guru/kelas")}>Kembali ke Kelas</BackAction>
 
       {/* =====================================================
           HERO KELAS
@@ -1278,7 +1274,7 @@ const style = {
   halaman: {
     minHeight: "100vh",
     padding: "28px 32px 50px",
-    backgroundColor: WARNA.background,
+    backgroundColor: "transparent",
     boxSizing: "border-box" as const,
   },
 

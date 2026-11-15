@@ -23,7 +23,14 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
         guru: { select: { id: true, nama: true } },
         kelasTujuan: { include: { kelas: { select: { id: true, judul: true } } } },
         submission: {
-          select: { id: true, siswaId: true, fileUrl: true, waktuKumpul: true },
+          select: {
+            id: true,
+            siswaId: true,
+            fileUrl: true,
+            waktuKumpul: true,
+            nilai: true,
+            catatanNilai: true,
+          },
         },
       },
     });
@@ -42,6 +49,9 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
           deskripsi: tugas.deskripsi,
           tipeLampiran: tugas.tipeLampiran,
           lampiran: tugas.lampiran,
+          deadlineAt: tugas.deadlineAt?.toISOString() ?? null,
+          susulanAktif: tugas.susulanAktif,
+          deadlineSusulan: tugas.deadlineSusulan?.toISOString() ?? null,
           createdAt: tugas.createdAt,
           kelasTujuan: tugas.kelasTujuan.map((kt) => kt.kelas),
           jumlahSubmission: tugas.submission.length,
@@ -66,6 +76,10 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
       const submissionSaya = tugas.submission.find(
         (s) => s.siswaId === sesi.userId
       );
+      const sekarang = new Date();
+      const bolehKumpul = !tugas.deadlineAt ||
+        sekarang <= tugas.deadlineAt ||
+        (tugas.susulanAktif && !!tugas.deadlineSusulan && sekarang <= tugas.deadlineSusulan);
 
       return NextResponse.json({
         data: {
@@ -74,6 +88,10 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
           deskripsi: tugas.deskripsi,
           tipeLampiran: tugas.tipeLampiran,
           lampiran: tugas.lampiran,
+          deadlineAt: tugas.deadlineAt?.toISOString() ?? null,
+          susulanAktif: tugas.susulanAktif,
+          deadlineSusulan: tugas.deadlineSusulan?.toISOString() ?? null,
+          bolehKumpul,
           createdAt: tugas.createdAt,
           guru: tugas.guru,
           kelasTujuan: tugas.kelasTujuan.map((kt) => kt.kelas),
@@ -81,6 +99,8 @@ export async function GET(request: NextRequest, { params }: KonteksRute) {
             ? {
                 fileUrl: submissionSaya.fileUrl,
                 waktuKumpul: submissionSaya.waktuKumpul,
+                nilai: submissionSaya.nilai,
+                catatanNilai: submissionSaya.catatanNilai,
               }
             : null,
         },
@@ -102,6 +122,9 @@ interface BodyEditTugas {
   deskripsi?: string;
   tipeLampiran?: "PDF" | "LINK" | null;
   lampiran?: string | null;
+  deadlineAt?: string | null;
+  susulanAktif?: boolean;
+  deadlineSusulan?: string | null;
 }
 
 export async function PATCH(request: NextRequest, { params }: KonteksRute) {
@@ -116,6 +139,34 @@ export async function PATCH(request: NextRequest, { params }: KonteksRute) {
     wajibGuruPemilik(sesi, tugas.guruId);
 
     const body: BodyEditTugas = await request.json().catch(() => ({}));
+    if (body.susulanAktif !== undefined && typeof body.susulanAktif !== "boolean") {
+      return NextResponse.json({ pesan: "Pengaturan deadline susulan tidak valid." }, { status: 400 });
+    }
+
+    function bacaTanggal(value: string | null | undefined) {
+      if (value === undefined) return null;
+      if (value === null || value === "") return null;
+      const tanggal = new Date(value);
+      return Number.isNaN(tanggal.getTime()) ? undefined : tanggal;
+    }
+
+    const deadlineAt = body.deadlineAt === undefined ? tugas.deadlineAt : bacaTanggal(body.deadlineAt);
+    const deadlineSusulan = body.deadlineSusulan === undefined
+      ? tugas.deadlineSusulan
+      : bacaTanggal(body.deadlineSusulan);
+    const susulanAktif = body.susulanAktif ?? tugas.susulanAktif;
+    if (deadlineAt === undefined || deadlineSusulan === undefined) {
+      return NextResponse.json({ pesan: "Format deadline tidak valid." }, { status: 400 });
+    }
+    if (
+      susulanAktif &&
+      (!deadlineAt || !deadlineSusulan || deadlineSusulan <= deadlineAt)
+    ) {
+      return NextResponse.json(
+        { pesan: "Deadline susulan harus diisi dan berada setelah deadline utama." },
+        { status: 400 }
+      );
+    }
 
     const tugasTerupdate = await db.tugas.update({
       where: { id },
@@ -124,6 +175,9 @@ export async function PATCH(request: NextRequest, { params }: KonteksRute) {
         deskripsi: body.deskripsi?.trim(),
         tipeLampiran: body.tipeLampiran,
         lampiran: body.lampiran,
+        deadlineAt,
+        susulanAktif,
+        deadlineSusulan: susulanAktif ? deadlineSusulan : null,
       },
     });
 

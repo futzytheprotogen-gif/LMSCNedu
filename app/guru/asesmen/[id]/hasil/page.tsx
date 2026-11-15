@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { JenisPeringatanAsesmen } from "@/lib/asesmenIntegrity";
+import BackAction from "@/components/BackAction";
 import styles from "./page.module.css";
 
 interface SoalHasil {
@@ -120,7 +120,7 @@ export default function HasilAsesmenGuru() {
   return (
     <main className={styles.page}>
       <div className={styles.container}>
-        <Link className={styles.back} href={`/guru/asesmen/${params.id}`}>← Kembali ke asesmen</Link>
+        <BackAction as="link" href={`/guru/asesmen/${params.id}`}>Kembali ke asesmen</BackAction>
         {sedangMuat ? (
           <div className={styles.state} role="status">Memuat hasil asesmen...</div>
         ) : error && !hasil ? (

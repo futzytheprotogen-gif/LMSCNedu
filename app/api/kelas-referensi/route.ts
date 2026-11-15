@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { wajibAdminSaja, tanganiErrorRbac } from "@/lib/rbac";
+import { wajibAdminTier, tanganiErrorRbac } from "@/lib/rbac";
 
 // ------------------------------------------------------------
 // GET /api/kelas-referensi — dipakai buat isi dropdown di:
@@ -13,16 +13,49 @@ import { wajibAdminSaja, tanganiErrorRbac } from "@/lib/rbac";
 
 export async function GET(request: NextRequest) {
   try {
-    await wajibAdminSaja(request);
+    await wajibAdminTier(request);
 
-    const [rombel, mapel] = await Promise.all([
-      db.rombelAkademik.findMany({
-        orderBy: [{ angkatan: "asc" }, { jurusan: "asc" }, { variasi: "asc" }],
+    const [jurusan, rombel, mapel] = await Promise.all([
+      db.jurusanAkademik.findMany({
+        orderBy: { nama: "asc" },
+        include: { _count: { select: { rombel: true } } },
       }),
-      db.mataPelajaran.findMany({ orderBy: { nama: "asc" } }),
+      db.rombelAkademik.findMany({
+        orderBy: [{ angkatan: "asc" }, { jurusan: { nama: "asc" } }, { variasi: "asc" }],
+        include: {
+          jurusan: { select: { id: true, nama: true } },
+          _count: { select: { siswa: true } },
+        },
+      }),
+      db.mataPelajaran.findMany({
+        orderBy: { nama: "asc" },
+        include: {
+          _count: {
+            select: { guruPengampu: true, kelasGuru: true, asesmen: true },
+          },
+        },
+      }),
     ]);
 
-    return NextResponse.json({ data: { rombel, mapel } });
+    return NextResponse.json({
+      data: {
+        jurusan: jurusan.map(({ _count, ...item }) => ({
+          ...item,
+          jumlahRombel: _count.rombel,
+        })),
+        rombel: rombel.map(({ _count, ...item }) => ({
+          ...item,
+          jurusanId: item.jurusanId,
+          jurusan: item.jurusan?.nama ?? null,
+          jumlahSiswa: _count.siswa,
+        })),
+        mapel: mapel.map(({ _count, ...item }) => ({
+          ...item,
+          jumlahPenggunaan:
+            _count.guruPengampu + _count.kelasGuru + _count.asesmen,
+        })),
+      },
+    });
   } catch (error) {
     return (
       tanganiErrorRbac(error) ??

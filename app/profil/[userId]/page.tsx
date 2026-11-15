@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { unggahFileDariBrowser } from "@/lib/upload-client";
+import BackAction from "@/components/BackAction";
 import styles from "./page.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
@@ -55,18 +57,34 @@ export default function HalamanProfil() {
   const [sedangSimpan, setSedangSimpan] = useState(false);
   const [pesanError, setPesanError] = useState<string | null>(null);
 
-  const muatProfil = useCallback(async () => {
-    setSedangMuat(true);
-    const endpoint = iniProfilSendiri ? "/api/profil/saya" : `/api/profil/${params.userId}`;
-    const response = await fetch(endpoint);
-    const data = await response.json();
-    if (response.ok) setProfil(data.data);
-    setSedangMuat(false);
-  }, [iniProfilSendiri, params.userId]);
-
   useEffect(() => {
-    muatProfil();
-  }, [muatProfil]);
+    let aktif = true;
+
+    async function muatProfil() {
+      const endpoint = iniProfilSendiri ? "/api/profil/saya" : `/api/profil/${params.userId}`;
+      try {
+        const response = await fetch(endpoint, { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.pesan ?? "Gagal memuat profil.");
+        if (aktif) {
+          setProfil(data.data);
+          setPesanError(null);
+        }
+      } catch (reason) {
+        console.error("Gagal memuat profil:", reason);
+        if (aktif) {
+          setPesanError(reason instanceof Error ? reason.message : "Gagal memuat profil.");
+        }
+      } finally {
+        if (aktif) setSedangMuat(false);
+      }
+    }
+
+    void muatProfil();
+    return () => {
+      aktif = false;
+    };
+  }, [iniProfilSendiri, params.userId]);
 
   function bukaModalEdit() {
     if (!profil) return;
@@ -92,17 +110,7 @@ export default function HalamanProfil() {
       let urlFotoAkhir = fotoUrl;
 
       if (fileFoto) {
-        const formData = new FormData();
-        formData.append("file", fileFoto);
-        formData.append("folder", "foto-profil");
-        const responseUpload = await fetch("/api/upload", { method: "POST", body: formData });
-        const dataUpload = await responseUpload.json();
-        if (!responseUpload.ok) {
-          setPesanError(dataUpload.pesan ?? "Gagal upload foto");
-          setSedangSimpan(false);
-          return;
-        }
-        urlFotoAkhir = dataUpload.url;
+        urlFotoAkhir = await unggahFileDariBrowser(fileFoto, "foto-profil");
       }
 
       const response = await fetch("/api/profil/saya", {
@@ -129,15 +137,15 @@ export default function HalamanProfil() {
   }
 
   if (sedangMuat) return <p style={estilo.pesanMuat}>Memuat profil...</p>;
-  if (!profil) return <p style={estilo.pesanMuat}>Profil tidak ditemukan.</p>;
+  if (!profil) {
+    return <p style={estilo.pesanMuat}>{pesanError ?? "Profil tidak ditemukan."}</p>;
+  }
 
   const inisial = profil.nama.charAt(0).toUpperCase();
 
   return (
     <div className={styles.page} style={estilo.halaman}>
-      <button onClick={() => router.back()} style={estilo.tombolKembali}>
-        ← Kembali
-      </button>
+      <BackAction as="button" onClick={() => router.back()}>Kembali</BackAction>
 
       <div className={styles.profileCard} style={estilo.kartuUtama}>
         <div className={styles.banner} style={estilo.banner}>

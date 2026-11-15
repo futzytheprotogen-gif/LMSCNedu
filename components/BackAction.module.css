@@ -1,0 +1,38 @@
+.backAction {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 16px;
+  padding: 0 14px;
+  border: 1px solid var(--cn-line);
+  border-radius: 9px;
+  color: var(--cn-primary-dark);
+  background: var(--cn-surface);
+  box-shadow: 0 4px 12px rgb(var(--cn-navy-rgb) / 4%);
+  font: 700 12px/1.3 "IBM Plex Sans", sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  animation: enter 340ms ease both;
+  transition: color 170ms ease, background-color 170ms ease, border-color 170ms ease, box-shadow 170ms ease, transform 170ms ease;
+}
+
+.backAction:hover {
+  transform: translateY(-2px);
+  border-color: var(--cn-primary);
+  color: var(--cn-primary-dark);
+  background: var(--cn-tint);
+  box-shadow: 0 8px 18px rgb(var(--cn-primary-rgb) / 12%);
+}
+
+.backAction:active { transform: translateY(0) scale(.98); }
+.backAction:focus-visible { outline: 3px solid rgb(var(--cn-primary-rgb) / 25%); outline-offset: 2px; }
+.backAction:disabled { opacity: .6; cursor: not-allowed; }
+.icon { display: grid; width: 23px; height: 23px; flex: 0 0 auto; place-items: center; border-radius: 6px; color: var(--cn-primary); background: var(--cn-tint); transition: transform 170ms ease; }
+.backAction:hover .icon { transform: translateX(-2px); }
+
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .backAction, .backAction .icon { animation-duration: .01ms; animation-iteration-count: 1; transition-duration: .01ms; }
+}

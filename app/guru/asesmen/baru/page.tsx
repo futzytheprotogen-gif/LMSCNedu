@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import BackAction from "@/components/BackAction";
 
 interface MapelRingkas {
   id: string;
@@ -89,13 +90,7 @@ function FormulirBuatAsesmen() {
     <div style={estilo.halaman}>
       <div style={estilo.container}>
         {/* Navigasi Kembali */}
-        <button
-          type="button"
-          onClick={() => router.back()}
-          style={estilo.tombolKembali}
-        >
-          ← Kembali ke Kelas
-        </button>
+        <BackAction as="button" onClick={() => router.back()}>Kembali ke Kelas</BackAction>
 
         {/* Banner Card Identitas CN Edu */}
         <div style={estilo.bannerHeader}>
@@ -241,7 +236,7 @@ function FormulirBuatAsesmen() {
 
 const estilo = {
   halaman: {
-    backgroundColor: "var(--cn-tint)",
+    backgroundColor: "transparent",
     minHeight: "100vh",
     padding: "32px 20px",
     fontFamily: "inherit",

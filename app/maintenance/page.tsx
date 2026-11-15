@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { connection } from "next/server";
 import { db } from "@/lib/db";
 import BrandMark from "@/components/BrandMark";
+import BackAction from "@/components/BackAction";
 import styles from "./page.module.css";
 
 export default async function MaintenancePage() {
@@ -19,7 +19,7 @@ export default async function MaintenancePage() {
         <h1>Akses layanan sedang dibatasi.</h1>
         <p>{pengaturan?.value || "CN Edu sedang dalam pemeliharaan. Silakan kembali beberapa saat lagi."}</p>
         <div className={styles.note}><span>DATA AMAN</span><p>Akun, kelas, nilai, dan data pembelajaran tetap tersimpan. Akses akan dibuka kembali oleh administrator.</p></div>
-        <Link href="/login">Kembali ke halaman masuk <b>↗</b></Link>
+        <BackAction as="link" href="/login">Kembali ke halaman masuk</BackAction>
       </section>
     </main>
   );

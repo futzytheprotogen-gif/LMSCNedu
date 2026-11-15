@@ -1,20 +1,20 @@
 .scene {
-  --scene-canvas: #eaf2ff;
-  --scene-orbit: #bfdbfe;
-  --scene-orbit-soft: #dbeafe;
-  --scene-window: #c7e4f7;
+  --scene-canvas: var(--cn-tint);
+  --scene-orbit: var(--cn-primary);
+  --scene-orbit-soft: var(--cn-primary);
+  --scene-window: color-mix(in srgb, var(--cn-primary) 20%, var(--cn-surface));
   --scene-hills: #a9c9a8;
   --scene-trees: #60896c;
   --scene-plant: #4f8c65;
   --scene-desk: #c47b46;
   --scene-desk-dark: #8a542f;
-  --scene-laptop: #334155;
-  --scene-screen: #fff;
-  --scene-panel: #f8fafc;
-  --scene-panel-line: #e2e8f0;
-  --scene-card: #fff;
-  --scene-card-tint: #eff6ff;
-  --scene-card-accent: #2563eb;
+  --scene-laptop: var(--cn-primary-dark);
+  --scene-screen: var(--cn-surface);
+  --scene-panel: var(--cn-tint);
+  --scene-panel-line: var(--cn-line);
+  --scene-card: var(--cn-surface);
+  --scene-card-tint: var(--cn-tint);
+  --scene-card-accent: var(--cn-primary);
   --scene-sun: #fbbf24;
   --scene-moon: #e2e8f0;
   --scene-stars: #fff1a8;
@@ -30,22 +30,22 @@
 }
 
 :global(:root[data-theme="dark"]) .scene {
-  --scene-canvas: #111c2e;
-  --scene-orbit: #213653;
-  --scene-orbit-soft: #192a40;
-  --scene-window: #172b43;
+  --scene-canvas: var(--cn-bg);
+  --scene-orbit: var(--cn-primary);
+  --scene-orbit-soft: var(--cn-primary);
+  --scene-window: color-mix(in srgb, var(--cn-primary) 20%, var(--cn-surface));
   --scene-hills: #20384b;
   --scene-trees: #183b43;
   --scene-plant: #286057;
   --scene-desk: #68462f;
   --scene-desk-dark: #422f29;
-  --scene-laptop: #26374d;
-  --scene-screen: #101b2b;
-  --scene-panel: #172337;
-  --scene-panel-line: #2a3a50;
-  --scene-card: #1c2b41;
-  --scene-card-tint: #203a59;
-  --scene-card-accent: #60a5fa;
+  --scene-laptop: var(--cn-primary-dark);
+  --scene-screen: var(--cn-surface);
+  --scene-panel: var(--cn-tint);
+  --scene-panel-line: var(--cn-line);
+  --scene-card: var(--cn-surface);
+  --scene-card-tint: var(--cn-tint);
+  --scene-card-accent: var(--cn-primary);
   --scene-stars: #c7ddff;
   --scene-glow: #243b56;
 }

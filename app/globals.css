@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@import "@fontsource-variable/ibm-plex-sans";
+@import "@fontsource/ibm-plex-serif/400.css";
+@import "@fontsource/ibm-plex-serif/600.css";
+@import "@fontsource/ibm-plex-serif/700.css";
+
 :root {
   color-scheme: light;
   --cn-primary: #2563eb;
@@ -103,6 +108,96 @@
   --ring: var(--cn-primary);
 }
 
+:root[data-palette="midnight-violet"] {
+  color-scheme: light;
+  --midnight-violet-50: #f7f4fb;
+  --midnight-violet-100: #eeeaf6;
+  --midnight-violet-200: #ded6ec;
+  --midnight-violet-300: #c7b9df;
+  --midnight-violet-400: #ac98cf;
+  --midnight-violet-500: #9f86c0;
+  --midnight-violet-600: #7d6eaa;
+  --midnight-violet-700: #5e548e;
+  --midnight-violet-800: #3f3568;
+  --midnight-violet-900: #231942;
+  --midnight-violet-950: #17102c;
+  --cn-primary: var(--midnight-violet-700);
+  --cn-primary-dark: var(--midnight-violet-900);
+  --cn-navy: var(--midnight-violet-900);
+  --cn-coral: var(--cn-primary);
+  --cn-coral-dark: var(--cn-primary-dark);
+  --cn-cyan: var(--midnight-violet-600);
+  --cn-bg: #f8f6fb;
+  --cn-surface: #fff;
+  --cn-tint: var(--midnight-violet-50);
+  --cn-coral-tint: var(--midnight-violet-100);
+  --cn-text: #2b2440;
+  --cn-muted: #716a82;
+  --cn-line: #e4deed;
+  --cn-primary-rgb: 94, 84, 142;
+  --cn-coral-rgb: 94, 84, 142;
+  --cn-cyan-rgb: 125, 110, 170;
+  --cn-navy-rgb: 35, 25, 66;
+  --cn-surface-rgb: 255, 255, 255;
+  --cn-muted-rgb: 113, 106, 130;
+  --background: var(--cn-bg);
+  --foreground: var(--cn-text);
+  --card: var(--cn-surface);
+  --card-foreground: var(--cn-text);
+  --popover: var(--cn-surface);
+  --popover-foreground: var(--cn-text);
+  --primary: var(--cn-primary);
+  --primary-foreground: #fff;
+  --secondary: var(--midnight-violet-100);
+  --secondary-foreground: var(--midnight-violet-900);
+  --muted: var(--midnight-violet-100);
+  --muted-foreground: var(--cn-muted);
+  --accent: var(--midnight-violet-100);
+  --accent-foreground: var(--midnight-violet-800);
+  --border: var(--cn-line);
+  --input: var(--cn-line);
+  --ring: var(--cn-primary);
+  --radius: 0.875rem;
+}
+
+:root[data-theme="dark"][data-palette="midnight-violet"] {
+  color-scheme: dark;
+  --cn-primary: #b6a2d8;
+  --cn-primary-dark: #d3c4ea;
+  --cn-navy: #eee9f6;
+  --cn-coral: var(--cn-primary);
+  --cn-coral-dark: var(--cn-primary-dark);
+  --cn-cyan: #b4a1d6;
+  --cn-bg: #15121c;
+  --cn-surface: #201b2b;
+  --cn-tint: #292337;
+  --cn-coral-tint: #302941;
+  --cn-text: #f0ecf6;
+  --cn-muted: #b8afc7;
+  --cn-line: #40384f;
+  --cn-primary-rgb: 182, 162, 216;
+  --cn-coral-rgb: 182, 162, 216;
+  --cn-cyan-rgb: 180, 161, 214;
+  --cn-navy-rgb: 0, 0, 0;
+  --cn-surface-rgb: 32, 27, 43;
+  --cn-muted-rgb: 184, 175, 199;
+  --background: var(--cn-bg);
+  --foreground: var(--cn-text);
+  --card: var(--cn-surface);
+  --card-foreground: var(--cn-text);
+  --popover: var(--cn-surface);
+  --popover-foreground: var(--cn-text);
+  --primary: var(--cn-primary);
+  --primary-foreground: #17102c;
+  --secondary: #302941;
+  --secondary-foreground: var(--cn-text);
+  --muted: #302941;
+  --muted-foreground: var(--cn-muted);
+  --accent: #393047;
+  --accent-foreground: #e4d8f4;
+  --destructive-foreground: #17102c;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -123,7 +218,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: "Segoe UI", Arial, sans-serif;
+  --font-sans: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --font-serif: "IBM Plex Serif", Georgia, serif;
   --font-mono: Consolas, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -227,6 +323,12 @@ main > * {
   font-weight: 600;
 }
 
+.cn-theme-settings {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .cn-theme-control select {
   width: auto;
   min-height: 34px;
@@ -237,6 +339,40 @@ main > * {
   background-color: var(--cn-surface);
   font-size: 12px;
   cursor: pointer;
+}
+
+.cn-palette-switch {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--cn-line);
+  border-radius: 9px;
+  color: var(--cn-text);
+  background: var(--cn-surface);
+  cursor: pointer;
+}
+
+.cn-palette-switch:hover {
+  border-color: var(--cn-primary);
+  background: var(--cn-tint);
+}
+
+.cn-palette-switch svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.cn-palette-switch:focus-visible {
+  outline: 3px solid rgb(var(--cn-primary-rgb) / 22%);
+  outline-offset: 2px;
 }
 
 .cn-theme-control select:focus-visible {
@@ -300,7 +436,7 @@ body {
 
 ::selection {
   color: #ffffff;
-  background: #1d4ed8;
+  background: var(--cn-primary);
 }
 
 h1,
@@ -309,7 +445,11 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Sora", "Segoe UI", Arial, sans-serif;
+  font-family: "IBM Plex Serif", Georgia, serif;
+}
+
+:root[data-palette="midnight-violet"] body {
+  background-image: radial-gradient(ellipse at 12% 0%, rgb(var(--cn-primary-rgb) / 7%), transparent 34%);
 }
 
 button,
@@ -331,6 +471,14 @@ button:not(:disabled) {
   cursor: pointer;
 }
 
+button:not(:disabled):hover {
+  filter: brightness(1.04);
+}
+
+button:not(:disabled):active {
+  scale: 0.98;
+}
+
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -343,6 +491,12 @@ textarea:focus-visible {
 button[data-attachment-mode]:focus-visible {
   outline: none;
   box-shadow: 0 0 0 4px rgb(var(--cn-primary-rgb) / 15%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):active {
+    scale: 1;
+  }
 }
 
 img,
@@ -408,7 +562,7 @@ pre {
 
 .cn-role-brand {
   color: var(--cn-navy) !important;
-  font-family: "Sora", sans-serif !important;
+  font-family: "IBM Plex Serif", Georgia, serif !important;
 }
 
 .cn-role-hamburger {
@@ -421,15 +575,58 @@ pre {
 }
 
 .cn-role-sidebar a {
+  position: relative;
+  min-height: 44px;
+  padding-left: 18px !important;
   color: var(--cn-muted);
   border-radius: 8px;
   transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.cn-role-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 5px !important;
+  padding: 18px 12px 12px !important;
+}
+
+.cn-role-nav-label {
+  margin: 0 10px 6px;
+  color: var(--cn-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.cn-role-sidebar nav a::before {
+  position: absolute;
+  top: 50%;
+  left: 7px;
+  width: 3px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--cn-primary);
+  content: "";
+  opacity: 0;
+  transform: translateY(-50%) scaleY(0.5);
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .cn-role-sidebar nav a:hover {
   color: var(--cn-primary-dark) !important;
   background-color: var(--cn-tint) !important;
   transform: translateX(2px);
+}
+
+.cn-role-sidebar nav a[aria-current="page"] {
+  color: var(--cn-primary) !important;
+  background-color: color-mix(in srgb, var(--cn-primary) 9%, var(--cn-surface)) !important;
+  font-weight: 700 !important;
+}
+
+.cn-role-sidebar nav a[aria-current="page"]::before {
+  opacity: 1;
+  transform: translateY(-50%) scaleY(1);
 }
 
 .cn-role-sidebar-footer {
@@ -439,8 +636,12 @@ pre {
 }
 
 .cn-role-logout-action {
+  display: flex;
   width: 100%;
   min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
   padding: 0 12px;
   border: 1px solid var(--cn-danger);
   border-radius: 8px;
@@ -458,6 +659,37 @@ pre {
 
 .cn-role-main {
   min-width: 0;
+  background-color: var(--cn-tint);
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgba(var(--cn-primary-rgb), 0.07), transparent 38%),
+    linear-gradient(rgba(var(--cn-primary-rgb), 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--cn-primary-rgb), 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+:root[data-theme="dark"] .cn-role-main {
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgba(var(--cn-primary-rgb), 0.1), transparent 38%),
+    linear-gradient(rgba(var(--cn-primary-rgb), 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--cn-primary-rgb), 0.03) 1px, transparent 1px);
+}
+
+@media (max-width: 700px) {
+  .cn-theme-settings {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .cn-theme-control {
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .cn-theme-control select {
+    min-height: 32px;
+    padding-left: 7px;
+    font-size: 11px;
+  }
 }
 
 .cn-role-sidebar-header {

@@ -1,6 +1,7 @@
 import { put, del } from "@vercel/blob";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { UKURAN_MAKSIMAL_UPLOAD_BYTES } from "./upload-config";
 
 // ------------------------------------------------------------
 // Dipakai buat semua fitur yang butuh upload file: lampiran Tugas
@@ -13,11 +14,9 @@ import path from "node:path";
 // persis di waktu yang hampir bersamaan.
 // ------------------------------------------------------------
 
-const UKURAN_MAKSIMAL_BYTES = 10 * 1024 * 1024; // 10 MB
-
 export class FileTerlaluBesarError extends Error {
   constructor() {
-    super(`Ukuran file melebihi batas maksimal ${UKURAN_MAKSIMAL_BYTES / 1024 / 1024}MB`);
+    super(`Ukuran file melebihi batas maksimal ${UKURAN_MAKSIMAL_UPLOAD_BYTES / 1024 / 1024}MB`);
     this.name = "FileTerlaluBesarError";
   }
 }
@@ -35,7 +34,7 @@ interface OpsiUnggah {
 }
 
 export async function unggahFile(file: File, opsi: OpsiUnggah): Promise<string> {
-  if (file.size > UKURAN_MAKSIMAL_BYTES) {
+  if (file.size > UKURAN_MAKSIMAL_UPLOAD_BYTES) {
     throw new FileTerlaluBesarError();
   }
 

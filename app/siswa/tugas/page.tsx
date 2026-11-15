@@ -18,10 +18,19 @@ interface TugasSiswa {
   deskripsi: string;
   tipeLampiran: "PDF" | "LINK" | null;
   lampiran: string | null;
+  deadlineAt: string | null;
+  susulanAktif: boolean;
+  deadlineSusulan: string | null;
+  statusDeadline: "TANPA_DEADLINE" | "TERBUKA" | "SUSULAN" | "TUTUP";
   guru: { id: string; nama: string };
   kelasTujuan: KelasRingkas[];
   dikirimAt: string;
-  submission: { fileUrl: string; waktuKumpul: string } | null;
+  submission: {
+    fileUrl: string;
+    waktuKumpul: string;
+    nilai: number | null;
+    catatanNilai: string | null;
+  } | null;
   status: "SUDAH" | "HARI_INI" | "BELUM";
 }
 
@@ -224,6 +233,22 @@ function KartuTugas({ t, onBuka }: { t: TugasSiswa; onBuka: () => void }) {
               year: "numeric",
             })}
           </span>
+          {t.deadlineAt && (
+            <span>
+              ⏳ Deadline{" "}
+              {new Date(t.deadlineAt).toLocaleString("id-ID", {
+                day: "numeric",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              {t.statusDeadline === "TUTUP"
+                ? " · Berakhir"
+                : t.statusDeadline === "SUSULAN"
+                  ? " · Susulan"
+                  : ""}
+            </span>
+          )}
           {t.lampiran && <span>{t.tipeLampiran === "PDF" ? "📄 PDF" : "🔗 Link"}</span>}
         </div>
 
@@ -242,7 +267,7 @@ function KartuTugas({ t, onBuka }: { t: TugasSiswa; onBuka: () => void }) {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "linear-gradient(180deg, var(--cn-tint) 0%, var(--cn-surface) 42%, var(--cn-tint) 100%)",
+    background: "transparent",
     color: "var(--cn-coral-dark)",
   },
   container: {

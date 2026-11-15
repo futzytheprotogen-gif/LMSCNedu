@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { hitungAktivitasBaru, tandaiSudahDilihat, type TipeAktivitasSiswa } from "@/lib/notifikasiSiswa";
+import BackAction from "@/components/BackAction";
 import layout from "./page.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
@@ -90,9 +91,7 @@ export default function DetailKelasSiswa() {
     return (
       <div style={styles.centerBox}>
         <p style={{ color: "var(--cn-danger)" }}>⚠️ {error ?? "Kelas tidak ditemukan."}</p>
-        <button type="button" onClick={() => router.push("/siswa/kelas")} style={styles.backButton}>
-          ← Kembali ke Kelas
-        </button>
+        <BackAction as="button" onClick={() => router.push("/siswa/kelas")}>Kembali ke Kelas</BackAction>
       </div>
     );
   }
@@ -100,9 +99,7 @@ export default function DetailKelasSiswa() {
   return (
     <div style={styles.page}>
       <main className={layout.container} style={styles.container}>
-        <button type="button" onClick={() => router.push("/siswa/kelas")} style={styles.backLink}>
-          ← Kembali ke Kelas
-        </button>
+        <BackAction as="button" onClick={() => router.push("/siswa/kelas")}>Kembali ke Kelas</BackAction>
 
         <header className={layout.classHero} style={styles.classHeader}>
           <h1 style={styles.title}>{kelas.judul}</h1>
@@ -324,7 +321,7 @@ const LABEL_TIPE: Record<ItemFeed["tipe"], string> = {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "linear-gradient(180deg, var(--cn-tint) 0%, var(--cn-surface) 42%, var(--cn-tint) 100%)",
+    background: "transparent",
     color: "var(--cn-coral-dark)",
   },
   container: { width: "100%", maxWidth: "760px", margin: "0 auto", padding: "34px 24px 60px" },

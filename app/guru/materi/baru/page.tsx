@@ -3,6 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { unggahFileDariBrowser } from "@/lib/upload-client";
+import BackAction from "@/components/BackAction";
 
 export default function HalamanUploadMateri() {
   return (
@@ -52,22 +54,8 @@ function FormUploadMateri() {
     try {
       if (tipe === "PDF" && fileTerpilih) {
         setSedangUpload(true);
-        const formData = new FormData();
-        formData.append("file", fileTerpilih);
-        formData.append("folder", "materi");
-        const responseUpload = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const dataUpload = await responseUpload.json();
+        urlAkhir = await unggahFileDariBrowser(fileTerpilih, "materi");
         setSedangUpload(false);
-
-        if (!responseUpload.ok) {
-          setPesanError(dataUpload.pesan ?? "Gagal upload file");
-          setSedangSimpan(false);
-          return;
-        }
-        urlAkhir = dataUpload.url;
       }
 
       const response = await fetch("/api/materi", {
@@ -101,13 +89,7 @@ function FormUploadMateri() {
       <div style={estilo.wrapper}>
         {/* Navigation / Header */}
         <div style={estilo.header}>
-          <button
-            type="button"
-            onClick={() => router.back()}
-            style={estilo.btnKembali}
-          >
-            ← Kembali
-          </button>
+          <BackAction as="button" onClick={() => router.back()}>Kembali</BackAction>
           <h1 style={estilo.judulHalaman}>Upload Materi</h1>
           <p style={estilo.subJudul}>
             Tambahkan tautan atau dokumen PDF sebagai materi pembelajaran siswa.
@@ -296,7 +278,7 @@ const COLOR = {
 const estilo = {
   halaman: {
     minHeight: "100vh",
-    backgroundColor: COLOR.bg,
+    backgroundColor: "transparent",
     padding: "40px 16px",
     display: "flex",
     justifyContent: "center",

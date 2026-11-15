@@ -1,7 +1,7 @@
 .section { width: min(1120px, 100%); margin: 0 auto; padding: 38px 24px 86px; color: var(--cn-text); }
 .heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
 .eyebrow { color: var(--cn-primary); font-size: 10px; font-weight: 800; letter-spacing: 1px; }
-.heading h2 { margin: 7px 0 0; color: var(--cn-text); font-family: "Sora", sans-serif; font-size: 26px; font-weight: 700; }
+.heading h2 { margin: 7px 0 0; color: var(--cn-text); font-family: "IBM Plex Serif", Georgia, serif; font-size: 26px; font-weight: 700; }
 .heading p { max-width: 270px; margin: 0 0 2px; color: var(--cn-muted); font-size: 12px; line-height: 1.6; }
 .carousel { overflow: hidden; border: 1px solid var(--cn-line); border-radius: 12px; background: var(--cn-surface); box-shadow: 0 12px 36px rgb(var(--cn-navy-rgb) / 6%); outline: none; }
 .carousel:focus-visible { outline: 3px solid rgb(var(--cn-primary-rgb) / 24%); outline-offset: 4px; }
@@ -25,7 +25,7 @@
 .visualContent { min-width: 0; padding: 17px 15px 10px; }
 .visualTitle { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
 .visualTitle > div > span { color: var(--cn-primary); font-size: 7px; font-weight: 800; letter-spacing: .7px; }
-.visualTitle h3 { overflow: hidden; margin: 4px 0 0; color: var(--cn-text); font-family: "Sora", sans-serif; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.visualTitle h3 { overflow: hidden; margin: 4px 0 0; color: var(--cn-text); font-family: "IBM Plex Serif", Georgia, serif; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .visualDate { color: var(--cn-muted); font-size: 7px; white-space: nowrap; }
 .visualRows { display: grid; gap: 6px; }
 .visualRow { display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--cn-line); border-radius: 6px; background: var(--cn-surface); }
@@ -39,9 +39,9 @@
 .visualFooter { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 11px; color: var(--cn-muted); font-size: 7px; }
 .visualFooter > span:first-child { display: flex; align-items: center; gap: 5px; color: var(--cn-muted); }
 .copy { display: flex; flex-direction: column; justify-content: center; padding: 28px 24px 28px 12px; }
-.count { color: var(--cn-primary); font-family: "Sora", sans-serif; font-size: 11px; font-weight: 700; }
+.count { color: var(--cn-primary); font-family: "IBM Plex Serif", Georgia, serif; font-size: 11px; font-weight: 700; }
 .count i { padding: 0 4px; color: var(--cn-muted); font-style: normal; }
-.copy h3 { margin: 13px 0 9px; color: var(--cn-text); font-family: "Sora", sans-serif; font-size: 21px; line-height: 1.3; }
+.copy h3 { margin: 13px 0 9px; color: var(--cn-text); font-family: "IBM Plex Serif", Georgia, serif; font-size: 21px; line-height: 1.3; }
 .copy p { margin: 0; color: var(--cn-muted); font-size: 12px; line-height: 1.7; }
 .controls { display: flex; align-items: center; gap: 7px; margin-top: 22px; }
 .arrowButton { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--cn-line); border-radius: 7px; color: var(--cn-text); background: var(--cn-surface); font-size: 16px; transition: color 150ms ease, background 150ms ease, border-color 150ms ease; }

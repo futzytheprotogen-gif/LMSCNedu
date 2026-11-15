@@ -103,10 +103,23 @@ async function main() {
   // 1. Rombel Akademik
   const daftarRombel = buildDaftarRombel();
   for (const rombel of daftarRombel) {
+    const jurusan = rombel.jurusan
+      ? await prisma.jurusanAkademik.upsert({
+          where: { nama: rombel.jurusan },
+          update: {},
+          create: { nama: rombel.jurusan },
+        })
+      : null;
     await prisma.rombelAkademik.upsert({
       where: { label: rombel.label },
-      update: {},
-      create: rombel,
+      update: jurusan ? { jurusanId: jurusan.id } : {},
+      create: {
+        label: rombel.label,
+        jenjang: rombel.jenjang,
+        angkatan: rombel.angkatan,
+        jurusanId: jurusan?.id,
+        variasi: rombel.variasi,
+      },
     });
   }
   console.log(`Rombel akademik: ${daftarRombel.length} entri.`);

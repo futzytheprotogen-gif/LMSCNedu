@@ -2,8 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import BrandMark from "@/components/BrandMark";
+import BackAction from "@/components/BackAction";
 import styles from "./page.module.css";
 
 type TipeAkun = "ADMIN" | "GURU" | "SISWA";
@@ -183,9 +183,7 @@ export default function HalamanLogin() {
         {/* RIGHT SIDE */}
         <section className={styles.panelKanan} style={estilo.panelKanan}>
           <div style={estilo.formContainer}>
-            <Link className={styles.backLink} href="/">
-              <span aria-hidden="true">←</span> Kembali ke Beranda
-            </Link>
+            <BackAction as="link" href="/">Kembali ke Beranda</BackAction>
             <div style={estilo.formHeader}>
               <span style={estilo.smallTitle}>
                 WELCOME BACK

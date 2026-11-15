@@ -9,6 +9,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import { useAppNotice } from "@/components/AppNoticeProvider";
+import BackAction from "@/components/BackAction";
 import styles from "./page.module.css";
 
 /* ==========================================================================
@@ -881,19 +882,7 @@ export default function HalamanDetailKelas() {
             dihapus atau tidak tersedia.
           </p>
 
-          <button
-            type="button"
-            onClick={() =>
-              router.push(
-                "/admin/kelas"
-              )
-            }
-            className={
-              styles.primaryButton
-            }
-          >
-            ← Kembali ke Daftar Kelas
-          </button>
+          <BackAction as="button" onClick={() => router.push("/admin/kelas")}>Kembali ke Daftar Kelas</BackAction>
         </div>
       </div>
     );
@@ -912,18 +901,7 @@ export default function HalamanDetailKelas() {
         ================================================================= */}
 
         <div className={styles.topBar}>
-          <button
-            type="button"
-            onClick={() =>
-              router.push(
-                "/admin/kelas"
-              )
-            }
-            className={styles.backButton}
-          >
-            <span>←</span>
-            Kembali ke Daftar Kelas
-          </button>
+          <BackAction as="button" onClick={() => router.push("/admin/kelas")}>Kembali ke Daftar Kelas</BackAction>
 
           <div
             className={

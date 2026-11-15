@@ -1,6 +1,6 @@
 .page {
   min-height: calc(100vh - 56px);
-  background: var(--cn-tint);
+  background: transparent;
   color: var(--cn-navy);
 }
 
@@ -309,6 +309,68 @@
 
 .profileLink span {
   color: var(--cn-primary-dark);
+}
+
+.deadlineList {
+  display: grid;
+}
+
+.deadlineItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--cn-coral-tint);
+  color: inherit;
+  text-decoration: none;
+}
+
+.deadlineMark,
+.deadlineExpired {
+  display: grid;
+  flex: 0 0 30px;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--cn-primary-dark);
+  background: var(--cn-tint);
+  font-size: 15px;
+}
+
+.deadlineExpired {
+  color: var(--cn-danger);
+  background: var(--cn-danger-tint);
+}
+
+.deadlineItem > span:nth-child(2) {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+}
+
+.deadlineItem strong {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deadlineItem small,
+.deadlineItem time {
+  color: var(--cn-muted);
+  font-size: 9px;
+}
+
+.deadlineEmpty {
+  padding: 12px;
+  border: 1px dashed var(--cn-line);
+  border-radius: 8px;
+  color: var(--cn-muted);
+  background: var(--cn-bg);
+  font-size: 10px;
+  line-height: 1.5;
 }
 
 .empty,

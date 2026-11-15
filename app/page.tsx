@@ -5,6 +5,7 @@ import LandingFoxScene from "@/components/LandingFoxScene";
 import LandingDashboardPreview from "@/components/LandingDashboardPreview";
 import ThemeSelector from "@/components/ThemeSelector";
 import BrandMark from "@/components/BrandMark";
+import UiIcon from "@/components/UiIcon";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -97,10 +98,10 @@ export default function HalamanBeranda() {
 
         <div className={styles.navMobileMenu}>
           <div className={styles.mobileTheme}><ThemeSelector /></div>
-          <a href="#fitur">Fitur</a>
-          <a href="#role">Role</a>
-          <a href="#kenapa">Kenapa CN Edu</a>
-          <Link href="/login">Masuk</Link>
+          <a href="#fitur"><UiIcon className={styles.mobileNavIcon} name="book" />Fitur</a>
+          <a href="#role"><UiIcon className={styles.mobileNavIcon} name="students" />Role</a>
+          <a href="#kenapa"><UiIcon className={styles.mobileNavIcon} name="info" />Kenapa CN Edu</a>
+          <Link href="/login"><UiIcon className={styles.mobileNavIcon} name="user-plus" />Masuk</Link>
         </div>
       </header>
 

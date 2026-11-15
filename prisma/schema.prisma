@@ -160,16 +160,29 @@ model Siswa {
 // Ini BUKAN "Kelas" ala Google Classroom — itu model Kelas di bawah.
 // ------------------------------------------------------------
 
+model JurusanAkademik {
+  id        String   @id @default(cuid())
+  nama      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rombel RombelAkademik[]
+
+  @@map("jurusan_akademik")
+}
+
 model RombelAkademik {
   id       String  @id @default(cuid())
   label    String  @unique // contoh: "12 PPLG 2", "10 TJKT PLUS", "SMP", "SMA"
   jenjang  String // "SMP" | "SMA" | "SMK"
   angkatan Int? // 10 | 11 | 12, null untuk SMP/SMA generik
-  jurusan  String? // DKV | TJKT | PPLG | PEMASARAN | MPLB, null untuk SMP/SMA
+  jurusanId String?
   variasi  String? // "PLUS" | "1" | "2" dst, null untuk SMP/SMA
 
-  siswa Siswa[]
+  jurusan JurusanAkademik? @relation(fields: [jurusanId], references: [id], onDelete: Restrict)
+  siswa   Siswa[]
 
+  @@index([jurusanId])
   @@map("rombel_akademik")
 }
 
@@ -422,6 +435,9 @@ model Tugas {
   deskripsi    String             @db.Text
   tipeLampiran TipeLampiranTugas?
   lampiran     String?
+  deadlineAt   DateTime?
+  susulanAktif Boolean            @default(false)
+  deadlineSusulan DateTime?
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 
@@ -453,6 +469,8 @@ model SubmissionTugas {
   siswaId     String
   fileUrl     String
   waktuKumpul DateTime @default(now())
+  nilai       Float?
+  catatanNilai String? @db.Text
 
   tugas Tugas @relation(fields: [tugasId], references: [id], onDelete: Cascade)
   siswa Siswa @relation(fields: [siswaId], references: [id], onDelete: Cascade)

@@ -229,7 +229,7 @@
   border-color: var(--cn-primary);
 
   box-shadow:
-    0 0 0 3px rgba(40, 112, 232, 0.09);
+    0 0 0 3px rgb(var(--cn-primary-rgb) / 9%);
 }
 
 .inputWrapper svg {
@@ -304,7 +304,7 @@
   border-color: var(--cn-primary);
 
   box-shadow:
-    0 0 0 3px rgba(40, 112, 232, 0.09);
+    0 0 0 3px rgb(var(--cn-primary-rgb) / 9%);
 }
 
 .formGroup textarea::placeholder {
@@ -475,7 +475,7 @@
   background: var(--cn-primary);
   color: var(--cn-surface);
 
-  box-shadow: 0 4px 12px rgba(40, 112, 232, 0.16);
+  box-shadow: 0 4px 12px rgb(var(--cn-primary-rgb) / 16%);
 }
 
 .submitButton:hover:not(:disabled) {
@@ -483,7 +483,7 @@
 
   transform: translateY(-1px);
 
-  box-shadow: 0 7px 16px rgba(40, 112, 232, 0.22);
+  box-shadow: 0 7px 16px rgb(var(--cn-primary-rgb) / 22%);
 }
 
 .submitButton:disabled {

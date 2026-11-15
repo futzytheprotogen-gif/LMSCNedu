@@ -12,18 +12,7 @@
   --border: var(--cn-line);
 
   min-height: 100vh;
-  background:
-    radial-gradient(
-      circle at 90% 0%,
-      rgba(var(--cn-primary-rgb), 0.07),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at 0% 35%,
-      rgba(var(--cn-cyan-rgb), 0.07),
-      transparent 25%
-    ),
-    var(--bg);
+  background: transparent;
 
   color: var(--text);
   padding: 30px;

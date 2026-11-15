@@ -818,7 +818,7 @@ function formatTanggal(tanggal: string) {
 const estilo = {
   halaman: {
     minHeight: "100vh",
-    backgroundColor: WARNA.background,
+    backgroundColor: "transparent",
     padding: "28px",
     boxSizing: "border-box" as const,
   },
@@ -1021,7 +1021,7 @@ const estilo = {
     flexWrap: "wrap" as const,
     padding: "2px",
     borderRadius: "10px",
-    backgroundColor: "rgba(35, 88, 167, 0.04)",
+    backgroundColor: "rgb(var(--cn-primary-rgb) / 4%)",
   },
 
   filterIndicator: {
@@ -1031,7 +1031,7 @@ const estilo = {
     height: "calc(100% - 4px)",
     borderRadius: "8px",
     backgroundColor: WARNA.primarySoft,
-    boxShadow: "0 4px 10px rgba(35, 88, 167, 0.08)",
+    boxShadow: "0 4px 10px rgb(var(--cn-primary-rgb) / 8%)",
     transition: "left 0.28s ease, width 0.28s ease, opacity 0.2s ease",
     zIndex: 1,
   },

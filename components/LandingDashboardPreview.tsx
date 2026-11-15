@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import BrandMark from "@/components/BrandMark";
+import UiIcon from "@/components/UiIcon";
 import styles from "./LandingDashboardPreview.module.css";
 
 const TAMPILAN_ROLE = [
@@ -10,7 +11,12 @@ const TAMPILAN_ROLE = [
     ikon: "A",
     judul: "Ringkasan sekolah",
     sapaan: "Selamat datang, Admin",
-    navigasi: ["Ringkasan", "Kelas", "Akun", "Laporan"],
+    navigasi: [
+      { label: "Ringkasan", icon: "chart" },
+      { label: "Kelas", icon: "classroom" },
+      { label: "Akun", icon: "user-plus" },
+      { label: "Laporan", icon: "info" },
+    ],
     statistik: [
       { label: "Kelas aktif", nilai: "24", keterangan: "+2 bulan ini" },
       { label: "Akun terdaftar", nilai: "384", keterangan: "Guru dan siswa" },
@@ -23,7 +29,11 @@ const TAMPILAN_ROLE = [
     ikon: "K",
     judul: "Pemantauan sekolah",
     sapaan: "Seluruh aktivitas, satu pandangan",
-    navigasi: ["Kelas", "Siswa", "Guru"],
+    navigasi: [
+      { label: "Kelas", icon: "classroom" },
+      { label: "Siswa", icon: "students" },
+      { label: "Guru", icon: "teacher" },
+    ],
     statistik: [
       { label: "Kelas terpantau", nilai: "24", keterangan: "Semua jurusan" },
       { label: "Siswa aktif", nilai: "312", keterangan: "Tahun ajaran ini" },
@@ -36,7 +46,12 @@ const TAMPILAN_ROLE = [
     ikon: "U",
     judul: "Analisis capaian belajar",
     sapaan: "Pantau hasil belajar lintas kelas",
-    navigasi: ["Kelas", "Siswa", "Guru", "Rekap nilai"],
+    navigasi: [
+      { label: "Kelas", icon: "classroom" },
+      { label: "Siswa", icon: "students" },
+      { label: "Guru", icon: "teacher" },
+      { label: "Rekap nilai", icon: "chart" },
+    ],
     statistik: [
       { label: "Rata-rata sekolah", nilai: "82,4", keterangan: "Nilai asesmen" },
       { label: "Kelas terpantau", nilai: "24", keterangan: "Urut berdasarkan skor" },
@@ -49,7 +64,11 @@ const TAMPILAN_ROLE = [
     ikon: "G",
     judul: "Ruang mengajar",
     sapaan: "Kelas dan pekerjaan hari ini",
-    navigasi: ["Kelas", "Asesmen", "Tugas"],
+    navigasi: [
+      { label: "Kelas", icon: "classroom" },
+      { label: "Asesmen", icon: "clipboard" },
+      { label: "Tugas", icon: "checklist" },
+    ],
     statistik: [
       { label: "Kelas diampu", nilai: "04", keterangan: "Tahun ajaran ini" },
       { label: "Pengumpulan baru", nilai: "18", keterangan: "Perlu diperiksa" },
@@ -62,7 +81,12 @@ const TAMPILAN_ROLE = [
     ikon: "S",
     judul: "Ruang belajar",
     sapaan: "Semua yang perlu dikerjakan",
-    navigasi: ["Ringkasan", "Kelas", "Asesmen", "Tugas"],
+    navigasi: [
+      { label: "Ringkasan", icon: "chart" },
+      { label: "Kelas", icon: "classroom" },
+      { label: "Asesmen", icon: "clipboard" },
+      { label: "Tugas", icon: "checklist" },
+    ],
     statistik: [
       { label: "Kelas diikuti", nilai: "05", keterangan: "Semua mapel" },
       { label: "Tugas tertunda", nilai: "02", keterangan: "Cek tenggat" },
@@ -119,8 +143,8 @@ export default function LandingDashboardPreview() {
           <aside className={styles.appSidebar}>
             <div className={styles.sidebarLabel}>MENU UTAMA</div>
             {tampilan.navigasi.map((item, index) => (
-              <div className={`${styles.sidebarItem} ${index === 0 ? styles.sidebarItemActive : ""}`} key={item}>
-                <span>{["▦", "▤", "♙", "↗"][index % 4]}</span>{item}
+              <div className={`${styles.sidebarItem} ${index === 0 ? styles.sidebarItemActive : ""}`} key={item.label}>
+                <span><UiIcon name={item.icon} size={12} /></span>{item.label}
               </div>
             ))}
             <div className={styles.sidebarFoot}><span>{tampilan.ikon}</span> Portal {tampilan.role}</div>

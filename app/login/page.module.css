@@ -38,7 +38,7 @@
 }
 
 .halaman {
-  background: #f8fafc !important;
+  background: var(--cn-bg) !important;
 }
 
 .backgroundGlow1,
@@ -51,22 +51,22 @@
 .wrapper {
   max-width: 980px !important;
   min-height: 600px !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--cn-line) !important;
   border-radius: 12px !important;
   box-shadow: 0 20px 55px rgb(15 23 42 / 9%) !important;
 }
 
 .panelKiri {
-  background-color: #f1f6fd !important;
+  background-color: var(--cn-tint) !important;
   background-image:
-    linear-gradient(rgb(37 99 235 / 3%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(37 99 235 / 3%) 1px, transparent 1px) !important;
+    linear-gradient(rgb(var(--cn-primary-rgb) / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--cn-primary-rgb) / 3%) 1px, transparent 1px) !important;
   background-size: 28px 28px !important;
-  border-right: 1px solid #e2e8f0 !important;
+  border-right: 1px solid var(--cn-line) !important;
 }
 
 .panelKanan {
-  background: #fff !important;
+  background: var(--cn-surface) !important;
 }
 
 .tab {
@@ -85,20 +85,20 @@
 }
 
 .tab:hover:not(:disabled) {
-  color: #0f172a !important;
-  background: #f8fafc !important;
+  color: var(--cn-navy) !important;
+  background: var(--cn-tint) !important;
 }
 
 .tab:focus-visible,
 .passwordToggle:focus-visible,
 .linkLupa:focus-visible {
-  outline: 3px solid rgb(37 99 235 / 24%) !important;
+  outline: 3px solid rgb(var(--cn-primary-rgb) / 24%) !important;
   outline-offset: 2px !important;
 }
 
 .input:focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 11%);
+  border-color: var(--cn-primary) !important;
+  box-shadow: 0 0 0 3px rgb(var(--cn-primary-rgb) / 11%);
 }
 
 .tombol {
@@ -216,7 +216,7 @@
 }
 
 :global(:root[data-theme="dark"]) .panelKiri {
-  background-color: #0e1727 !important;
+  background-color: var(--cn-tint) !important;
   border-color: var(--cn-line) !important;
 }
 

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import { useAppNotice } from "@/components/AppNoticeProvider";
+import BackAction from "@/components/BackAction";
 import styles from "./page.module.css";
 
 interface SiswaApi {
@@ -18,6 +19,11 @@ interface SiswaApi {
   };
 }
 
+interface RombelApi {
+  id: string;
+  label: string;
+}
+
 interface KelompokRombel {
   rombelId: string;
   label: string;
@@ -28,6 +34,7 @@ export default function HalamanDaftarSiswa() {
   const konfirmasi = useAppConfirm();
   const beriNotifikasi = useAppNotice();
   const [kelompok, setKelompok] = useState<KelompokRombel[]>([]);
+  const [daftarRombel, setDaftarRombel] = useState<RombelApi[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
 
   const [rombelDibuka, setRombelDibuka] = useState<string | null>(null);
@@ -41,6 +48,7 @@ export default function HalamanDaftarSiswa() {
   const [formJenisKelamin, setFormJenisKelamin] = useState<
     "" | "L" | "P"
   >("");
+  const [formRombelId, setFormRombelId] = useState("");
 
   const [sedangProsesEdit, setSedangProsesEdit] = useState(false);
   const [pesanErrorEdit, setPesanErrorEdit] = useState<string | null>(null);
@@ -49,14 +57,21 @@ export default function HalamanDaftarSiswa() {
     try {
       setSedangMuat(true);
 
-      const response = await fetch("/api/akun?tipe=SISWA");
-      const data = await response.json();
+      const [response, responseRombel] = await Promise.all([
+        fetch("/api/akun?tipe=SISWA"),
+        fetch("/api/kelas-referensi"),
+      ]);
+      const [data, dataRombel] = await Promise.all([
+        response.json(),
+        responseRombel.json(),
+      ]);
 
       if (!response.ok) {
         throw new Error(data.pesan ?? "Gagal mengambil data siswa");
       }
 
       const daftarSiswa: SiswaApi[] = data.data ?? [];
+      if (responseRombel.ok) setDaftarRombel(dataRombel.data.rombel ?? []);
 
       const peta = new Map<string, KelompokRombel>();
 
@@ -128,6 +143,7 @@ export default function HalamanDaftarSiswa() {
     setFormNis(siswa.nis);
     setFormTanggalLahir(siswa.tanggalLahir.slice(0, 10));
     setFormJenisKelamin(siswa.jenisKelamin ?? "");
+    setFormRombelId(siswa.rombel.id);
 
     setPesanErrorEdit(null);
   }
@@ -163,6 +179,7 @@ export default function HalamanDaftarSiswa() {
             nis: formNis.trim(),
             tanggalLahir: formTanggalLahir,
             jenisKelamin: formJenisKelamin || undefined,
+            rombelId: formRombelId,
           }),
         }
       );
@@ -468,13 +485,7 @@ export default function HalamanDaftarSiswa() {
       {/* DETAIL ROMBEL */}
       {!sedangMuat && rombelAktif && (
         <section className={styles.contentSection}>
-          <button
-            className={styles.backButton}
-            onClick={kembaliKeRombel}
-          >
-            <span>←</span>
-            Kembali ke rombel
-          </button>
+          <BackAction as="button" onClick={kembaliKeRombel}>Kembali ke rombel</BackAction>
 
           <div className={styles.detailHeader}>
             <div>
@@ -747,6 +758,20 @@ export default function HalamanDaftarSiswa() {
                     }
                     className={styles.formInput}
                   />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Rombel akademik</label>
+                  <select
+                    className={styles.formInput}
+                    onChange={(event) => setFormRombelId(event.target.value)}
+                    value={formRombelId}
+                  >
+                    {daftarRombel.map((rombel) => (
+                      <option key={rombel.id} value={rombel.id}>{rombel.label}</option>
+                    ))}
+                  </select>
+                  <small className={styles.formHint}>Perubahan kelas dilakukan manual; keanggotaan kelas belajar tidak ikut berubah.</small>
                 </div>
 
                 <div className={styles.formGroup}>

@@ -1,6 +1,6 @@
 .page {
   min-height: calc(100vh - 56px);
-  background: var(--cn-tint);
+  background: transparent;
   color: var(--cn-navy);
 }
 

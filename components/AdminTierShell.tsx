@@ -5,8 +5,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import ThemePaletteButton from "@/components/ThemePaletteButton";
 import ThemeSwitchButton from "@/components/ThemeSwitchButton";
 import BrandMark from "@/components/BrandMark";
+import UiIcon, { type UiIconName } from "@/components/UiIcon";
 import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 import styles from "./AdminTierShell.module.css";
 
@@ -21,14 +23,14 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
   const router = useRouter();
   const konfirmasi = useAppConfirm();
   const awalan = role === "Kepsek" ? "/kepsek" : "/kurikulum";
-  const menu = [
-    { label: "Kelas", href: `${awalan}/kelas` },
-    { label: "Siswa", href: `${awalan}/siswa` },
-    { label: "Guru", href: `${awalan}/guru` },
-    ...(role === "Kurikulum"
-      ? [{ label: "Rekap Nilai", href: "/kurikulum/rekap-nilai" }]
-      : []),
+  const menu: { label: string; href: string; icon: UiIconName }[] = [
+    { label: "Kelas", href: `${awalan}/kelas`, icon: "classroom" },
+    { label: "Siswa", href: `${awalan}/siswa`, icon: "students" },
+    { label: "Guru", href: `${awalan}/guru`, icon: "teacher" },
   ];
+  if (role === "Kurikulum") {
+    menu.push({ label: "Rekap Nilai", href: "/kurikulum/rekap-nilai", icon: "chart" });
+  }
 
   async function keluar() {
     const disetujui = await konfirmasi({
@@ -63,6 +65,7 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
           <span>CN Edu <small>— {role}</small></span>
         </Link>
         <div className={styles.topbarActions}>
+          <ThemePaletteButton />
           <ThemeSwitchButton />
           <Link className={styles.profile} href="/profil/saya">Profil <span>↗</span></Link>
         </div>
@@ -106,6 +109,7 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
           initial="sembunyi"
           variants={VARIAN_MENU_ROLE}
         >
+          <span className={`cn-role-nav-label ${styles.navLabel}`}>MENU {role.toUpperCase()}</span>
           {menu.map((item) => {
             const aktif = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
@@ -121,7 +125,10 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
                   href={item.href}
                   onClick={() => setMenuTerbuka(false)}
                 >
-                  {item.label}
+                  <span className={styles.navItem}>
+                    <UiIcon className={styles.navIcon} name={item.icon} />
+                    <span>{item.label}</span>
+                  </span>
                 </Link>
               </motion.div>
             );
@@ -129,7 +136,8 @@ export default function AdminTierShell({ children, role }: AdminTierShellProps) 
         </motion.nav>
         <div className={styles.sidebarFooter}>
           <button className={styles.logout} onClick={keluar} type="button">
-            <span aria-hidden="true">↪</span> Keluar dari akun
+            <UiIcon className={styles.logoutIcon} name="logout" size={16} />
+            <span>Keluar dari akun</span>
           </button>
         </div>
       </motion.aside>

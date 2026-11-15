@@ -1,8 +1,20 @@
 .shell {
   min-height: 100vh;
   padding-top: 56px;
-  background: var(--cn-tint);
+  background-color: var(--cn-tint);
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgba(var(--cn-primary-rgb), 0.07), transparent 38%),
+    linear-gradient(rgba(var(--cn-primary-rgb), 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--cn-primary-rgb), 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
   color: var(--cn-text);
+}
+
+:global(:root[data-theme="dark"]) .shell {
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgba(var(--cn-primary-rgb), 0.1), transparent 38%),
+    linear-gradient(rgba(var(--cn-primary-rgb), 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--cn-primary-rgb), 0.03) 1px, transparent 1px);
 }
 
 .topbar {
@@ -24,7 +36,7 @@
   align-items: center;
   gap: 10px;
   color: var(--cn-navy);
-  font-family: "Sora", sans-serif;
+  font-family: "IBM Plex Serif", Georgia, serif;
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
@@ -89,7 +101,7 @@
 
 .sidebarBrand {
   color: var(--cn-primary);
-  font-family: "Sora", sans-serif;
+  font-family: "IBM Plex Serif", Georgia, serif;
   font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -109,15 +121,20 @@
 }
 
 .closeMenu:hover { background: var(--cn-tint); transform: rotate(90deg); }
-.navigation { display: grid; gap: 4px; padding: 14px 12px; }
+.navigation { display: grid; gap: 5px; padding: 18px 12px; }
+
+.navLabel {
+  margin: 0 10px 6px;
+}
 
 .navLink {
+  position: relative;
   display: flex;
-  min-height: 43px;
+  min-height: 44px;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 0 12px;
+  padding: 0 12px 0 18px;
   border-radius: 9px;
   color: var(--cn-coral-dark);
   font-size: 14px;
@@ -126,8 +143,34 @@
   transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
 }
 
+.navItem { display: flex; min-width: 0; align-items: center; gap: 11px; }
+.navIcon { width: 18px; height: 18px; flex: 0 0 auto; }
+
+.navLink::before {
+  position: absolute;
+  top: 50%;
+  left: 7px;
+  width: 3px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--cn-primary);
+  content: "";
+  opacity: 0;
+  transform: translateY(-50%) scaleY(0.5);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
 .navLink:hover { color: var(--cn-primary-dark); background: var(--cn-tint); transform: translateX(2px); }
-.navLinkActive { color: var(--cn-primary); background: var(--cn-tint); }
+.navLinkActive {
+  color: var(--cn-primary);
+  background: color-mix(in srgb, var(--cn-primary) 9%, var(--cn-surface));
+  font-weight: 700;
+}
+
+.navLinkActive::before {
+  opacity: 1;
+  transform: translateY(-50%) scaleY(1);
+}
 
 .sidebarFooter {
   margin-top: auto;
@@ -153,7 +196,7 @@
 }
 
 .logout:hover { border-color: var(--cn-danger); color: var(--cn-surface); background: var(--cn-danger); transform: translateY(-1px); }
-.logout span { font-size: 17px; }
+.logoutIcon { flex: 0 0 auto; }
 
 .content { min-width: 0; min-height: calc(100vh - 56px); margin-left: 240px; }
 .scrim { display: none; }
@@ -204,7 +247,7 @@
 }
 
 :global(:root[data-theme="dark"]) .shell {
-  background: var(--cn-bg);
+  background-color: var(--cn-bg);
 }
 
 :global(:root[data-theme="dark"]) .topbar {

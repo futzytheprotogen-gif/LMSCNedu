@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { RoleAplikasi } from "@/lib/auth";
+import UiIcon from "@/components/UiIcon";
 import styles from "./MasterActingAsControl.module.css";
 
 interface AkunAkses {
@@ -104,7 +105,7 @@ export default function MasterActingAsControl() {
         <div className={styles.activeState}>
           <p>Sedang sebagai <strong>{active.nama}</strong><small>{LABEL_ROLE[active.role]}</small></p>
           <button disabled={busy} onClick={akhiriAkses} type="button">
-            {busy ? "Memproses..." : "Kembali ke Master"}
+            {busy ? "Memproses..." : <><UiIcon name="arrow-left" size={13} />Kembali ke Master</>}
           </button>
         </div>
       ) : (

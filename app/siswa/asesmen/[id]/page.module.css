@@ -426,12 +426,13 @@
   right: 0;
   bottom: 0;
   left: 240px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  box-sizing: border-box;
+  display: flex;
   min-height: 72px;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 8px max(18px, calc((100vw - 240px - 720px) / 2)) max(8px, env(safe-area-inset-bottom));
+  padding: 8px 18px max(8px, env(safe-area-inset-bottom));
   border-top: 1px solid var(--cn-line);
   background: rgb(var(--cn-surface-rgb) / 96%);
   box-shadow: 0 -6px 22px rgb(var(--cn-navy-rgb) / 8%);
@@ -441,6 +442,9 @@
 .dockAction {
   position: relative;
   display: grid;
+  width: min(100%, 220px);
+  max-width: 220px;
+  flex: 1 1 0;
   min-width: 0;
   min-height: 52px;
   align-content: center;
@@ -888,6 +892,23 @@
   }
 
   .questionJump {
+    font-size: 10px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .navigationDock {
+    min-height: 58px;
+    gap: 8px;
+    padding: 4px 12px max(4px, env(safe-area-inset-bottom));
+  }
+
+  .dockAction {
+    min-height: 46px;
+    gap: 3px;
+  }
+
+  .dockAction small {
     font-size: 10px;
   }
 }

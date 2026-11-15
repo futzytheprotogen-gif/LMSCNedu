@@ -6,8 +6,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { hitungAktivitasBaru } from "@/lib/notifikasiSiswa";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import ThemePaletteButton from "@/components/ThemePaletteButton";
 import ThemeSwitchButton from "@/components/ThemeSwitchButton";
 import BrandMark from "@/components/BrandMark";
+import UiIcon, { type UiIconName } from "@/components/UiIcon";
 import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 import { rekamCatatanIntegritas } from "@/lib/asesmenIntegrity";
 import styles from "./layout.module.css";
@@ -18,11 +20,11 @@ const WARNA_DANGER = "var(--cn-danger)";
 const TINGGI_NAVBAR = 56;
 const LEBAR_SIDEBAR = 240;
 
-const MENU_SISWA = [
-  { label: "Ringkasan", href: "/siswa" },
-  { label: "Kelas", href: "/siswa/kelas", notifikasi: true },
-  { label: "Asesmen", href: "/siswa/asesmen" },
-  { label: "Tugas", href: "/siswa/tugas" },
+const MENU_SISWA: { label: string; href: string; icon: UiIconName; notifikasi?: boolean }[] = [
+  { label: "Ringkasan", href: "/siswa", icon: "chart" },
+  { label: "Kelas", href: "/siswa/kelas", icon: "classroom", notifikasi: true },
+  { label: "Asesmen", href: "/siswa/asesmen", icon: "clipboard" },
+  { label: "Tugas", href: "/siswa/tugas", icon: "checklist" },
 ];
 
 interface KelasRingkas {
@@ -33,12 +35,33 @@ interface KelasRingkas {
 export default function LayoutSiswa({ children }: { children: ReactNode }) {
   const [sidebarTerbuka, setSidebarTerbuka] = useState(false);
   const [totalNotif, setTotalNotif] = useState(0);
+  const [namaPengguna, setNamaPengguna] = useState<string | null>(null);
 
   const pathname = usePathname();
   const router = useRouter();
   const konfirmasi = useAppConfirm();
   const idAsesmenAktif = pathname.match(/^\/siswa\/asesmen\/([^/]+)/)?.[1] ?? null;
   const sedangAsesmen = idAsesmenAktif !== null;
+
+  useEffect(() => {
+    let masihAktif = true;
+    async function muatNamaPengguna() {
+      try {
+        const response = await fetch("/api/sesi", { cache: "no-store" });
+        const hasil = await response.json();
+        if (!response.ok) throw new Error(hasil.pesan ?? "Gagal memuat nama akun.");
+        if (typeof hasil.data?.nama !== "string" || !hasil.data.nama.trim()) {
+          throw new Error("Nama akun tidak tersedia di sesi.");
+        }
+        if (masihAktif) setNamaPengguna(hasil.data.nama.trim());
+      } catch (error) {
+        console.error("Gagal memuat identitas Siswa:", error);
+      }
+    }
+
+    void muatNamaPengguna();
+    return () => { masihAktif = false; };
+  }, []);
 
   const cekNotifBaru = useCallback(async () => {
     try {
@@ -93,22 +116,14 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
     router.push(result.redirect);
   }
 
-  async function handleMenuNavigation(
+  function handleMenuNavigation(
     event: MouseEvent<HTMLAnchorElement>,
     href: string,
     hasNotifications?: boolean
   ) {
     if (sedangAsesmen) {
       event.preventDefault();
-      const lanjut = await konfirmasi({
-        title: "Tinggalkan ujian?",
-        message: "Ujian masih berlangsung. Timer tetap berjalan. Pilih “Lanjutkan ujian” untuk kembali mengerjakan, atau lanjutkan hanya jika ada kendala mendesak.",
-        confirmLabel: "Keluar dari ujian",
-        cancelLabel: "Lanjutkan ujian",
-        tone: "primary",
-      });
-      if (!lanjut) return;
-      if (idAsesmenAktif) rekamCatatanIntegritas(idAsesmenAktif, "LEAVE_ASSESSMENT");
+      return;
     }
 
     setSidebarTerbuka(false);
@@ -121,19 +136,23 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
       <header className={`cn-role-navbar ${styles.navbar}`} style={estilo.navbar}>
         <button
           className={`cn-role-hamburger ${styles.hamburger}`}
-          onClick={() => setSidebarTerbuka(true)}
+          onClick={() => {
+            if (!sedangAsesmen) setSidebarTerbuka(true);
+          }}
+          disabled={sedangAsesmen}
           style={estilo.tombolHamburger}
-          aria-label="Buka menu"
+          aria-label={sedangAsesmen ? "Navigasi dikunci selama ujian" : "Buka menu"}
           type="button"
         >
           ☰
         </button>
 
-        <span className="cn-role-brand" style={{ ...estilo.namaBrand, display: "inline-flex", alignItems: "center", gap: 8 }}>
-          <BrandMark style={{ width: 28, height: 28, color: "var(--cn-primary)" }} />
-          CN Edu — Siswa
+        <span className="cn-role-brand" style={{ ...estilo.namaBrand, display: "inline-flex", alignItems: "center", gap: 8 }} title={namaPengguna ?? "CN Edu"}>
+          <BrandMark style={{ width: 34, height: 34, color: "var(--cn-primary)" }} />
+          <span style={estilo.namaBrandText}>CN Edu{namaPengguna ? ` — ${namaPengguna}` : ""}</span>
         </span>
         <div style={estilo.navKanan}>
+          <ThemePaletteButton />
           <ThemeSwitchButton />
           <Link
             href="/profil/saya"
@@ -149,7 +168,7 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
       </header>
 
       <AnimatePresence>
-        {sidebarTerbuka && (
+        {sidebarTerbuka && !sedangAsesmen && (
           <motion.div
             aria-hidden="true"
             animate={{ opacity: 1 }}
@@ -165,7 +184,7 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
       <motion.aside
         className={`cn-role-sidebar ${styles.sidebar}`}
         initial={false}
-        animate={{ x: sidebarTerbuka ? 0 : "-100%" }}
+        animate={{ x: sidebarTerbuka && !sedangAsesmen ? 0 : "-100%" }}
         transition={TRANSISI_DRAWER_ROLE}
         style={estilo.sidebar}
       >
@@ -184,8 +203,14 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <motion.nav style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
-          {MENU_SISWA.map((item) => {
+        {sedangAsesmen ? (
+          <div className={styles.examLocked} role="status">
+            Ujian sedang berlangsung. Navigasi dikunci sampai kamu menyelesaikan ujian.
+          </div>
+        ) : (
+          <motion.nav className="cn-role-navigation" aria-label="Menu Siswa" style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
+            <span className="cn-role-nav-label">RUANG BELAJAR</span>
+            {MENU_SISWA.map((item) => {
             const aktif = item.href === "/siswa"
               ? pathname === item.href
               : pathname.startsWith(item.href);
@@ -193,6 +218,7 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
             return (
               <motion.div key={item.href} variants={VARIAN_ITEM_MENU_ROLE} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
               <Link
+                aria-current={aktif ? "page" : undefined}
                 href={item.href}
                 onClick={(event) => {
                   if (sedangAsesmen) {
@@ -204,7 +230,10 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
                 }}
                 style={{ ...estilo.linkMenu, ...(aktif ? estilo.linkMenuAktif : {}) }}
               >
-                <span style={estilo.labelMenu}>{item.label}</span>
+                <span style={estilo.menuLabelGroup}>
+                  <span style={estilo.iconMenu}><UiIcon name={item.icon} size={18} /></span>
+                  <span style={estilo.labelMenu}>{item.label}</span>
+                </span>
 
                 {item.notifikasi && totalNotif > 0 && (
                   <span
@@ -217,12 +246,14 @@ export default function LayoutSiswa({ children }: { children: ReactNode }) {
               </Link>
               </motion.div>
             );
-          })}
-        </motion.nav>
+            })}
+          </motion.nav>
+        )}
 
         <div className="cn-role-sidebar-footer">
           <button className="cn-role-logout-action" onClick={handleLogout} type="button">
-            Keluar dari akun
+            <UiIcon name="logout" size={16} />
+            <span>Keluar dari akun</span>
           </button>
         </div>
       </motion.aside>
@@ -264,6 +295,14 @@ const estilo = {
     justifyContent: "center",
   },
   namaBrand: { fontSize: "15px", fontWeight: 700, color: "var(--cn-coral-dark)" },
+  namaBrandText: {
+    display: "block",
+    minWidth: 0,
+    maxWidth: "min(42vw, 320px)",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap" as const,
+  },
   navKanan: { display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" },
   tombolProfil: { fontSize: "13px", fontWeight: 700, color: WARNA_PRIMARY, textDecoration: "none", padding: "8px 10px" },
   overlay: {
@@ -336,6 +375,8 @@ const estilo = {
     transition: "background-color 0.15s ease",
   },
   linkMenuAktif: { backgroundColor: "var(--cn-tint)", color: WARNA_PRIMARY },
+  menuLabelGroup: { display: "flex", minWidth: 0, alignItems: "center", gap: "11px" },
+  iconMenu: { display: "grid", width: "20px", height: "20px", flexShrink: 0, placeItems: "center", color: "currentColor" },
   labelMenu: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
   badgeNotifikasi: {
     minWidth: "21px",

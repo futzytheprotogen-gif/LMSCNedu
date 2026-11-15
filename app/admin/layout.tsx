@@ -5,8 +5,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import ThemePaletteButton from "@/components/ThemePaletteButton";
 import ThemeSwitchButton from "@/components/ThemeSwitchButton";
 import BrandMark from "@/components/BrandMark";
+import UiIcon, { type UiIconName } from "@/components/UiIcon";
 import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@/components/RoleMotion";
 
 // ------------------------------------------------------------
@@ -22,12 +24,13 @@ const WARNA_DANGER = "var(--cn-danger)";
 const TINGGI_NAVBAR = 56;
 const LEBAR_SIDEBAR = 240;
 
-const MENU_ADMIN = [
-  { label: "Buat Kelas", href: "/admin/kelas" },
-  { label: "Buat Akun", href: "/admin/akun" },
-  { label: "Daftar Siswa", href: "/admin/siswa" },
-  { label: "Daftar Guru", href: "/admin/guru" },
-  { label: "Laporan", href: "/admin/laporan", notifikasi: true },
+const MENU_ADMIN: { label: string; href: string; icon: UiIconName; notifikasi?: boolean }[] = [
+  { label: "Buat Kelas", href: "/admin/kelas", icon: "classroom" },
+  { label: "Buat Akun", href: "/admin/akun", icon: "user-plus" },
+  { label: "Jurusan & Mapel", href: "/admin/data-akademik", icon: "book" },
+  { label: "Daftar Siswa", href: "/admin/siswa", icon: "students" },
+  { label: "Daftar Guru", href: "/admin/guru", icon: "teacher" },
+  { label: "Laporan", href: "/admin/laporan", icon: "chart", notifikasi: true },
 ];
 
 interface DataLaporan {
@@ -164,12 +167,22 @@ export default function LayoutAdmin({
           ☰
         </button>
 
-        <span className="cn-role-brand" style={estilo.namaBrand}>
-          <BrandMark style={{ width: 28, height: 28, color: "var(--cn-primary)" }} />
+        <span
+          className="cn-role-brand"
+          style={{
+            ...estilo.namaBrand,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <BrandMark style={{ width: 36, height: 36, color: "var(--cn-primary)" }} />
           CN Edu — Admin
         </span>
 
         <div style={estilo.navKanan}>
+          <ThemePaletteButton />
           <ThemeSwitchButton />
           <Link href="/profil/saya" style={estilo.tombolProfil}>Profil</Link>
         </div>
@@ -224,10 +237,12 @@ export default function LayoutAdmin({
 
         {/* MENU */}
 
-        <motion.nav style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
+        <motion.nav className="cn-role-navigation" aria-label="Navigasi Admin" style={estilo.nav} variants={VARIAN_MENU_ROLE} initial="sembunyi" animate="tampil">
+          <span className="cn-role-nav-label">MENU UTAMA</span>
           {masterAdmin && (
             <motion.div variants={VARIAN_ITEM_MENU_ROLE} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
               <Link
+                aria-current={pathname.startsWith("/master") ? "page" : undefined}
                 href="/master"
                 onClick={() => setSidebarTerbuka(false)}
                 style={{
@@ -235,7 +250,10 @@ export default function LayoutAdmin({
                   ...(pathname.startsWith("/master") ? estilo.linkMenuAktif : {}),
                 }}
               >
-                <span style={estilo.labelMenu}>Kembali ke Master Control</span>
+                <span style={estilo.menuLabelGroup}>
+                  <span style={estilo.iconMenu}><UiIcon name="layers" size={18} /></span>
+                  <span style={estilo.labelMenu}>Kembali ke Master Control</span>
+                </span>
               </Link>
             </motion.div>
           )}
@@ -245,6 +263,7 @@ export default function LayoutAdmin({
             return (
               <motion.div key={item.href} variants={VARIAN_ITEM_MENU_ROLE} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
               <Link
+                aria-current={aktif ? "page" : undefined}
                 href={item.href}
                 onClick={() => {
                   setSidebarTerbuka(false);
@@ -254,8 +273,9 @@ export default function LayoutAdmin({
               >
                 {/* Nama menu */}
 
-                <span style={estilo.labelMenu}>
-                  {item.label}
+                <span style={estilo.menuLabelGroup}>
+                  <span style={estilo.iconMenu}><UiIcon name={item.icon} size={18} /></span>
+                  <span style={estilo.labelMenu}>{item.label}</span>
                 </span>
 
                 {/* =================================================
@@ -302,7 +322,8 @@ export default function LayoutAdmin({
 
         <div className="cn-role-sidebar-footer">
           <button className="cn-role-logout-action" onClick={handleLogout} type="button">
-            Keluar dari akun
+            <UiIcon name="logout" size={16} />
+            <span>Keluar dari akun</span>
           </button>
         </div>
       </motion.aside>
@@ -364,7 +385,7 @@ const estilo = {
   },
 
   namaBrand: {
-    fontSize: "15px",
+    fontSize: "17px",
     fontWeight: 700,
     color: "var(--cn-coral-dark)",
   },
@@ -469,6 +490,22 @@ const estilo = {
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap" as const,
+  },
+
+  menuLabelGroup: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    gap: "11px",
+  },
+
+  iconMenu: {
+    display: "grid",
+    width: "20px",
+    height: "20px",
+    flexShrink: 0,
+    placeItems: "center",
+    color: "currentColor",
   },
 
   // ==========================================================

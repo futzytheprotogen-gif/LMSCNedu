@@ -3,9 +3,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import { useAppNotice } from "@/components/AppNoticeProvider";
+import { unggahFileDariBrowser } from "@/lib/upload-client";
 import responsive from "./page.module.css";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
+
+function toLocalDateTime(value: string | null) {
+  if (!value) return "";
+  const date = new Date(value);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 16);
+}
 
 interface KelasRingkas {
   id: string;
@@ -18,6 +26,9 @@ interface Tugas {
   deskripsi: string;
   tipeLampiran: "PDF" | "LINK" | null;
   lampiran: string | null;
+  deadlineAt: string | null;
+  susulanAktif: boolean;
+  deadlineSusulan: string | null;
   createdAt: string;
   kelasTujuan: KelasRingkas[];
 }
@@ -29,6 +40,9 @@ interface SiswaPengumpulan {
   fotoProfil?: string | null;
   status: "SUDAH" | "BELUM";
   fileUrl?: string | null;
+  submissionId: string | null;
+  nilai: number | null;
+  catatanNilai: string | null;
   waktuKumpul?: string | null;
 }
 
@@ -58,6 +72,9 @@ export default function HalamanTugasGuru() {
   const [tugasDiedit, setTugasDiedit] = useState<Tugas | null>(null);
   const [judul, setJudul] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
+  const [deadlineAt, setDeadlineAt] = useState("");
+  const [susulanAktif, setSusulanAktif] = useState(false);
+  const [deadlineSusulan, setDeadlineSusulan] = useState("");
   const [pakaiLampiran, setPakaiLampiran] = useState(false);
   const [tipeLampiran, setTipeLampiran] = useState<"PDF" | "LINK">("LINK");
   const [lampiran, setLampiran] = useState("");
@@ -76,6 +93,9 @@ export default function HalamanTugasGuru() {
     useState<DataPengumpulan | null>(null);
   const [sedangMuatPengumpulan, setSedangMuatPengumpulan] = useState(false);
   const [errorPengumpulan, setErrorPengumpulan] = useState<string | null>(null);
+  const [draftNilai, setDraftNilai] = useState<Record<string, string>>({});
+  const [draftCatatan, setDraftCatatan] = useState<Record<string, string>>({});
+  const [idSedangNilai, setIdSedangNilai] = useState<string | null>(null);
   const [filterPengumpulan, setFilterPengumpulan] = useState<
     "SEMUA" | "SUDAH" | "BELUM"
   >("SEMUA");
@@ -109,13 +129,17 @@ export default function HalamanTugasGuru() {
   }, []);
 
   useEffect(() => {
-    muatSemua();
+    const timer = window.setTimeout(() => { void muatSemua(); }, 0);
+    return () => window.clearTimeout(timer);
   }, [muatSemua]);
 
   function bukaModalBuat() {
     setTugasDiedit(null);
     setJudul("");
     setDeskripsi("");
+    setDeadlineAt("");
+    setSusulanAktif(false);
+    setDeadlineSusulan("");
     setPakaiLampiran(false);
     setTipeLampiran("LINK");
     setLampiran("");
@@ -129,6 +153,9 @@ export default function HalamanTugasGuru() {
     setTugasDiedit(t);
     setJudul(t.judul);
     setDeskripsi(t.deskripsi);
+    setDeadlineAt(toLocalDateTime(t.deadlineAt));
+    setSusulanAktif(t.susulanAktif);
+    setDeadlineSusulan(toLocalDateTime(t.deadlineSusulan));
     setPakaiLampiran(!!t.lampiran);
     setTipeLampiran(t.tipeLampiran ?? "LINK");
     setLampiran(t.lampiran ?? "");
@@ -170,6 +197,16 @@ export default function HalamanTugasGuru() {
       setPesanError("Masukkan link lampiran.");
       return;
     }
+    if (susulanAktif) {
+      if (!deadlineAt || !deadlineSusulan) {
+        setPesanError("Isi deadline utama dan deadline susulan terlebih dahulu.");
+        return;
+      }
+      if (new Date(deadlineSusulan).getTime() <= new Date(deadlineAt).getTime()) {
+        setPesanError("Deadline susulan harus setelah deadline utama.");
+        return;
+      }
+    }
 
     setSedangSimpan(true);
     setPesanError(null);
@@ -180,25 +217,8 @@ export default function HalamanTugasGuru() {
       if (pakaiLampiran && tipeLampiran === "PDF" && fileTerpilih) {
         setSedangUpload(true);
 
-        const formData = new FormData();
-        formData.append("file", fileTerpilih);
-        formData.append("folder", "lampiran-tugas");
-
-        const responseUpload = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const dataUpload = await responseUpload.json();
-
+        urlLampiranAkhir = await unggahFileDariBrowser(fileTerpilih, "lampiran-tugas");
         setSedangUpload(false);
-
-        if (!responseUpload.ok) {
-          setPesanError(dataUpload.pesan ?? "Gagal upload file.");
-          return;
-        }
-
-        urlLampiranAkhir = dataUpload.url;
       }
     } catch {
       setSedangUpload(false);
@@ -211,6 +231,11 @@ export default function HalamanTugasGuru() {
       deskripsi: deskripsi.trim(),
       tipeLampiran: pakaiLampiran ? tipeLampiran : undefined,
       lampiran: pakaiLampiran ? urlLampiranAkhir : undefined,
+      deadlineAt: deadlineAt ? new Date(deadlineAt).toISOString() : null,
+      susulanAktif,
+      deadlineSusulan: susulanAktif && deadlineSusulan
+        ? new Date(deadlineSusulan).toISOString()
+        : null,
     };
 
     try {
@@ -313,6 +338,8 @@ export default function HalamanTugasGuru() {
     setErrorPengumpulan(null);
     setFilterPengumpulan("SEMUA");
     setPencarianSiswa("");
+    setDraftNilai({});
+    setDraftCatatan({});
     setSedangMuatPengumpulan(true);
 
     try {
@@ -329,6 +356,18 @@ export default function HalamanTugasGuru() {
       }
 
       setDataPengumpulan(data.data ?? data);
+      setDraftNilai(Object.fromEntries(
+        (data.data?.siswa ?? data.siswa ?? []).map((siswa: SiswaPengumpulan) => [
+          siswa.id,
+          siswa.nilai === null ? "" : String(siswa.nilai),
+        ])
+      ));
+      setDraftCatatan(Object.fromEntries(
+        (data.data?.siswa ?? data.siswa ?? []).map((siswa: SiswaPengumpulan) => [
+          siswa.id,
+          siswa.catatanNilai ?? "",
+        ])
+      ));
     } catch {
       setErrorPengumpulan(
         "Tidak dapat mengambil data pengumpulan tugas."
@@ -342,6 +381,41 @@ export default function HalamanTugasGuru() {
     setTugasPengumpulan(null);
     setDataPengumpulan(null);
     setErrorPengumpulan(null);
+  }
+
+  async function simpanNilaiTugas(siswa: SiswaPengumpulan) {
+    if (!siswa.submissionId) return;
+    const nilai = Number(draftNilai[siswa.id]);
+    if (!Number.isFinite(nilai) || nilai < 0 || nilai > 100) {
+      beriNotifikasi("Nilai harus berada di antara 0 dan 100.", "error");
+      return;
+    }
+
+    setIdSedangNilai(siswa.id);
+    try {
+      const response = await fetch(`/api/tugas/${tugasPengumpulan?.id}/pengumpulan`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          submissionId: siswa.submissionId,
+          nilai,
+          catatanNilai: draftCatatan[siswa.id] ?? "",
+        }),
+      });
+      const hasil = await response.json();
+      if (!response.ok) throw new Error(hasil.pesan ?? "Nilai gagal disimpan.");
+      setDataPengumpulan((sebelumnya) => sebelumnya && ({
+        ...sebelumnya,
+        siswa: sebelumnya.siswa.map((item) => item.id === siswa.id
+          ? { ...item, nilai: hasil.data.nilai, catatanNilai: hasil.data.catatanNilai }
+          : item),
+      }));
+      beriNotifikasi("Nilai tugas berhasil disimpan.", "sukses");
+    } catch (caught) {
+      beriNotifikasi(caught instanceof Error ? caught.message : "Nilai tugas gagal disimpan.", "error");
+    } finally {
+      setIdSedangNilai(null);
+    }
   }
 
   const hariIni = new Date().toDateString();
@@ -753,6 +827,44 @@ export default function HalamanTugasGuru() {
                 />
               </label>
 
+              <label style={styles.label}>
+                <span>Deadline pengumpulan</span>
+                <input
+                  type="datetime-local"
+                  value={deadlineAt}
+                  onChange={(event) => setDeadlineAt(event.target.value)}
+                  style={styles.input}
+                />
+                <small style={styles.helperText}>Kosongkan jika tugas tidak memiliki batas waktu.</small>
+              </label>
+
+              <div style={styles.deadlineRecovery}>
+                <label style={styles.checkboxRow}>
+                  <input
+                    type="checkbox"
+                    checked={susulanAktif}
+                    onChange={(event) => setSusulanAktif(event.target.checked)}
+                    style={styles.attachmentCheckbox}
+                  />
+                  <span style={styles.attachmentHeading}>
+                    <strong>Aktifkan deadline tugas susulan</strong>
+                    <small>Siswa masih dapat mengumpulkan setelah deadline utama.</small>
+                  </span>
+                </label>
+                {susulanAktif && (
+                  <label style={styles.label}>
+                    <span>Batas akhir tugas susulan</span>
+                    <input
+                      type="datetime-local"
+                      min={deadlineAt || undefined}
+                      value={deadlineSusulan}
+                      onChange={(event) => setDeadlineSusulan(event.target.value)}
+                      style={styles.input}
+                    />
+                  </label>
+                )}
+              </div>
+
               <div style={styles.attachmentBox}>
                 <label style={styles.checkboxRow}>
                   <input
@@ -949,6 +1061,10 @@ export default function HalamanTugasGuru() {
                 </p>
               </div>
 
+              <a href={`/api/tugas/${tugasPengumpulan.id}/nilai`} style={styles.exportButton}>
+                Unduh rekap nilai
+              </a>
+
               <button
                 type="button"
                 onClick={tutupPengumpulan}
@@ -1105,6 +1221,12 @@ export default function HalamanTugasGuru() {
                       <StudentSubmissionRow
                         key={siswa.id}
                         siswa={siswa}
+                        nilai={draftNilai[siswa.id] ?? ""}
+                        catatan={draftCatatan[siswa.id] ?? ""}
+                        sedangSimpan={idSedangNilai === siswa.id}
+                        onNilaiChange={(value) => setDraftNilai((previous) => ({ ...previous, [siswa.id]: value }))}
+                        onCatatanChange={(value) => setDraftCatatan((previous) => ({ ...previous, [siswa.id]: value }))}
+                        onSimpanNilai={() => void simpanNilaiTugas(siswa)}
                       />
                     ))
                   )}
@@ -1186,6 +1308,18 @@ function KartuTugas({
                 minute: "2-digit",
               })}
             </span>
+
+            {t.deadlineAt && (
+              <span>
+                ⏳ Deadline: {new Date(t.deadlineAt).toLocaleString("id-ID", {
+                  day: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+                {t.susulanAktif && " · Susulan aktif"}
+              </span>
+            )}
 
             {t.lampiran && (
               <span>
@@ -1376,8 +1510,20 @@ function SubmissionStat({
 
 function StudentSubmissionRow({
   siswa,
+  nilai,
+  catatan,
+  sedangSimpan,
+  onNilaiChange,
+  onCatatanChange,
+  onSimpanNilai,
 }: {
   siswa: SiswaPengumpulan;
+  nilai: string;
+  catatan: string;
+  sedangSimpan: boolean;
+  onNilaiChange: (value: string) => void;
+  onCatatanChange: (value: string) => void;
+  onSimpanNilai: () => void;
 }) {
   const sudah = siswa.status === "SUDAH";
 
@@ -1451,6 +1597,40 @@ function StudentSubmissionRow({
       ) : (
         <span style={styles.noFile}>—</span>
       )}
+
+      {sudah && (
+        <div style={styles.studentGrade}>
+          <label style={styles.studentGradeField}>
+            <span>Nilai (0–100)</span>
+            <input
+              aria-label={`Nilai ${siswa.nama}`}
+              max="100"
+              min="0"
+              onChange={(event) => onNilaiChange(event.target.value)}
+              step="0.1"
+              type="number"
+              value={nilai}
+              style={styles.studentGradeInput}
+            />
+          </label>
+          <input
+            aria-label={`Catatan nilai ${siswa.nama}`}
+            onChange={(event) => onCatatanChange(event.target.value)}
+            placeholder="Catatan (opsional)"
+            type="text"
+            value={catatan}
+            style={styles.studentGradeInput}
+          />
+          <button
+            disabled={sedangSimpan || !siswa.submissionId || nilai === ""}
+            onClick={onSimpanNilai}
+            style={styles.studentGradeButton}
+            type="button"
+          >
+            {sedangSimpan ? "Menyimpan..." : "Simpan"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -1522,8 +1702,7 @@ function LoadingState() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background:
-      "linear-gradient(180deg, var(--cn-tint) 0%, var(--cn-surface) 42%, var(--cn-tint) 100%)",
+    background: "transparent",
     position: "relative" as const,
     overflow: "hidden" as const,
     color: "var(--cn-coral-dark)",
@@ -2172,6 +2351,20 @@ const styles = {
     fontSize: "11px",
   },
 
+  exportButton: {
+    display: "inline-flex",
+    alignItems: "center",
+    minHeight: "34px",
+    padding: "0 10px",
+    borderRadius: "8px",
+    color: "var(--cn-surface)",
+    background: "var(--cn-primary)",
+    fontSize: "10px",
+    fontWeight: 800,
+    textDecoration: "none",
+    whiteSpace: "nowrap" as const,
+  },
+
   closeButton: {
     width: "32px",
     height: "32px",
@@ -2233,6 +2426,15 @@ const styles = {
     border: "1px solid var(--cn-line)",
     borderRadius: "10px",
     marginBottom: "16px",
+  },
+
+  deadlineRecovery: {
+    display: "grid",
+    gap: "12px",
+    padding: "14px",
+    background: "var(--cn-tint)",
+    border: "1px solid var(--cn-line)",
+    borderRadius: "10px",
   },
 
   checkboxRow: {
@@ -2558,10 +2760,42 @@ const styles = {
   studentRow: {
     display: "flex",
     alignItems: "center",
+    flexWrap: "wrap" as const,
     gap: "11px",
     padding: "12px 13px",
     borderBottom: "1px solid var(--cn-coral-tint)",
     background: "var(--cn-surface)",
+  },
+
+  studentGrade: {
+    display: "flex",
+    alignItems: "flex-end",
+    flexWrap: "wrap" as const,
+    gap: "6px",
+    marginLeft: "auto",
+  },
+
+  studentGradeField: { display: "grid", gap: "3px", color: "var(--cn-muted)", fontSize: "9px" },
+  studentGradeInput: {
+    width: "120px",
+    minHeight: "32px",
+    padding: "0 8px",
+    border: "1px solid var(--cn-line)",
+    borderRadius: "7px",
+    color: "var(--cn-text)",
+    background: "var(--cn-surface)",
+    font: "inherit",
+    fontSize: "10px",
+  },
+  studentGradeButton: {
+    minHeight: "32px",
+    padding: "0 9px",
+    border: "0",
+    borderRadius: "7px",
+    color: "var(--cn-surface)",
+    background: "var(--cn-primary)",
+    fontSize: "10px",
+    fontWeight: 700,
   },
 
   studentAvatar: {

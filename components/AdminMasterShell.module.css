@@ -38,6 +38,40 @@
     linear-gradient(90deg, rgb(137 93 168 / 4%) 1px, transparent 1px);
 }
 
+:global(:root[data-theme="light"][data-palette="midnight-violet"]) .shell {
+  --master-bg: #f8f6fb;
+  --master-surface: #fff;
+  --master-panel: #eeeaf6;
+  --master-text: #231942;
+  --master-muted: #716a82;
+  --master-line: #e4deed;
+  --master-accent: #5e548e;
+  --master-accent-soft: #eeeaf6;
+  --master-accent-ink: #fff;
+  background-color: var(--master-bg);
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgb(94 84 142 / 7%), transparent 38%),
+    linear-gradient(rgb(94 84 142 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(94 84 142 / 4%) 1px, transparent 1px);
+}
+
+:global(:root[data-theme="dark"][data-palette="midnight-violet"]) .shell {
+  --master-bg: #15121c;
+  --master-surface: #201b2b;
+  --master-panel: #292337;
+  --master-text: #f0ecf6;
+  --master-muted: #b8afc7;
+  --master-line: #40384f;
+  --master-accent: #b6a2d8;
+  --master-accent-soft: #302941;
+  --master-accent-ink: #17102c;
+  background-color: var(--master-bg);
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgb(182 162 216 / 10%), transparent 38%),
+    linear-gradient(rgb(182 162 216 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(182 162 216 / 3%) 1px, transparent 1px);
+}
+
 :global(:root[data-theme="dark"]) .shell :is(input, select, textarea) {
   border-color: var(--master-line);
   color: var(--master-text);
@@ -76,7 +110,7 @@
 .bootMark { position: relative; display: grid; width: 70px; height: 70px; place-items: center; border: 1px solid rgb(255 79 163 / 55%); color: #ff4fa3; background: rgb(18 10 25 / 82%); box-shadow: 0 0 32px rgb(255 79 163 / 12%), inset 0 0 20px rgb(255 79 163 / 5%); animation: boot-mark 650ms cubic-bezier(.2, .8, .2, 1) both; }
 .bootMark::before { position: absolute; inset: 5px; border: 1px solid rgb(191 125 255 / 20%); content: ""; }
 .bootGlyph { width: 45px; height: 45px; }
-.bootContent > strong { margin-top: 10px; color: #f4edf8; font: 550 23px/1.3 "Sora", sans-serif; letter-spacing: -.04em; }
+.bootContent > strong { margin-top: 10px; color: #f4edf8; font: 550 23px/1.3 "IBM Plex Serif", Georgia, serif; letter-spacing: -.04em; }
 .bootCode { margin-top: 8px; color: #ad94b7; font-size: 7px; letter-spacing: .13em; }
 .bootTrack { width: 100%; height: 2px; margin: 24px 0 10px; overflow: hidden; background: #392642; }
 .bootTrack i { display: block; width: 100%; height: 100%; background: linear-gradient(90deg, #a84bff, #ff4fa3 65%, #56d9ff); box-shadow: 0 0 12px rgb(255 79 163 / 65%); transform: scaleX(0); transform-origin: left; animation: boot-progress 850ms 100ms cubic-bezier(.15, .7, .25, 1) forwards; }
@@ -102,7 +136,7 @@
   background: var(--master-surface);
 }
 
-.brand { display: flex; align-items: center; gap: 10px; color: var(--master-text); text-decoration: none; font: 750 13px/1 "Sora", sans-serif; letter-spacing: .08em; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--master-text); text-decoration: none; font: 750 13px/1 "IBM Plex Serif", Georgia, serif; letter-spacing: .08em; }
 .brandMark { width: 36px; height: 36px; padding: 4px; border: 1px solid color-mix(in srgb, var(--master-accent) 55%, transparent); color: var(--master-accent); }
 .brand small { margin-left: 7px; color: var(--master-accent); font: 700 9px/1 "IBM Plex Sans", sans-serif; letter-spacing: .12em; }
 .topActions { display: flex; align-items: center; gap: 13px; margin-left: auto; }
@@ -131,14 +165,16 @@
 .signal i:nth-child(2) { height: 10px; opacity: .78; }
 .signal i:nth-child(3) { height: 14px; }
 .sideHeading div { display: grid; gap: 5px; }
-.sideHeading strong { color: var(--master-text); font: 700 9px/1 "Sora", sans-serif; letter-spacing: .09em; }
+.sideHeading strong { color: var(--master-text); font: 700 9px/1 "IBM Plex Serif", Georgia, serif; letter-spacing: .09em; }
 .sideHeading small { color: var(--master-muted); font-size: 8px; letter-spacing: .1em; }
 .navigation { display: grid; min-height: 0; flex: 1 1 auto; align-content: start; gap: 4px; overflow-y: auto; overscroll-behavior: contain; padding: 20px 12px; }
 .navLabel { margin: 8px 8px 7px; color: var(--master-muted); font: 700 8px/1 "IBM Plex Sans", sans-serif; letter-spacing: .14em; }
-.navLink { display: flex; min-height: 39px; align-items: center; gap: 11px; padding: 0 10px; border: 1px solid transparent; border-radius: 2px; color: var(--master-muted); font-size: 11px; font-weight: 600; text-decoration: none; }
+.navLink { position: relative; display: flex; min-height: 42px; align-items: center; gap: 11px; padding: 0 10px 0 14px; border: 1px solid transparent; border-radius: 8px; color: var(--master-muted); font-size: 11px; font-weight: 600; text-decoration: none; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; }
+.navLink::before { position: absolute; top: 50%; left: 4px; width: 2px; height: 17px; border-radius: 999px; background: var(--master-accent); content: ""; opacity: 0; transform: translateY(-50%) scaleY(.5); transition: opacity 160ms ease, transform 160ms ease; }
 .navLink:hover { color: var(--master-text); background: var(--master-panel); }
-.navLink.active { border-color: color-mix(in srgb, var(--master-accent) 27%, transparent); color: var(--master-accent); background: var(--master-accent-soft); }
-.navIcon { display: grid; width: 17px; place-items: center; font-size: 14px; }
+.navLink.active { border-color: color-mix(in srgb, var(--master-accent) 22%, transparent); color: var(--master-accent); background: var(--master-accent-soft); }
+.navLink.active::before { opacity: 1; transform: translateY(-50%) scaleY(1); }
+.navIcon { display: grid; width: 24px; height: 24px; place-items: center; border-radius: 6px; color: currentColor; background: color-mix(in srgb, currentColor 9%, transparent); font-size: 13px; }
 .sideFooter { display: grid; flex: 0 0 auto; gap: 13px; margin-top: auto; padding: 14px; border-top: 1px solid var(--master-line); }
 .accessNote { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--master-line); border-radius: 2px; }
 .accessNote > span { flex: 0 0 auto; }

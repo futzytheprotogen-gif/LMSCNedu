@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { unggahFileDariBrowser } from "@/lib/upload-client";
+import BackAction from "@/components/BackAction";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -11,10 +13,19 @@ interface DetailTugas {
   deskripsi: string;
   tipeLampiran: "PDF" | "LINK" | null;
   lampiran: string | null;
+  deadlineAt: string | null;
+  susulanAktif: boolean;
+  deadlineSusulan: string | null;
+  bolehKumpul: boolean;
   createdAt: string;
   guru: { id: string; nama: string };
   kelasTujuan: { id: string; judul: string }[];
-  submission: { fileUrl: string; waktuKumpul: string } | null;
+  submission: {
+    fileUrl: string;
+    waktuKumpul: string;
+    nilai: number | null;
+    catatanNilai: string | null;
+  } | null;
 }
 
 export default function DetailTugasSiswa() {
@@ -65,25 +76,12 @@ export default function DetailTugasSiswa() {
     setPesanError(null);
 
     try {
-      const formData = new FormData();
-      formData.append("file", fileTerpilih);
-      formData.append("folder", "jawaban-tugas");
-
-      const responseUpload = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const dataUpload = await responseUpload.json();
-
-      if (!responseUpload.ok) {
-        setPesanError(dataUpload.pesan ?? "Gagal upload file.");
-        return;
-      }
+      const fileUrl = await unggahFileDariBrowser(fileTerpilih, "jawaban-tugas");
 
       const responseSubmit = await fetch(`/api/tugas/${params.id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileUrl: dataUpload.url }),
+        body: JSON.stringify({ fileUrl }),
       });
       const dataSubmit = await responseSubmit.json();
 
@@ -94,8 +92,8 @@ export default function DetailTugasSiswa() {
 
       setFileTerpilih(null);
       await muat();
-    } catch {
-      setPesanError("Tidak dapat terhubung ke server.");
+    } catch (error) {
+      setPesanError(error instanceof Error ? error.message : "Tidak dapat terhubung ke server.");
     } finally {
       setSedangKirim(false);
     }
@@ -109,22 +107,19 @@ export default function DetailTugasSiswa() {
     return (
       <div style={styles.centerBox}>
         <p style={{ color: "var(--cn-danger)" }}>⚠️ {errorMuat ?? "Tugas tidak ditemukan."}</p>
-        <button type="button" onClick={() => router.push("/siswa/tugas")} style={styles.backButton}>
-          ← Kembali ke Tugas
-        </button>
+        <BackAction as="button" onClick={() => router.push("/siswa/tugas")}>Kembali ke Tugas</BackAction>
       </div>
     );
   }
 
   const sudahKumpul = !!tugas.submission;
   const tanggal = new Date(tugas.createdAt);
+  const bolehKumpul = tugas.bolehKumpul;
 
   return (
     <div style={styles.page}>
       <main style={styles.container}>
-        <button type="button" onClick={() => router.push("/siswa/tugas")} style={styles.backLink}>
-          ← Kembali ke Tugas
-        </button>
+        <BackAction as="button" onClick={() => router.push("/siswa/tugas")}>Kembali ke Tugas</BackAction>
 
         <article style={styles.card}>
           <div style={styles.cardHeader}>
@@ -152,6 +147,16 @@ export default function DetailTugasSiswa() {
           </div>
 
           <p style={styles.description}>{tugas.deskripsi}</p>
+
+          {tugas.deadlineAt && (
+            <div style={styles.deadlineBox}>
+              <strong>Deadline pengumpulan</strong>
+              <span>{new Date(tugas.deadlineAt).toLocaleString("id-ID", { dateStyle: "long", timeStyle: "short" })}</span>
+              {tugas.susulanAktif && tugas.deadlineSusulan && (
+                <span>Batas tugas susulan: {new Date(tugas.deadlineSusulan).toLocaleString("id-ID", { dateStyle: "long", timeStyle: "short" })}</span>
+              )}
+            </div>
+          )}
 
           {tugas.lampiran && (
             <a href={tugas.lampiran} target="_blank" rel="noreferrer" style={styles.attachmentButton}>
@@ -181,31 +186,47 @@ export default function DetailTugasSiswa() {
               <a href={tugas.submission.fileUrl} target="_blank" rel="noreferrer" style={styles.fileLink}>
                 📎 Lihat file yang dikumpulkan
               </a>
+              {tugas.submission.nilai !== null && (
+                <strong>Nilai: {tugas.submission.nilai}/100</strong>
+              )}
+              {tugas.submission.catatanNilai && (
+                <span>Catatan guru: {tugas.submission.catatanNilai}</span>
+              )}
             </div>
           )}
 
-          <label style={styles.uploadLabel}>
-            <span>{sudahKumpul ? "Ganti file jawaban (opsional)" : "Upload jawaban (PDF)"}</span>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => setFileTerpilih(e.target.files?.[0] ?? null)}
-              style={styles.fileInput}
-            />
-          </label>
+          {bolehKumpul ? (
+            <>
+              <label style={styles.uploadLabel}>
+                <span>{sudahKumpul ? "Ganti file jawaban (opsional)" : "Upload jawaban (PDF)"}</span>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) => setFileTerpilih(e.target.files?.[0] ?? null)}
+                  style={styles.fileInput}
+                />
+              </label>
 
-          {fileTerpilih && <div style={styles.fileInfo}>📄 {fileTerpilih.name}</div>}
+              {fileTerpilih && <div style={styles.fileInfo}>📄 {fileTerpilih.name}</div>}
 
-          {pesanError && <div style={styles.errorBox}>⚠️ {pesanError}</div>}
+              {pesanError && <div style={styles.errorBox}>⚠️ {pesanError}</div>}
 
-          <button
-            type="button"
-            onClick={kirimJawaban}
-            disabled={sedangKirim}
-            style={styles.submitButton}
-          >
-            {sedangKirim ? "Mengirim..." : sudahKumpul ? "Kumpulkan Ulang" : "Kumpulkan Tugas"}
-          </button>
+              <button
+                type="button"
+                onClick={kirimJawaban}
+                disabled={sedangKirim}
+                style={styles.submitButton}
+              >
+                {sedangKirim ? "Mengirim..." : sudahKumpul ? "Kumpulkan Ulang" : "Kumpulkan Tugas"}
+              </button>
+            </>
+          ) : (
+            <div style={styles.deadlineClosed} role="status">
+              {tugas.susulanAktif
+                ? "Deadline tugas susulan telah berakhir."
+                : "Deadline telah berakhir. Pengumpulan susulan belum diaktifkan."}
+            </div>
+          )}
         </article>
       </main>
     </div>
@@ -215,7 +236,7 @@ export default function DetailTugasSiswa() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "linear-gradient(180deg, var(--cn-tint) 0%, var(--cn-surface) 42%, var(--cn-tint) 100%)",
+    background: "transparent",
     color: "var(--cn-coral-dark)",
   },
   container: { width: "100%", maxWidth: "720px", margin: "0 auto", padding: "34px 24px 60px" },
@@ -278,6 +299,25 @@ const styles = {
     whiteSpace: "nowrap" as const,
   },
   description: { margin: "16px 0", color: "var(--cn-coral-dark)", fontSize: "13px", lineHeight: 1.7, whiteSpace: "pre-wrap" as const },
+  deadlineBox: {
+    display: "grid",
+    gap: "5px",
+    margin: "14px 0",
+    padding: "12px 14px",
+    borderRadius: "10px",
+    border: "1px solid var(--cn-line)",
+    background: "var(--cn-tint)",
+    color: "var(--cn-text)",
+    fontSize: "12px",
+  },
+  deadlineClosed: {
+    padding: "12px 14px",
+    borderRadius: "10px",
+    color: "var(--cn-danger)",
+    background: "var(--cn-danger-tint)",
+    fontSize: "12px",
+    fontWeight: 700,
+  },
   attachmentButton: {
     display: "inline-block",
     textDecoration: "none",

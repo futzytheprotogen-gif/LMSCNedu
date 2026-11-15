@@ -297,7 +297,7 @@ export default function HalamanKelasSiswa() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "linear-gradient(180deg, var(--cn-tint) 0%, var(--cn-surface) 42%, var(--cn-tint) 100%)",
+    background: "transparent",
     position: "relative" as const,
     overflow: "hidden" as const,
     color: "var(--cn-coral-dark)",

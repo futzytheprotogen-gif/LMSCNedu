@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./ModalKelas.module.css";
 
 type Props = {
@@ -14,8 +14,12 @@ type Props = {
   }) => void;
 };
 
-export default function ModalKelas({
-  terbuka,
+export default function ModalKelas(props: Props) {
+  if (!props.terbuka) return null;
+  return <ModalKelasTerbuka {...props} />;
+}
+
+function ModalKelasTerbuka({
   sedangProses,
   pesanError,
   onTutup,
@@ -23,15 +27,6 @@ export default function ModalKelas({
 }: Props) {
   const [judul, setJudul] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
-
-  useEffect(() => {
-    if (!terbuka) {
-      setJudul("");
-      setDeskripsi("");
-    }
-  }, [terbuka]);
-
-  if (!terbuka) return null;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

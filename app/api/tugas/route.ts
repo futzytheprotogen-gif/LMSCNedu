@@ -24,6 +24,9 @@ export async function GET(request: NextRequest) {
         deskripsi: t.deskripsi,
         tipeLampiran: t.tipeLampiran,
         lampiran: t.lampiran,
+        deadlineAt: t.deadlineAt,
+        susulanAktif: t.susulanAktif,
+        deadlineSusulan: t.deadlineSusulan,
         createdAt: t.createdAt,
         kelasTujuan: t.kelasTujuan.map((kt) => kt.kelas),
       })),
@@ -46,6 +49,15 @@ interface BodyBuatTugas {
   tipeLampiran?: "PDF" | "LINK";
   lampiran?: string;
   kelasIds?: string[];
+  deadlineAt?: string | null;
+  susulanAktif?: boolean;
+  deadlineSusulan?: string | null;
+}
+
+function bacaTanggal(value: string | null | undefined) {
+  if (value === undefined || value === null || value === "") return null;
+  const tanggal = new Date(value);
+  return Number.isNaN(tanggal.getTime()) ? undefined : tanggal;
 }
 
 export async function POST(request: NextRequest) {
@@ -53,11 +65,39 @@ export async function POST(request: NextRequest) {
     const sesi = await wajibGuru(request);
 
     const body: BodyBuatTugas = await request.json().catch(() => ({}));
-    const { judul, deskripsi, tipeLampiran, lampiran, kelasIds } = body;
+    const {
+      judul,
+      deskripsi,
+      tipeLampiran,
+      lampiran,
+      kelasIds,
+      deadlineAt: deadlineInput,
+      susulanAktif: susulanInput,
+      deadlineSusulan: deadlineSusulanInput,
+    } = body;
 
     if (!judul?.trim() || !deskripsi?.trim()) {
       return NextResponse.json(
         { pesan: "judul dan deskripsi wajib diisi" },
+        { status: 400 }
+      );
+    }
+    if (susulanInput !== undefined && typeof susulanInput !== "boolean") {
+      return NextResponse.json({ pesan: "Pengaturan deadline susulan tidak valid." }, { status: 400 });
+    }
+
+    const deadlineAt = bacaTanggal(deadlineInput);
+    const deadlineSusulan = bacaTanggal(deadlineSusulanInput);
+    const susulanAktif = susulanInput ?? false;
+    if (deadlineAt === undefined || deadlineSusulan === undefined) {
+      return NextResponse.json({ pesan: "Format deadline tidak valid." }, { status: 400 });
+    }
+    if (
+      susulanAktif &&
+      (!deadlineAt || !deadlineSusulan || deadlineSusulan <= deadlineAt)
+    ) {
+      return NextResponse.json(
+        { pesan: "Deadline susulan harus diisi dan berada setelah deadline utama." },
         { status: 400 }
       );
     }
@@ -68,7 +108,7 @@ export async function POST(request: NextRequest) {
       const jumlahKelasValid = await db.kelasGuru.count({
         where: { guruId: sesi.userId, kelasId: { in: kelasIds } },
       });
-      if (jumlahKelasValid === 0) {
+      if (jumlahKelasValid !== new Set(kelasIds).size) {
         return NextResponse.json(
           { pesan: "Kamu tidak mengajar di kelas yang dipilih" },
           { status: 403 }
@@ -82,6 +122,9 @@ export async function POST(request: NextRequest) {
         deskripsi: deskripsi.trim(),
         tipeLampiran: tipeLampiran ?? null,
         lampiran: lampiran || null,
+        deadlineAt,
+        susulanAktif,
+        deadlineSusulan: susulanAktif ? deadlineSusulan : null,
         guruId: sesi.userId,
         kelasTujuan: kelasIds?.length
           ? { create: kelasIds.map((kelasId) => ({ kelasId })) }

@@ -10,7 +10,7 @@ interface KelasPemantauan {
   createdAt?: string;
 }
 
-const WARNA_KATEGORI = ["#f97316", "#0f766e", "#f59e0b", "#2563eb"];
+const WARNA_KATEGORI = ["#f97316", "#0f766e", "#f59e0b", "var(--cn-primary)"];
 
 function buatRentangBulan(daftarKelas: KelasPemantauan[]) {
   const bulanIni = new Date();
@@ -43,7 +43,7 @@ export default function ClassMonitoringCharts({ daftarKelas, peran }: { daftarKe
     const utama = terurut.slice(0, 5).map((kelas, indeks) => ({
       label: kelas.judul,
       nilai: kelas.jumlahSiswa,
-      warna: ["#2563eb", "#0f766e", "#8b5cf6", "#f59e0b", "#ec4899"][indeks],
+      warna: ["var(--cn-primary)", "#0f766e", "#8b5cf6", "#f59e0b", "#ec4899"][indeks],
     }));
     const siswaLain = terurut.slice(5).reduce((total, kelas) => total + kelas.jumlahSiswa, 0);
     return siswaLain > 0 ? [...utama, { label: "Kelas lainnya", nilai: siswaLain, warna: "#dc2626" }] : utama;

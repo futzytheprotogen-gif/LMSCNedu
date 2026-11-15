@@ -2,20 +2,11 @@ import mariadb from "mariadb";
 
 export const dynamic = "force-dynamic";
 
-const b = (v?: string) => v?.trim().replace(/^["']|["']$/g, "");
-
 export async function GET() {
-  const info = {
-    host: b(process.env.DB_HOST),
-    port: b(process.env.DB_PORT),
-    dbName: b(process.env.DB_NAME),
-    userEndsWithRoot: b(process.env.DB_USER)?.endsWith(".root"),
-    passwordLength: process.env.DB_PASSWORD?.length,
-    dbSslRaw: process.env.DB_SSL,
-  };
-
+  let conn: Awaited<ReturnType<typeof mariadb.createConnection>> | null = null;
   try {
-    const conn = await mariadb.createConnection({
+    const b = (value?: string) => value?.trim().replace(/^["']|["']$/g, "");
+    conn = await mariadb.createConnection({
       host: b(process.env.DB_HOST),
       port: Number(b(process.env.DB_PORT)),
       user: b(process.env.DB_USER),
@@ -25,13 +16,20 @@ export async function GET() {
       connectTimeout: 15000,
     });
     await conn.query("SELECT 1");
-    await conn.end();
-    return Response.json({ ok: true, info });
-  } catch (e) {
-    const err = e as { code?: string; message?: string };
+    return Response.json({ ok: true });
+  } catch (error) {
+    console.error("Pemeriksaan koneksi database gagal:", error);
     return Response.json(
-      { ok: false, code: err.code, message: err.message, info },
-      { status: 500 }
+      { ok: false, pesan: "Koneksi database belum tersedia." },
+      { status: 503 }
     );
+  } finally {
+    if (conn) {
+      try {
+        await conn.end();
+      } catch (error) {
+        console.error("Gagal menutup koneksi pemeriksaan database:", error);
+      }
+    }
   }
 }

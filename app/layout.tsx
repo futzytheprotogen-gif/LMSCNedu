@@ -18,10 +18,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script id="cnedu-theme-init" strategy="beforeInteractive">
           {`try {
             var savedTheme = localStorage.getItem("cnedu-theme");
+            var savedPalette = localStorage.getItem("cnedu-palette");
             var isDark = savedTheme === "gelap" || (savedTheme !== "terang" && window.matchMedia("(prefers-color-scheme: dark)").matches);
             document.documentElement.dataset.theme = isDark ? "dark" : "light";
+            document.documentElement.dataset.palette = savedPalette === "midnight-violet" ? "midnight-violet" : "standar";
           } catch (error) {
             document.documentElement.dataset.theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            document.documentElement.dataset.palette = "standar";
           }`}
         </Script>
         <AppThemeProvider>

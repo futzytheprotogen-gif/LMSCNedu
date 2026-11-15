@@ -9,64 +9,12 @@
 
   color: var(--cn-coral-dark);
 
-  background:
-    radial-gradient(
-      circle at 85% 5%,
-      rgba(var(--cn-primary-rgb), 0.09),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at 5% 90%,
-      rgba(var(--cn-cyan-rgb), 0.08),
-      transparent 25%
-    ),
-    var(--cn-tint);
+  background: transparent;
 
   overflow-x: hidden;
 
   animation: pageFadeIn 0.55s ease both;
 }
-
-/* Decorative background */
-
-.page::before {
-  content: "";
-  position: fixed;
-  width: 420px;
-  height: 420px;
-
-  top: -220px;
-  right: -150px;
-
-  border-radius: 50%;
-
-  background: rgba(var(--cn-primary-rgb), 0.045);
-
-  filter: blur(4px);
-
-  pointer-events: none;
-  z-index: 0;
-}
-
-.page::after {
-  content: "";
-  position: fixed;
-  width: 300px;
-  height: 300px;
-
-  bottom: -170px;
-  left: -120px;
-
-  border-radius: 50%;
-
-  background: rgba(var(--cn-cyan-rgb), 0.055);
-
-  filter: blur(5px);
-
-  pointer-events: none;
-  z-index: 0;
-}
-
 
 /* =========================================================
    HERO

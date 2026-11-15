@@ -1,7 +1,7 @@
 .page {
   min-height: calc(100vh - 56px);
   color: var(--cn-navy);
-  background: var(--cn-tint);
+  background: transparent;
 }
 
 .container {

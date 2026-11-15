@@ -15,14 +15,26 @@
 .wadah {
   font-family: "IBM Plex Sans", sans-serif;
   color: var(--ink);
-  background: var(--cn-tint);
+  background-color: var(--cn-tint);
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgba(var(--cn-primary-rgb), 0.07), transparent 38%),
+    linear-gradient(rgba(var(--cn-primary-rgb), 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--cn-primary-rgb), 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
   overflow-x: hidden;
+}
+
+:global(:root[data-theme="dark"]) .wadah {
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgba(var(--cn-primary-rgb), 0.1), transparent 38%),
+    linear-gradient(rgba(var(--cn-primary-rgb), 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--cn-primary-rgb), 0.03) 1px, transparent 1px);
 }
 
 .wadah h1,
 .wadah h2,
 .wadah h3 {
-  font-family: "Sora", sans-serif;
+  font-family: "IBM Plex Serif", Georgia, serif;
 }
 
 /* ---------------- NAVBAR ---------------- */
@@ -53,7 +65,7 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-family: "Sora", sans-serif;
+  font-family: "IBM Plex Serif", Georgia, serif;
   font-weight: 800;
   font-size: 19px;
   color: var(--navy);
@@ -121,11 +133,16 @@
 }
 
 .navMobileMenu a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
   font-size: 14px;
   font-weight: 500;
   color: var(--ink);
   text-decoration: none;
 }
+
+.mobileNavIcon { width: 17px; height: 17px; flex: 0 0 auto; color: var(--primary); }
 
 /* ---------------- HERO ---------------- */
 
@@ -309,7 +326,7 @@
 }
 
 .heroSignal strong {
-  font-family: "Sora", sans-serif;
+  font-family: "IBM Plex Serif", Georgia, serif;
   font-size: 9px;
   letter-spacing: 0.08em;
 }
@@ -483,7 +500,7 @@
 }
 
 .statAngka {
-  font-family: "Sora", sans-serif;
+  font-family: "IBM Plex Serif", Georgia, serif;
   font-size: 36px;
   font-weight: 800;
   color: var(--navy);
@@ -604,7 +621,12 @@
 /* ---------------- ROLE ---------------- */
 
 .roleSeksi {
-  background: #0f172a;
+  background-color: #0f172a;
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgb(182 162 216 / 10%), transparent 38%),
+    linear-gradient(rgb(182 162 216 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(182 162 216 / 3%) 1px, transparent 1px);
+  background-size: 48px 48px;
   position: relative;
   overflow: hidden;
   padding: 96px 24px;
@@ -656,7 +678,7 @@
   border-radius: 10px;
   background: var(--coral);
   color: #fff;
-  font-family: "Sora", sans-serif;
+  font-family: "IBM Plex Serif", Georgia, serif;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -807,7 +829,12 @@
 .cta {
   text-align: center;
   padding: 96px 24px;
-  background: linear-gradient(135deg, var(--cn-tint) 0%, var(--cn-coral-tint) 100%);
+  background-color: var(--cn-tint);
+  background-image:
+    radial-gradient(ellipse at 92% 0%, rgba(var(--cn-primary-rgb), 0.07), transparent 38%),
+    linear-gradient(rgba(var(--cn-primary-rgb), 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--cn-primary-rgb), 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 .ctaJudul {

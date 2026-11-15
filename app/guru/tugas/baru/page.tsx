@@ -3,6 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { unggahFileDariBrowser } from "@/lib/upload-client";
+import BackAction from "@/components/BackAction";
 
 const WARNA = {
   primary: "var(--cn-primary)",
@@ -34,6 +36,9 @@ function FormBuatTugas() {
 
   const [judul, setJudul] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
+  const [deadlineAt, setDeadlineAt] = useState("");
+  const [susulanAktif, setSusulanAktif] = useState(false);
+  const [deadlineSusulan, setDeadlineSusulan] = useState("");
   const [pakaiLampiran, setPakaiLampiran] = useState(false);
   const [tipeLampiran, setTipeLampiran] = useState<"PDF" | "LINK">("LINK");
   const [lampiran, setLampiran] = useState("");
@@ -54,6 +59,10 @@ function FormBuatTugas() {
       setPesanError("Silakan pilih file PDF terlebih dahulu.");
       return;
     }
+    if (susulanAktif && (!deadlineAt || !deadlineSusulan || new Date(deadlineSusulan) <= new Date(deadlineAt))) {
+      setPesanError("Deadline susulan harus diisi dan berada setelah deadline utama.");
+      return;
+    }
 
     setSedangSimpan(true);
     let urlLampiranAkhir = lampiran;
@@ -61,22 +70,8 @@ function FormBuatTugas() {
     try {
       if (pakaiLampiran && tipeLampiran === "PDF" && fileTerpilih) {
         setSedangUpload(true);
-        const formData = new FormData();
-        formData.append("file", fileTerpilih);
-        formData.append("folder", "lampiran-tugas");
-        const responseUpload = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const dataUpload = await responseUpload.json();
+        urlLampiranAkhir = await unggahFileDariBrowser(fileTerpilih, "lampiran-tugas");
         setSedangUpload(false);
-
-        if (!responseUpload.ok) {
-          setPesanError(dataUpload.pesan ?? "Gagal mengunggah file.");
-          setSedangSimpan(false);
-          return;
-        }
-        urlLampiranAkhir = dataUpload.url;
       }
 
       const response = await fetch("/api/tugas", {
@@ -87,6 +82,11 @@ function FormBuatTugas() {
           deskripsi: deskripsi.trim(),
           tipeLampiran: pakaiLampiran ? tipeLampiran : undefined,
           lampiran: pakaiLampiran ? urlLampiranAkhir : undefined,
+          deadlineAt: deadlineAt ? new Date(deadlineAt).toISOString() : null,
+          susulanAktif,
+          deadlineSusulan: susulanAktif && deadlineSusulan
+            ? new Date(deadlineSusulan).toISOString()
+            : null,
           kelasIds: kelasId ? [kelasId] : undefined,
         }),
       });
@@ -98,8 +98,10 @@ function FormBuatTugas() {
       }
 
       router.push(kelasId ? `/guru/kelas/${kelasId}` : "/guru/tugas");
-    } catch {
-      setPesanError("Gagal terhubung ke server. Silakan coba lagi.");
+    } catch (error) {
+      setPesanError(
+        error instanceof Error ? error.message : "Gagal terhubung ke server. Silakan coba lagi."
+      );
     } finally {
       setSedangSimpan(false);
       setSedangUpload(false);
@@ -111,13 +113,7 @@ function FormBuatTugas() {
       <div style={estilo.container}>
         {/* Header Section */}
         <div style={estilo.header}>
-          <button
-            type="button"
-            onClick={() => router.back()}
-            style={estilo.tombolKembali}
-          >
-            ← Kembali
-          </button>
+          <BackAction as="button" onClick={() => router.back()}>Kembali</BackAction>
           <span style={estilo.badgeLabel}>RUANG GURU</span>
           <h1 style={estilo.judulHalaman}>Buat Tugas Baru</h1>
           <p style={estilo.subjudulHalaman}>
@@ -166,6 +162,44 @@ function FormBuatTugas() {
               placeholder="Tuliskan instruksi pengerjaan tugas secara rinci di sini..."
               style={estilo.textarea}
             />
+          </div>
+
+          <div style={estilo.grupInput}>
+            <label style={estilo.label}>Deadline pengumpulan</label>
+            <input
+              type="datetime-local"
+              value={deadlineAt}
+              onChange={(event) => setDeadlineAt(event.target.value)}
+              style={estilo.input}
+            />
+            <small style={estilo.bantuan}>Kosongkan jika tugas tidak memiliki batas waktu.</small>
+          </div>
+
+          <div style={estilo.kartuDeadline}>
+            <label style={estilo.labelCheckbox}>
+              <input
+                checked={susulanAktif}
+                onChange={(event) => setSusulanAktif(event.target.checked)}
+                style={estilo.checkbox}
+                type="checkbox"
+              />
+              <span>
+                <strong>Aktifkan deadline tugas susulan</strong>
+                <small style={estilo.bantuan}>Izinkan pengumpulan setelah deadline utama sampai batas susulan.</small>
+              </span>
+            </label>
+            {susulanAktif && (
+              <div style={estilo.grupInput}>
+                <label style={estilo.label}>Batas akhir tugas susulan</label>
+                <input
+                  type="datetime-local"
+                  min={deadlineAt || undefined}
+                  value={deadlineSusulan}
+                  onChange={(event) => setDeadlineSusulan(event.target.value)}
+                  style={estilo.input}
+                />
+              </div>
+            )}
           </div>
 
           <div style={estilo.garisPemisah} />
@@ -287,7 +321,7 @@ function FormBuatTugas() {
 const estilo = {
   halaman: {
     minHeight: "100vh",
-    backgroundColor: WARNA.background,
+    backgroundColor: "transparent",
     padding: "32px 16px",
     display: "flex",
     justifyContent: "center",
@@ -404,6 +438,15 @@ const estilo = {
     backgroundColor: WARNA.border,
     margin: "4px 0",
   },
+  kartuDeadline: {
+    display: "grid",
+    gap: "12px",
+    padding: "14px",
+    borderRadius: "10px",
+    border: `1px solid ${WARNA.border}`,
+    backgroundColor: "var(--cn-tint)",
+  },
+  bantuan: { color: "var(--cn-muted)", fontSize: "11px", lineHeight: 1.4 },
   seksiLampiran: {
     display: "flex",
     flexDirection: "column" as const,

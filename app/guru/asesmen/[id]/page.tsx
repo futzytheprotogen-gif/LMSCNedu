@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import { useAppNotice } from "@/components/AppNoticeProvider";
+import BackAction from "@/components/BackAction";
 
 const WARNA_PRIMARY = "var(--cn-primary)";
 
@@ -456,14 +457,7 @@ export default function HalamanDetailAsesmen() {
               "Data asesmen tidak tersedia."}
           </p>
 
-          <button
-            onClick={() =>
-              router.push("/guru/asesmen")
-            }
-            style={estilo.tombolPrimary}
-          >
-            Kembali ke Asesmen
-          </button>
+          <BackAction as="button" onClick={() => router.push("/guru/asesmen")}>Kembali ke Asesmen</BackAction>
         </div>
       </div>
     );
@@ -606,15 +600,7 @@ export default function HalamanDetailAsesmen() {
             TOP BAR
         ================================= */}
 
-        <button
-          onClick={() =>
-            router.push("/guru/asesmen")
-          }
-          style={estilo.tombolKembali}
-        >
-          <span style={estilo.iconKembali}>←</span>
-          Kembali ke Asesmen
-        </button>
+        <BackAction as="button" onClick={() => router.push("/guru/asesmen")}>Kembali ke Asesmen</BackAction>
 
         {/* =================================
             HERO
@@ -1673,7 +1659,7 @@ const estilo = {
   halaman: {
     minHeight: "100vh",
     padding: "28px 32px 50px",
-    backgroundColor: "var(--cn-tint)",
+    backgroundColor: "transparent",
     color: "var(--cn-coral-dark)",
   },
 

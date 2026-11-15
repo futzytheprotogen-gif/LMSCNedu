@@ -2,7 +2,7 @@
 .header { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
 .breadcrumb, .formHeading > div > span, .listTop > div > span { color: var(--master-muted); font: 700 9px/1.4 "IBM Plex Sans", sans-serif; letter-spacing: .13em; }
 .breadcrumb span { padding: 0 5px; color: var(--master-accent); }
-.header h1 { margin: 8px 0 5px; color: var(--master-text); font: 750 clamp(23px, 3vw, 30px)/1.2 "Sora", sans-serif; letter-spacing: -.04em; }
+.header h1 { margin: 8px 0 5px; color: var(--master-text); font: 750 clamp(23px, 3vw, 30px)/1.2 "IBM Plex Serif", Georgia, serif; letter-spacing: -.04em; }
 .header p { max-width: 670px; margin: 0; color: var(--master-muted); font-size: 11px; line-height: 1.6; }
 .createButton, .saveButton { min-height: 36px; padding: 0 13px; border: 1px solid var(--master-accent); border-radius: 6px; color: var(--master-accent-ink); background: var(--master-accent); font-size: 10px; font-weight: 700; white-space: nowrap; cursor: pointer; }
 .createButton:hover, .saveButton:hover:not(:disabled) { filter: brightness(1.08); }
@@ -11,7 +11,7 @@
 .alertSuccess { border-color: #c7e8da; color: #197b59; background: #f1fbf5; }
 .createForm, .accountPanel { min-width: 0; padding: 17px; border: 1px solid var(--master-line); border-radius: 9px; background: var(--master-surface); box-shadow: 0 4px 16px rgb(10 35 43 / 3%); }
 .formHeading, .listTop { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-.formHeading h2, .listTop h2 { margin: 5px 0 0; color: var(--master-text); font: 700 14px/1.3 "Sora", sans-serif; }
+.formHeading h2, .listTop h2 { margin: 5px 0 0; color: var(--master-text); font: 700 14px/1.3 "IBM Plex Serif", Georgia, serif; }
 .formHeading > span { color: var(--master-muted); font-size: 9px; }
 .formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 15px; }
 .formGrid label { display: grid; gap: 6px; color: var(--master-muted); font-size: 9px; font-weight: 650; }
@@ -31,7 +31,7 @@
 .tableWrap th { height: 34px; padding: 0 11px; color: var(--master-muted); background: var(--master-panel); font: 700 8px "IBM Plex Sans", sans-serif; letter-spacing: .06em; text-transform: uppercase; }
 .tableWrap td { padding: 10px 11px; border-top: 1px solid var(--master-line); color: var(--master-text); font-size: 9px; vertical-align: middle; }
 .identity { display: flex; align-items: center; gap: 9px; }
-.avatar { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 8px; color: #a82370; background: #f7e6f0; font: 700 11px "Sora", sans-serif; }
+.avatar { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 8px; color: #a82370; background: #f7e6f0; font: 700 11px "IBM Plex Serif", Georgia, serif; }
 .masterAvatar { color: #875fba; background: #f0eafb; }
 .identity > div { display: grid; gap: 4px; }
 .identity strong { color: var(--master-text); font-size: 9px; }

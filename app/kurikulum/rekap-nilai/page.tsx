@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import MonitoringCharts, { type DataGrafik } from "@/components/MonitoringCharts";
 import EmptyStateFox from "@/components/EmptyStateFox";
+import UiIcon from "@/components/UiIcon";
 import styles from "./page.module.css";
 
 type Periode = "semua" | "30hari";
@@ -82,7 +83,7 @@ export default function HalamanRekapNilai() {
   const dataDonat: DataGrafik[] = kelasRekap.map((kelas, indeks) => ({
     label: kelas.judul,
     nilai: kelas.totalSiswaMengerjakan,
-    warna: ["#2563eb", "#0f766e", "#8b5cf6", "#f59e0b", "#ec4899", "#dc2626"][indeks % 6],
+    warna: ["var(--cn-primary)", "#0f766e", "#8b5cf6", "#f59e0b", "#ec4899", "#dc2626"][indeks % 6],
   }));
   const dataPie: DataGrafik[] = [
     { label: "Di bawah 70", nilai: kelasRekap.filter((kelas) => kelas.rataRataNilaiKelas !== null && kelas.rataRataNilaiKelas < 70).length, warna: "#ef4444" },
@@ -100,7 +101,7 @@ export default function HalamanRekapNilai() {
       <header className={styles.header}>
         <div>
           <div className={styles.breadcrumb}>Kurikulum <span>/</span> Rekap Nilai</div>
-          <h1>Rekap Nilai</h1>
+          <h1><UiIcon className={styles.titleGlyph} name="chart" /><span>Rekap Nilai</span></h1>
           <p>Bandingkan capaian siswa dan kinerja pengajar di setiap kelas.</p>
         </div>
         <label className={styles.periodFilter}>
@@ -123,7 +124,7 @@ export default function HalamanRekapNilai() {
         </>
       ) : error ? (
         <section className={styles.errorState} role="alert">
-          <span>!</span>
+          <span><UiIcon className={styles.stateGlyph} name="info" /></span>
           <h2>Rekap belum dapat dimuat</h2>
           <p>{error}</p>
           <button type="button" onClick={() => void muat()}>Coba lagi</button>
@@ -132,7 +133,7 @@ export default function HalamanRekapNilai() {
         <>
           <section className={styles.summaryGrid} aria-label="Ringkasan kelas">
             <article className={`${styles.summaryCard} ${styles.bestCard}`}>
-              <div className={styles.summaryTop}><span className={styles.summaryIcon}>↗</span><span>KELAS TERBAIK</span></div>
+              <div className={styles.summaryTop}><span className={styles.summaryIcon}><UiIcon className={styles.glyph} name="trophy" /></span><span>KELAS TERBAIK</span></div>
               {rekap.ringkasan.kelasTerbaik ? <>
                 <h2>{rekap.ringkasan.kelasTerbaik.judul}</h2>
                 <p>Skor keseluruhan tertinggi</p>
@@ -140,7 +141,7 @@ export default function HalamanRekapNilai() {
               </> : <div className={styles.summaryEmpty}>Belum ada kelas untuk dibandingkan.</div>}
             </article>
             <article className={`${styles.summaryCard} ${styles.attentionCard}`}>
-              <div className={styles.summaryTop}><span className={styles.summaryIcon}>◎</span><span>KELAS PERLU PERHATIAN</span></div>
+              <div className={styles.summaryTop}><span className={styles.summaryIcon}><UiIcon className={styles.glyph} name="info" /></span><span>KELAS PERLU PERHATIAN</span></div>
               {rekap.ringkasan.kelasTerendah ? <>
                 <h2>{rekap.ringkasan.kelasTerendah.judul}</h2>
                 <p>Skor keseluruhan terendah</p>
@@ -151,7 +152,7 @@ export default function HalamanRekapNilai() {
 
           {!adaNilai && (
             <div className={styles.noGrades}>
-              <span>i</span>
+              <span className={styles.noteIcon}><UiIcon className={styles.glyph} name="info" /></span>
               <p><strong>Belum ada data nilai selesai.</strong> Peringkat nilai siswa akan muncul setelah asesmen dinilai.</p>
             </div>
           )}
@@ -173,12 +174,12 @@ export default function HalamanRekapNilai() {
           {rekap.kelas.length ? (
             <section className={styles.rankingSection}>
               <div className={styles.sectionHeader}>
-                <div><span>PERBANDINGAN</span><h2>Kinerja kelas</h2></div>
+                <div><span className={styles.sectionEyebrow}><UiIcon className={styles.smallGlyph} name="chart" />PERBANDINGAN</span><h2>Kinerja kelas</h2></div>
                 <small>{rekap.kelas.length} kelas <i /> {periode === "semua" ? "Semua waktu" : "30 hari terakhir"}</small>
               </div>
               <div className={styles.classList}>
                 {rekap.kelas.map((kelas, urutan) => (
-                  <article className={styles.classCard} key={kelas.id}>
+                  <article className={styles.classCard} key={kelas.id} style={{ animationDelay: `${urutan * 45}ms` }}>
                     <div className={styles.classHeader}>
                       <div className={styles.classIdentity}>
                         <span className={styles.rank}>#{String(urutan + 1).padStart(2, "0")}</span>
@@ -206,7 +207,7 @@ export default function HalamanRekapNilai() {
                     </div>
 
                     <div className={styles.teacherSection}>
-                      <div className={styles.teacherHeading}><h4>Kinerja guru</h4><span>{kelas.guru.length} pengampu</span></div>
+                      <div className={styles.teacherHeading}><h4><UiIcon className={styles.smallGlyph} name="teacher" />Kinerja guru</h4><span>{kelas.guru.length} pengampu</span></div>
                       {kelas.guru.length ? <div className={styles.teacherList}>{kelas.guru.map((guru) => (
                         <div className={styles.teacherRow} key={`${guru.id}-${guru.mapel}`}>
                           <div className={styles.teacherName}><span>{guru.nama.charAt(0).toUpperCase()}</span><div><strong>{guru.nama}</strong><small>{guru.mapel}</small></div></div>

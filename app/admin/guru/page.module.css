@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  background: var(--cn-tint);
+  background: transparent;
   color: var(--cn-coral-dark);
   padding: 36px 42px 60px;
 }

@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
+import BackAction from "@/components/BackAction";
 import {
   bacaCatatanIntegritas,
   hapusCatatanIntegritas,
@@ -308,7 +308,7 @@ export default function DetailAsesmenSiswa() {
       <main className={styles.container}>
         <div className={styles.stateError} role="alert">
           <p>{error}</p>
-          <Link href="/siswa/asesmen">Kembali ke asesmen</Link>
+          <BackAction as="link" href="/siswa/asesmen">Kembali ke asesmen</BackAction>
         </div>
       </main>
     );
@@ -337,8 +337,8 @@ export default function DetailAsesmenSiswa() {
 
       <header className={styles.header}>
         <div className={styles.headerTitle}>
-          <Link
-            className={styles.backLink}
+          <BackAction
+            as="link"
             href="/siswa/asesmen"
             onClick={(event) => {
               if (asesmen.submission) return;
@@ -346,8 +346,8 @@ export default function DetailAsesmenSiswa() {
               void kembaliKeDaftarAsesmen();
             }}
           >
-            ← Kembali ke asesmen
-          </Link>
+            Kembali ke asesmen
+          </BackAction>
           <p className={styles.eyebrow}>{asesmen.tipe === "UJIAN" ? "UJIAN" : "KUIS"} · {asesmen.mapel}</p>
           <h1>{asesmen.judul}</h1>
           <p className={styles.meta}>{asesmen.guru} <span aria-hidden="true">·</span> {asesmen.soal.length} soal</p>

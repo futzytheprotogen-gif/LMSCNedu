@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
             guru: { select: { id: true, nama: true } },
             submission: {
               where: { siswaId: sesi.userId },
-              select: { fileUrl: true, waktuKumpul: true },
+            select: { fileUrl: true, waktuKumpul: true, nilai: true, catatanNilai: true },
             },
           },
         },
@@ -51,10 +51,18 @@ export async function GET(request: NextRequest) {
         deskripsi: string;
         tipeLampiran: "PDF" | "LINK" | null;
         lampiran: string | null;
+        deadlineAt: Date | null;
+        susulanAktif: boolean;
+        deadlineSusulan: Date | null;
         guru: { id: string; nama: string };
         kelasTujuan: { id: string; judul: string }[];
         dikirimPalingBaru: Date;
-        submission: { fileUrl: string; waktuKumpul: string } | null;
+        submission: {
+          fileUrl: string;
+          waktuKumpul: string;
+          nilai: number | null;
+          catatanNilai: string | null;
+        } | null;
       }
     >();
 
@@ -63,6 +71,8 @@ export async function GET(request: NextRequest) {
         ? {
             fileUrl: tk.tugas.submission[0].fileUrl,
             waktuKumpul: tk.tugas.submission[0].waktuKumpul.toISOString(),
+            nilai: tk.tugas.submission[0].nilai,
+            catatanNilai: tk.tugas.submission[0].catatanNilai,
           }
         : null;
 
@@ -80,6 +90,9 @@ export async function GET(request: NextRequest) {
           deskripsi: tk.tugas.deskripsi,
           tipeLampiran: tk.tugas.tipeLampiran,
           lampiran: tk.tugas.lampiran,
+          deadlineAt: tk.tugas.deadlineAt,
+          susulanAktif: tk.tugas.susulanAktif,
+          deadlineSusulan: tk.tugas.deadlineSusulan,
           guru: tk.tugas.guru,
           kelasTujuan: [tk.kelas],
           dikirimPalingBaru: tk.dikirimAt,
@@ -89,6 +102,7 @@ export async function GET(request: NextRequest) {
     }
 
     const hariIni = new Date().toDateString();
+    const sekarang = new Date();
 
     const data = Array.from(petaTugas.values())
       .map((t) => {
@@ -108,6 +122,16 @@ export async function GET(request: NextRequest) {
           deskripsi: t.deskripsi,
           tipeLampiran: t.tipeLampiran,
           lampiran: t.lampiran,
+          deadlineAt: t.deadlineAt?.toISOString() ?? null,
+          susulanAktif: t.susulanAktif,
+          deadlineSusulan: t.deadlineSusulan?.toISOString() ?? null,
+          statusDeadline: !t.deadlineAt
+            ? "TANPA_DEADLINE" as const
+            : sekarang <= t.deadlineAt
+              ? "TERBUKA" as const
+              : t.susulanAktif && t.deadlineSusulan && sekarang <= t.deadlineSusulan
+                ? "SUSULAN" as const
+                : "TUTUP" as const,
           guru: t.guru,
           kelasTujuan: t.kelasTujuan,
           dikirimAt: t.dikirimPalingBaru.toISOString(),
