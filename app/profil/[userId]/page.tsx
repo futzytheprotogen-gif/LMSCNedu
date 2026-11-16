@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { urlFilePrivat } from "@/lib/file-url";
 import { unggahFileDariBrowser } from "@/lib/upload-client";
 import BackAction from "@/components/BackAction";
 import styles from "./page.module.css";
@@ -156,7 +157,7 @@ export default function HalamanProfil() {
           <div className={styles.profileTop} style={estilo.barisAtas}>
             <div className={styles.avatar} style={estilo.avatarWadah}>
               {profil.fotoProfil ? (
-                <img src={profil.fotoProfil} alt={profil.nama} style={estilo.avatarFoto} />
+                <img src={urlFilePrivat(profil.fotoProfil) ?? undefined} alt={profil.nama} style={estilo.avatarFoto} />
               ) : (
                 <div style={estilo.avatarInisial}>{inisial}</div>
               )}
@@ -209,7 +210,7 @@ export default function HalamanProfil() {
 
             <div style={estilo.previewFotoWadah}>
               {previewFoto || fotoUrl ? (
-                <img src={previewFoto ?? fotoUrl ?? ""} alt="Preview" style={estilo.previewFoto} />
+                <img src={urlFilePrivat(previewFoto ?? fotoUrl) ?? ""} alt="Preview" style={estilo.previewFoto} />
               ) : (
                 <div style={estilo.previewFotoKosong}>{inisial}</div>
               )}

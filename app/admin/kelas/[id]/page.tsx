@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { urlFilePrivat } from "@/lib/file-url";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import { useAppNotice } from "@/components/AppNoticeProvider";
 import BackAction from "@/components/BackAction";
@@ -2392,7 +2393,7 @@ function Avatar({
   if (image) {
     return (
       <img
-        src={image}
+        src={urlFilePrivat(image) ?? undefined}
         alt={name}
         className={
           styles.avatar

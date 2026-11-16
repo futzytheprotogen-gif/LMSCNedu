@@ -19,7 +19,7 @@ export async function unggahFileDariBrowser(
 
   if (process.env.NODE_ENV === "production") {
     const blob = await upload(pathname, file, {
-      access: "public",
+      access: "private",
       handleUploadUrl: "/api/upload",
       multipart: file.size > 5 * 1024 * 1024,
     });

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { urlFilePrivat } from "@/lib/file-url";
 import { unggahFileDariBrowser } from "@/lib/upload-client";
 import BackAction from "@/components/BackAction";
 
@@ -159,7 +160,7 @@ export default function DetailTugasSiswa() {
           )}
 
           {tugas.lampiran && (
-            <a href={tugas.lampiran} target="_blank" rel="noreferrer" style={styles.attachmentButton}>
+            <a href={urlFilePrivat(tugas.lampiran) ?? undefined} target="_blank" rel="noreferrer" style={styles.attachmentButton}>
               {tugas.tipeLampiran === "PDF" ? "📄 Lihat Lampiran PDF" : "🔗 Buka Link Lampiran"}
             </a>
           )}
@@ -183,7 +184,7 @@ export default function DetailTugasSiswa() {
                   minute: "2-digit",
                 })}
               </span>
-              <a href={tugas.submission.fileUrl} target="_blank" rel="noreferrer" style={styles.fileLink}>
+              <a href={urlFilePrivat(tugas.submission.fileUrl) ?? undefined} target="_blank" rel="noreferrer" style={styles.fileLink}>
                 📎 Lihat file yang dikumpulkan
               </a>
               {tugas.submission.nilai !== null && (

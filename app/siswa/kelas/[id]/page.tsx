@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { hitungAktivitasBaru, tandaiSudahDilihat, type TipeAktivitasSiswa } from "@/lib/notifikasiSiswa";
+import { urlFilePrivat } from "@/lib/file-url";
 import BackAction from "@/components/BackAction";
 import layout from "./page.module.css";
 
@@ -193,7 +194,7 @@ export default function DetailKelasSiswa() {
               <div key={g.id} style={styles.personRow}>
                 <div style={styles.avatar}>
                   {g.fotoProfil ? (
-                    <img src={g.fotoProfil} alt="" style={styles.avatarImg} />
+                    <img src={urlFilePrivat(g.fotoProfil) ?? undefined} alt="" style={styles.avatarImg} />
                   ) : (
                     g.nama.charAt(0).toUpperCase()
                   )}
@@ -221,7 +222,7 @@ export default function DetailKelasSiswa() {
               >
                 <div style={styles.avatar}>
                   {s.fotoProfil ? (
-                    <img src={s.fotoProfil} alt="" style={styles.avatarImg} />
+                    <img src={urlFilePrivat(s.fotoProfil) ?? undefined} alt="" style={styles.avatarImg} />
                   ) : (
                     s.nama.charAt(0).toUpperCase()
                   )}
@@ -297,7 +298,7 @@ function ItemFeedCard({
 
         {item.tipe === "MATERI" && typeof item.extra?.url === "string" && (
           <a
-            href={item.extra.url}
+            href={urlFilePrivat(item.extra.url) ?? undefined}
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}

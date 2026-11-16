@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppConfirm } from "@/components/ConfirmDialogProvider";
 import { useAppNotice } from "@/components/AppNoticeProvider";
+import { urlFilePrivat } from "@/lib/file-url";
 import { unggahFileDariBrowser } from "@/lib/upload-client";
 import responsive from "./page.module.css";
 
@@ -1381,7 +1382,7 @@ function KartuTugas({
 
           {t.lampiran && (
             <a
-              href={t.lampiran}
+              href={urlFilePrivat(t.lampiran) ?? undefined}
               target="_blank"
               rel="noreferrer"
               style={styles.attachmentButton}
@@ -1537,7 +1538,7 @@ function StudentSubmissionRow({
       <div style={styles.studentAvatar}>
         {siswa.fotoProfil ? (
           <img
-            src={siswa.fotoProfil}
+            src={urlFilePrivat(siswa.fotoProfil) ?? undefined}
             alt=""
             style={styles.avatarImage}
           />
@@ -1587,7 +1588,7 @@ function StudentSubmissionRow({
 
       {sudah && siswa.fileUrl ? (
         <a
-          href={siswa.fileUrl}
+          href={urlFilePrivat(siswa.fileUrl) ?? undefined}
           target="_blank"
           rel="noreferrer"
           style={styles.fileButton}

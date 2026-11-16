@@ -48,7 +48,7 @@ export async function unggahFile(file: File, opsi: OpsiUnggah): Promise<string> 
   }
 
   const hasil = await put(namaFile, file, {
-    access: "public",
+    access: "private",
     addRandomSuffix: false, // kita udah bikin nama unik sendiri di atas
   });
 
