@@ -1817,6 +1817,13 @@
     0 0 0 3px rgba(var(--cn-primary-rgb), 0.07);
 }
 
+.selectHint {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
 .modalList {
   display: flex;
   flex-direction: column;

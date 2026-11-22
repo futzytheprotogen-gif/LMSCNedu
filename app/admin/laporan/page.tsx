@@ -37,13 +37,13 @@ interface Laporan {
   email: string;
   nikNisInput: string;
   alasan: string;
-  status: "MENUNGGU" | "DITERIMA" | "DITOLAK" | "SELESAI";
+  status: "DITERIMA" | "DITOLAK" | "SELESAI";
+  bisaOtpManual?: boolean;
   createdAt: string;
 }
 
 const LABEL_STATUS: Record<Laporan["status"], string> = {
-  MENUNGGU: "Menunggu",
-  DITERIMA: "OTP Terkirim",
+  DITERIMA: "Diterima",
   DITOLAK: "Ditolak",
   SELESAI: "Selesai",
 };
@@ -53,7 +53,6 @@ export default function HalamanLaporan() {
   const [daftarLaporan, setDaftarLaporan] = useState<Laporan[]>([]);
   const [sedangMuat, setSedangMuat] = useState(true);
   const [sedangProsesId, setSedangProsesId] = useState<string | null>(null);
-  const [kodeOtpManual, setKodeOtpManual] = useState<{ id: string; kode: string } | null>(null);
   const [pesanAksi, setPesanAksi] = useState<{
     id: string;
     pesan: string;
@@ -71,10 +70,10 @@ export default function HalamanLaporan() {
     width: 0,
     opacity: 0,
   });
+  const [selectedHistoryIds, setSelectedHistoryIds] = useState<string[]>([]);
 
   const filterOrder: Array<"SEMUA" | Laporan["status"]> = [
     "SEMUA",
-    "MENUNGGU",
     "DITERIMA",
     "DITOLAK",
     "SELESAI",
@@ -111,7 +110,6 @@ export default function HalamanLaporan() {
   async function kirimOtp(id: string) {
     setSedangProsesId(id);
     setPesanAksi(null);
-    setKodeOtpManual(null);
 
     try {
       const response = await fetch(`/api/lupa-password/${id}/kirim-otp`, {
@@ -137,7 +135,6 @@ export default function HalamanLaporan() {
   async function buatOtpManual(id: string) {
     setSedangProsesId(id);
     setPesanAksi(null);
-    setKodeOtpManual(null);
 
     try {
       const response = await fetch(`/api/lupa-password/${id}/kirim-otp`, {
@@ -148,7 +145,6 @@ export default function HalamanLaporan() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.pesan ?? "Gagal membuat OTP.");
 
-      setKodeOtpManual({ id, kode: data.kodeOtp });
       setPesanAksi({ id, pesan: data.pesan, error: false });
       await muatLaporan();
     } catch (error) {
@@ -163,36 +159,32 @@ export default function HalamanLaporan() {
     }
   }
 
-  async function salinOtp(kode: string) {
-    try {
-      await navigator.clipboard.writeText(kode);
-      setPesanAksi({ id: kodeOtpManual?.id ?? "", pesan: "Kode OTP disalin.", error: false });
-    } catch {
-      setPesanAksi({
-        id: kodeOtpManual?.id ?? "",
-        pesan: "Tidak dapat menyalin kode. Silakan pilih dan salin kodenya.",
-        error: true,
-      });
-    }
-  }
-
   async function tolakLaporan(id: string) {
     if (!(await konfirmasi({
       title: "Tolak laporan ini?",
-      message: "Laporan akan ditolak dan dihapus dari daftar.",
+      message: "Laporan akan ditandai Ditolak dan tetap tersimpan dalam riwayat.",
       confirmLabel: "Tolak laporan",
     }))) return;
 
     setSedangProsesId(id);
+    setPesanAksi(null);
 
     try {
-      await fetch(`/api/lupa-password/${id}/tolak`, {
+      const response = await fetch(`/api/lupa-password/${id}/tolak`, {
         method: "POST",
       });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.pesan ?? "Gagal menolak laporan.");
 
+      setPesanAksi({ id, pesan: data.pesan, error: false });
       await muatLaporan();
     } catch (error) {
       console.error(error);
+      setPesanAksi({
+        id,
+        pesan: error instanceof Error ? error.message : "Gagal menolak laporan.",
+        error: true,
+      });
     } finally {
       setSedangProsesId(null);
     }
@@ -201,7 +193,7 @@ export default function HalamanLaporan() {
   async function selesaikanLaporan(id: string) {
     if (!(await konfirmasi({
       title: "Selesaikan laporan?",
-      message: "Laporan akan ditandai selesai dan dihapus dari daftar aktif.",
+      message: "Laporan akan ditandai Selesai dan tetap tersimpan dalam riwayat.",
       confirmLabel: "Tandai selesai",
       tone: "primary",
     }))) {
@@ -209,15 +201,24 @@ export default function HalamanLaporan() {
     }
 
     setSedangProsesId(id);
+    setPesanAksi(null);
 
     try {
-      await fetch(`/api/lupa-password/${id}/selesai`, {
+      const response = await fetch(`/api/lupa-password/${id}/selesai`, {
         method: "POST",
       });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.pesan ?? "Gagal menyelesaikan laporan.");
 
+      setPesanAksi({ id, pesan: data.pesan, error: false });
       await muatLaporan();
     } catch (error) {
       console.error(error);
+      setPesanAksi({
+        id,
+        pesan: error instanceof Error ? error.message : "Gagal menyelesaikan laporan.",
+        error: true,
+      });
     } finally {
       setSedangProsesId(null);
     }
@@ -226,10 +227,6 @@ export default function HalamanLaporan() {
   // =========================
   // STATISTIK
   // =========================
-
-  const jumlahMenunggu = daftarLaporan.filter(
-    (l) => l.status === "MENUNGGU"
-  ).length;
 
   const jumlahSiswa = daftarLaporan.filter(
     (l) => l.tipeAkun === "SISWA"
@@ -258,27 +255,93 @@ export default function HalamanLaporan() {
     return cocokStatus && cocokPencarian;
   });
 
+  const daftarRiwayat = daftarLaporan.filter(
+    (laporan) => laporan.status === "DITOLAK" || laporan.status === "SELESAI"
+  );
+  const semuaRiwayatDipilih =
+    daftarRiwayat.length > 0 &&
+    daftarRiwayat.every((laporan) => selectedHistoryIds.includes(laporan.id));
+
+  function togglePilihanRiwayat(id: string) {
+    setSelectedHistoryIds((ids) =>
+      ids.includes(id) ? ids.filter((selectedId) => selectedId !== id) : [...ids, id]
+    );
+  }
+
+  function toggleSemuaRiwayat() {
+    setSelectedHistoryIds(() =>
+      semuaRiwayatDipilih ? [] : daftarRiwayat.map((laporan) => laporan.id)
+    );
+  }
+
+  async function hapusRiwayat(ids: string[], semua = false) {
+    if (semua) {
+      if (
+        !(await konfirmasi({
+          title: "Hapus semua riwayat?",
+          message: "Riwayat berstatus Ditolak dan Selesai akan dihapus permanen.",
+          confirmLabel: "Hapus semua",
+          tone: "danger",
+        }))
+      ) return;
+    } else if (
+      !(await konfirmasi({
+        title: "Hapus riwayat pilihan?",
+        message: `${ids.length} riwayat akan dihapus permanen.`,
+        confirmLabel: "Hapus riwayat",
+        tone: "danger",
+      }))
+    ) return;
+
+    setPesanAksi(null);
+    try {
+      const response = await fetch("/api/lupa-password", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(semua ? { semua: true } : { ids }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.pesan ?? "Gagal menghapus riwayat.");
+
+      setSelectedHistoryIds([]);
+      setPesanAksi({ id: "riwayat", pesan: data.pesan, error: false });
+      await muatLaporan();
+    } catch (error) {
+      setPesanAksi({
+        id: "riwayat",
+        pesan: error instanceof Error ? error.message : "Gagal menghapus riwayat.",
+        error: true,
+      });
+    }
+  }
+
   useEffect(() => {
     const activeKey = filterStatus;
     const activeButton = filterButtonRefs.current[activeKey];
     const wrapper = filterWrapperRef.current;
 
-    if (!activeButton || !wrapper) {
-      return;
-    }
+    if (!activeButton || !wrapper) return;
 
-    const frame = window.requestAnimationFrame(() => {
+    const updateIndicator = () => {
       const wrapperRect = wrapper.getBoundingClientRect();
       const buttonRect = activeButton.getBoundingClientRect();
 
       setFilterIndicator({
-        left: buttonRect.left - wrapperRect.left,
+        left: buttonRect.left - wrapperRect.left + wrapper.scrollLeft,
         width: buttonRect.width,
         opacity: 1,
       });
-    });
+    };
 
-    return () => window.cancelAnimationFrame(frame);
+    const frame = window.requestAnimationFrame(updateIndicator);
+    window.addEventListener("resize", updateIndicator);
+    wrapper.addEventListener("scroll", updateIndicator);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", updateIndicator);
+      wrapper.removeEventListener("scroll", updateIndicator);
+    };
   }, [filterStatus]);
 
   return (
@@ -325,35 +388,6 @@ export default function HalamanLaporan() {
           <div>
             <span style={estilo.labelStat}>Total Laporan</span>
             <strong style={estilo.nilaiStat}>{daftarLaporan.length}</strong>
-          </div>
-        </div>
-
-        <div
-          style={{
-            ...estilo.kartuStat,
-            borderColor:
-              jumlahMenunggu > 0 ? "var(--cn-coral)" : WARNA.border,
-          }}
-        >
-          <div
-            style={{
-              ...estilo.iconStat,
-              backgroundColor: WARNA.warningSoft,
-            }}
-          >
-            🔔
-          </div>
-
-          <div>
-            <span style={estilo.labelStat}>Menunggu</span>
-
-            <div style={estilo.barisNilai}>
-              <strong style={estilo.nilaiStat}>{jumlahMenunggu}</strong>
-
-              {jumlahMenunggu > 0 && (
-                <span style={estilo.badgeBaru}>BARU</span>
-              )}
-            </div>
           </div>
         </div>
 
@@ -404,8 +438,38 @@ export default function HalamanLaporan() {
             </p>
           </div>
 
-          <div style={estilo.totalBadge}>
-            {laporanTampil.length} laporan
+          <div style={estilo.panelHeaderAksi}>
+            {daftarRiwayat.length > 0 && (
+              <>
+                <label style={estilo.checkboxAllLabel}>
+                  <input
+                    type="checkbox"
+                    checked={semuaRiwayatDipilih}
+                    onChange={toggleSemuaRiwayat}
+                  />
+                  Pilih semua riwayat
+                </label>
+                {selectedHistoryIds.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => void hapusRiwayat(selectedHistoryIds)}
+                    style={estilo.tombolHapusPilihan}
+                  >
+                    Hapus {selectedHistoryIds.length}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => void hapusRiwayat([], true)}
+                  style={estilo.tombolHapusSemua}
+                >
+                  Hapus semua riwayat
+                </button>
+              </>
+            )}
+            <div style={estilo.totalBadge}>
+              {laporanTampil.length} laporan
+            </div>
           </div>
         </div>
 
@@ -437,13 +501,11 @@ export default function HalamanLaporan() {
               const label =
                 status === "SEMUA"
                   ? "Semua"
-                  : status === "MENUNGGU"
-                    ? "Menunggu"
-                    : status === "DITERIMA"
-                      ? "Diterima"
-                      : status === "DITOLAK"
-                        ? "Ditolak"
-                        : "Selesai";
+                  : status === "DITERIMA"
+                    ? "Diterima"
+                    : status === "DITOLAK"
+                      ? "Ditolak"
+                      : "Selesai";
 
               const isActive = filterStatus === status;
 
@@ -464,9 +526,6 @@ export default function HalamanLaporan() {
                   }}
                 >
                   {label}
-                  {status === "MENUNGGU" && jumlahMenunggu > 0 && (
-                    <span style={estilo.filterBadge}>{jumlahMenunggu}</span>
-                  )}
                 </button>
               );
             })}
@@ -517,14 +576,23 @@ export default function HalamanLaporan() {
                   key={laporan.id}
                   style={{
                     ...estilo.kartuLaporan,
-                    borderLeft:
-                      laporan.status === "MENUNGGU"
-                        ? `4px solid ${WARNA.warning}`
-                        : `4px solid ${statusStyle.color}`,
+                    borderLeft: `4px solid ${statusStyle.color}`,
                   }}
                 >
                   {/* HEADER KARTU */}
                   <div style={estilo.headerKartu}>
+                    {(laporan.status === "DITOLAK" || laporan.status === "SELESAI") && (
+                      <label
+                        title="Pilih riwayat laporan"
+                        style={estilo.checkboxRiwayat}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedHistoryIds.includes(laporan.id)}
+                          onChange={() => togglePilihanRiwayat(laporan.id)}
+                        />
+                      </label>
+                    )}
                     <div style={estilo.identitas}>
                       <div
                         style={{
@@ -575,21 +643,33 @@ export default function HalamanLaporan() {
                       </div>
                     </div>
 
-                    <span
-                      style={{
-                        ...estilo.badgeStatus,
-                        backgroundColor: statusStyle.background,
-                        color: statusStyle.color,
-                      }}
-                    >
+                    <div style={estilo.aksiStatusKartu}>
+                      {(laporan.status === "DITOLAK" || laporan.status === "SELESAI") && (
+                        <button
+                          type="button"
+                          onClick={() => void hapusRiwayat([laporan.id])}
+                          style={estilo.tombolHapusKartu}
+                          title="Hapus riwayat satu laporan"
+                        >
+                          Hapus
+                        </button>
+                      )}
                       <span
                         style={{
-                          ...estilo.dotStatus,
-                          backgroundColor: statusStyle.color,
+                          ...estilo.badgeStatus,
+                          backgroundColor: statusStyle.background,
+                          color: statusStyle.color,
                         }}
-                      />
-                      {LABEL_STATUS[laporan.status] ?? "Status tidak diketahui"}
-                    </span>
+                      >
+                        <span
+                          style={{
+                            ...estilo.dotStatus,
+                            backgroundColor: statusStyle.color,
+                          }}
+                        />
+                        {LABEL_STATUS[laporan.status] ?? "Status tidak diketahui"}
+                      </span>
+                    </div>
                   </div>
 
                   {/* INFO */}
@@ -624,61 +704,16 @@ export default function HalamanLaporan() {
                   </div>
 
                   {/* ACTION */}
-                  {(laporan.status === "MENUNGGU" ||
-                    laporan.status === "DITERIMA") && (
+                  {(laporan.status === "DITERIMA" ||
+                    laporan.status === "DITOLAK") && (
                     <div style={estilo.footerKartu}>
                       <span style={estilo.petunjuk}>
-                        {laporan.status === "MENUNGGU"
-                          ? "Belum ada OTP aktif. Kirim lewat email atau buat kode manual."
-                          : "OTP aktif selama 10 menit; email bisa dikirim ulang atau berikan kode manual."}
+                        {laporan.status === "DITOLAK"
+                          ? "Email otomatis tidak terkirim. Buat OTP manual agar pemohon dapat melanjutkan."
+                          : "OTP aktif. Pemohon dapat menggunakan kode dari email atau kode manual."}
                       </span>
 
                       <div style={estilo.aksi}>
-                        {laporan.status === "MENUNGGU" && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => kirimOtp(laporan.id)}
-                              disabled={
-                                sedangProsesId === laporan.id
-                              }
-                              style={{
-                                ...estilo.tombolPrimary,
-                                opacity:
-                                  sedangProsesId === laporan.id
-                                    ? 0.6
-                                    : 1,
-                              }}
-                            >
-                              {sedangProsesId === laporan.id
-                                ? "Memproses..."
-                                : "Kirim OTP ke Email"}
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => buatOtpManual(laporan.id)}
-                              disabled={sedangProsesId === laporan.id}
-                              style={estilo.tombolSecondary}
-                            >
-                              Buat OTP Manual
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                tolakLaporan(laporan.id)
-                              }
-                              disabled={
-                                sedangProsesId === laporan.id
-                              }
-                              style={estilo.tombolDangerOutline}
-                            >
-                              Tolak
-                            </button>
-                          </>
-                        )}
-
                         {laporan.status === "DITERIMA" && (
                           <>
                             <button
@@ -692,13 +727,28 @@ export default function HalamanLaporan() {
                               ↻ Kirim Ulang OTP
                             </button>
 
+                            {laporan.bisaOtpManual !== false && (
+                              <button
+                                type="button"
+                                onClick={() => buatOtpManual(laporan.id)}
+                                disabled={sedangProsesId === laporan.id}
+                                style={estilo.tombolSecondary}
+                              >
+                                Buat OTP Manual
+                              </button>
+                            )}
+
                             <button
                               type="button"
-                              onClick={() => buatOtpManual(laporan.id)}
-                              disabled={sedangProsesId === laporan.id}
-                              style={estilo.tombolSecondary}
+                              onClick={() =>
+                                tolakLaporan(laporan.id)
+                              }
+                              disabled={
+                                sedangProsesId === laporan.id
+                              }
+                              style={estilo.tombolDangerOutline}
                             >
-                              Buat OTP Manual
+                              Tolak
                             </button>
 
                             <button
@@ -715,6 +765,16 @@ export default function HalamanLaporan() {
                             </button>
                           </>
                         )}
+                        {laporan.status === "DITOLAK" && laporan.bisaOtpManual !== false && (
+                          <button
+                            type="button"
+                            onClick={() => buatOtpManual(laporan.id)}
+                            disabled={sedangProsesId === laporan.id}
+                            style={estilo.tombolPrimary}
+                          >
+                            Buat OTP Manual
+                          </button>
+                        )}
                       </div>
                       {pesanAksi?.id === laporan.id && (
                         <p
@@ -726,22 +786,6 @@ export default function HalamanLaporan() {
                         >
                           {pesanAksi.pesan}
                         </p>
-                      )}
-                      {kodeOtpManual?.id === laporan.id && (
-                        <div aria-label="Kode OTP untuk diberikan manual" style={estilo.kodeOtpManual}>
-                          <span>KODE OTP MANUAL</span>
-                          <strong style={estilo.kodeOtpDigit}>{kodeOtpManual.kode}</strong>
-                          <small style={estilo.kodeOtpPetunjuk}>
-                            Berlaku 10 menit. Sampaikan kode ini secara pribadi kepada pemilik akun.
-                          </small>
-                          <button
-                            style={estilo.tombolSalinOtp}
-                            type="button"
-                            onClick={() => void salinOtp(kodeOtpManual.kode)}
-                          >
-                            Salin kode
-                          </button>
-                        </div>
                       )}
                     </div>
                   )}
@@ -761,12 +805,6 @@ export default function HalamanLaporan() {
 
 function gayaStatus(status: Laporan["status"]) {
   switch (status) {
-    case "MENUNGGU":
-      return {
-        background: WARNA.warningSoft,
-        color: "var(--cn-coral)",
-      };
-
     case "DITERIMA":
       return {
         background: WARNA.primarySoft,
@@ -951,6 +989,46 @@ const estilo = {
     gap: "15px",
     borderBottom: `1px solid ${WARNA.border}`,
   },
+  panelHeaderAksi: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    flexWrap: "wrap" as const,
+    gap: "8px",
+  },
+  checkboxAllLabel: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    color: WARNA.text,
+    fontSize: "11px",
+    fontWeight: 700,
+  },
+  checkboxRiwayat: {
+    display: "inline-flex",
+    alignSelf: "center",
+    cursor: "pointer",
+  },
+  tombolHapusPilihan: {
+    border: `1px solid ${WARNA.danger}`,
+    borderRadius: "8px",
+    padding: "8px 10px",
+    color: WARNA.danger,
+    backgroundColor: WARNA.dangerSoft,
+    fontSize: "11px",
+    fontWeight: 800,
+    cursor: "pointer",
+  },
+  tombolHapusSemua: {
+    border: "none",
+    borderRadius: "8px",
+    padding: "8px 10px",
+    color: WARNA.white,
+    backgroundColor: WARNA.danger,
+    fontSize: "11px",
+    fontWeight: 800,
+    cursor: "pointer",
+  },
 
   judulPanel: {
     margin: 0,
@@ -1018,7 +1096,10 @@ const estilo = {
     position: "relative" as const,
     display: "flex",
     gap: "5px",
-    flexWrap: "wrap" as const,
+    flexWrap: "nowrap" as const,
+    maxWidth: "100%",
+    overflowX: "auto" as const,
+    scrollbarWidth: "none" as const,
     padding: "2px",
     borderRadius: "10px",
     backgroundColor: "rgb(var(--cn-primary-rgb) / 4%)",
@@ -1061,7 +1142,8 @@ const estilo = {
   filterAktif: {
     color: WARNA.primaryDark,
     border: "none",
-    boxShadow: "none",
+    backgroundColor: `${WARNA.primarySoft}`,
+    boxShadow: "0 4px 10px rgb(var(--cn-primary-rgb) / 8%)",
   },
 
   filterBadge: {
@@ -1102,6 +1184,23 @@ const estilo = {
     display: "flex",
     alignItems: "center",
     gap: "11px",
+    flex: 1,
+  },
+  aksiStatusKartu: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: "7px",
+  },
+  tombolHapusKartu: {
+    border: `1px solid ${WARNA.danger}`,
+    borderRadius: "7px",
+    padding: "6px 8px",
+    color: WARNA.danger,
+    backgroundColor: WARNA.dangerSoft,
+    fontSize: "10px",
+    fontWeight: 800,
+    cursor: "pointer",
   },
 
   avatar: {
@@ -1241,41 +1340,6 @@ const estilo = {
     margin: "4px 0 0",
     fontSize: "12px",
     fontWeight: 600,
-  },
-
-  kodeOtpManual: {
-    display: "grid",
-    flexBasis: "100%",
-    justifyItems: "start",
-    gap: "6px",
-    marginTop: "8px",
-    padding: "12px",
-    border: `1px solid ${WARNA.border}`,
-    borderRadius: "9px",
-    backgroundColor: "var(--cn-tint)",
-  },
-
-  kodeOtpDigit: {
-    color: WARNA.text,
-    fontSize: "24px",
-    fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.18em",
-  },
-
-  kodeOtpPetunjuk: {
-    color: WARNA.muted,
-    fontSize: "11px",
-  },
-
-  tombolSalinOtp: {
-    border: `1px solid ${WARNA.border}`,
-    borderRadius: "7px",
-    padding: "7px 10px",
-    color: WARNA.text,
-    backgroundColor: WARNA.white,
-    fontSize: "11px",
-    fontWeight: 700,
-    cursor: "pointer",
   },
 
   tombolPrimary: {

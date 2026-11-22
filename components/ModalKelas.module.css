@@ -18,22 +18,41 @@
 }
 
 .modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 560px;
-  max-height: calc(100vh - 40px);
+  max-width: 600px;
+  max-height: calc(100dvh - 40px);
 
   overflow: hidden;
 
   background: var(--cn-surface);
 
   border: 1px solid var(--cn-line);
-  border-radius: 16px;
+  border-radius: 20px;
 
   box-shadow:
-    0 24px 70px rgba(23, 32, 51, 0.18),
-    0 5px 20px rgba(23, 32, 51, 0.06);
+    0 30px 90px rgba(23, 32, 51, 0.24),
+    0 6px 24px rgba(23, 32, 51, 0.08);
 
   animation: modalIn 0.25s ease;
+}
+
+.modal::before {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 4px;
+  background: linear-gradient(90deg, var(--cn-primary), var(--cn-cyan));
+  content: "";
+}
+
+.modal form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
 }
 
 
@@ -46,7 +65,9 @@
   align-items: center;
   justify-content: space-between;
 
-  padding: 22px 24px 18px;
+  flex: 0 0 auto;
+  padding: 27px 28px 21px;
+  background: linear-gradient(125deg, rgba(var(--cn-primary-rgb), 0.085), transparent 70%);
 }
 
 .headerLeft {
@@ -60,13 +81,15 @@
   align-items: center;
   justify-content: center;
 
-  width: 46px;
-  height: 46px;
+  width: 50px;
+  height: 50px;
 
-  border-radius: 11px;
+  border: 1px solid rgba(var(--cn-primary-rgb), 0.12);
+  border-radius: 14px;
 
-  background: var(--cn-tint);
+  background: linear-gradient(145deg, rgba(var(--cn-primary-rgb), 0.13), rgba(var(--cn-cyan-rgb), 0.08));
   color: var(--cn-primary);
+  box-shadow: 0 5px 14px rgba(var(--cn-primary-rgb), 0.08);
 }
 
 .iconWrapper svg {
@@ -77,17 +100,19 @@
 .title {
   margin: 0;
 
-  font-size: 19px;
+  font-size: 21px;
   line-height: 1.3;
-  font-weight: 750;
+  font-weight: 800;
 
   color: var(--cn-text);
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
-  margin: 3px 0 0;
+  margin: 5px 0 0;
 
-  font-size: 12.5px;
+  font-size: 13px;
+  line-height: 1.45;
   color: var(--cn-muted);
 }
 
@@ -96,25 +121,27 @@
   align-items: center;
   justify-content: center;
 
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
 
   border: 0;
-  border-radius: 8px;
+  border-radius: 11px;
 
-  background: transparent;
+  background: rgba(var(--cn-primary-rgb), 0.08);
   color: var(--cn-muted);
 
   cursor: pointer;
 
   transition:
     background 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .closeButton:hover {
-  background: var(--cn-bg);
+  background: rgba(var(--cn-primary-rgb), 0.14);
   color: var(--cn-text);
+  transform: rotate(4deg);
 }
 
 .closeButton svg {
@@ -138,23 +165,43 @@
 ========================= */
 
 .body {
-  padding: 23px 24px 20px;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 24px 28px 22px;
 
   overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 .sectionLabel {
-  margin-bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-bottom: 21px;
+  padding: 7px 10px;
+  border: 1px solid rgba(var(--cn-primary-rgb), 0.12);
+  border-radius: 999px;
+  background: rgba(var(--cn-primary-rgb), 0.06);
 
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 750;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.09em;
 
-  color: var(--cn-muted);
+  color: var(--cn-primary);
+}
+
+.sectionLabel::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cn-cyan);
+  box-shadow: 0 0 0 3px rgba(var(--cn-cyan-rgb), 0.12);
+  content: "";
 }
 
 .formGroup {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .formGroup label,
@@ -211,14 +258,14 @@
   align-items: center;
   gap: 10px;
 
-  height: 46px;
+  height: 50px;
 
-  padding: 0 13px;
+  padding: 0 14px;
 
   background: var(--cn-surface);
 
   border: 1px solid var(--cn-line);
-  border-radius: 9px;
+  border-radius: 11px;
 
   transition:
     border-color 0.2s ease,
@@ -257,7 +304,7 @@
   background: transparent;
 
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
 
   color: var(--cn-text);
 }
@@ -276,14 +323,14 @@
 
   width: 100%;
 
-  min-height: 118px;
+  min-height: 126px;
 
-  padding: 13px 14px;
+  padding: 14px 15px;
 
   resize: vertical;
 
   border: 1px solid var(--cn-line);
-  border-radius: 9px;
+  border-radius: 11px;
 
   outline: 0;
 
@@ -330,12 +377,12 @@
   align-items: flex-start;
   gap: 11px;
 
-  padding: 12px 13px;
+  padding: 14px 15px;
 
-  border: 1px solid var(--cn-tint);
-  border-radius: 9px;
+  border: 1px solid rgba(var(--cn-primary-rgb), 0.12);
+  border-radius: 12px;
 
-  background: var(--cn-bg);
+  background: linear-gradient(125deg, rgba(var(--cn-primary-rgb), 0.065), rgba(var(--cn-cyan-rgb), 0.035));
 }
 
 .infoIcon {
@@ -345,10 +392,10 @@
 
   flex-shrink: 0;
 
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
 
-  border-radius: 7px;
+  border-radius: 9px;
 
   background: var(--cn-tint);
   color: var(--cn-cyan);
@@ -422,20 +469,21 @@
   align-items: center;
   gap: 9px;
 
-  padding: 15px 24px;
+  flex: 0 0 auto;
+  padding: 16px 28px;
 
   border-top: 1px solid var(--cn-line);
 
-  background: var(--cn-bg);
+  background: rgba(var(--cn-primary-rgb), 0.035);
 }
 
 .cancelButton,
 .submitButton {
-  height: 40px;
+  min-height: 44px;
 
-  padding: 0 16px;
+  padding: 0 18px;
 
-  border-radius: 8px;
+  border-radius: 10px;
 
   font-family: inherit;
   font-size: 12.5px;
@@ -447,7 +495,8 @@
     background 0.2s ease,
     border-color 0.2s ease,
     transform 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .cancelButton {
@@ -460,6 +509,7 @@
 .cancelButton:hover {
   background: var(--cn-bg);
   border-color: var(--cn-line);
+  transform: translateY(-1px);
 }
 
 .submitButton {
@@ -557,21 +607,21 @@
   }
 
   .modal {
-    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
 
-    border-radius: 13px;
+    border-radius: 17px;
   }
 
   .header {
-    padding: 18px;
+    padding: 21px 20px 17px;
   }
 
   .body {
-    padding: 20px 18px;
+    padding: 21px 20px;
   }
 
   .footer {
-    padding: 13px 18px;
+    padding: 14px 20px;
   }
 
   .footer button {

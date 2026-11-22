@@ -464,17 +464,27 @@ export default function HalamanDaftarGuru() {
           >
             {/* MODAL HEADER */}
             <div className={styles.modalHeader}>
-              <div>
-                <div className={styles.modalEyebrow}>
-                  EDIT DATA GURU
+              <div className={styles.modalHeading}>
+                <div className={styles.modalIcon} aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                    <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+                    <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+                    <path d="M18 5h3M19.5 3.5v3" />
+                  </svg>
                 </div>
 
-                <h2>Perbarui Informasi</h2>
+                <div>
+                  <div className={styles.modalEyebrow}>
+                    EDIT DATA GURU
+                  </div>
 
-                <p>
-                  Perubahan akan langsung tersimpan ke
-                  sistem.
-                </p>
+                  <h2>Perbarui Informasi</h2>
+
+                  <p>
+                    Perubahan akan langsung tersimpan ke
+                    sistem.
+                  </p>
+                </div>
               </div>
 
               <button
@@ -489,30 +499,32 @@ export default function HalamanDaftarGuru() {
 
             {/* FORM */}
             <div className={styles.form}>
-              <div className={styles.field}>
-                <label>Nama Lengkap</label>
+              <div className={styles.formRow}>
+                <div className={styles.field}>
+                  <label>Nama Lengkap</label>
 
-                <input
-                  type="text"
-                  value={formNama}
-                  onChange={(e) =>
-                    setFormNama(e.target.value)
-                  }
-                  placeholder="Masukkan nama lengkap"
-                />
-              </div>
+                  <input
+                    type="text"
+                    value={formNama}
+                    onChange={(e) =>
+                      setFormNama(e.target.value)
+                    }
+                    placeholder="Masukkan nama lengkap"
+                  />
+                </div>
 
-              <div className={styles.field}>
-                <label>Email</label>
+                <div className={styles.field}>
+                  <label>Email</label>
 
-                <input
-                  type="email"
-                  value={formEmail}
-                  onChange={(e) =>
-                    setFormEmail(e.target.value)
-                  }
-                  placeholder="nama@sekolah.sch.id"
-                />
+                  <input
+                    type="email"
+                    value={formEmail}
+                    onChange={(e) =>
+                      setFormEmail(e.target.value)
+                    }
+                    placeholder="nama@sekolah.sch.id"
+                  />
+                </div>
               </div>
 
               <div className={styles.formRow}>

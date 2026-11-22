@@ -1,0 +1,209 @@
+.halaman {
+  box-sizing: border-box;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 16px;
+  background:
+    radial-gradient(circle at 50% -10%, rgb(var(--cn-primary-rgb) / 8%), transparent 34%),
+    var(--cn-bg);
+}
+
+.kartu {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px !important;
+  max-height: calc(100dvh - 32px) !important;
+  overflow-y: auto;
+  padding: 22px 28px 24px !important;
+  border: 1px solid var(--cn-line) !important;
+  border-radius: 14px !important;
+  background: var(--cn-surface) !important;
+  box-shadow: 0 18px 50px rgb(var(--cn-navy-rgb) / 9%) !important;
+}
+
+.tombolBack {
+  margin: 0 0 14px !important;
+}
+
+.header {
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--cn-primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.judul {
+  margin: 0 0 6px !important;
+  color: var(--cn-navy) !important;
+  font-size: clamp(23px, 5vw, 28px) !important;
+  line-height: 1.18 !important;
+  text-align: center;
+}
+
+.subjudul {
+  max-width: 370px;
+  margin: 0 auto !important;
+  color: var(--cn-text) !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  text-align: center;
+}
+
+.barisTab {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin-bottom: 14px;
+  padding: 5px;
+  border: 1px solid var(--cn-line);
+  border-radius: 9px;
+  background: var(--cn-tint);
+}
+
+.tab {
+  min-height: 42px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--cn-muted);
+  background: transparent;
+  font: 700 14px/1 "IBM Plex Sans", sans-serif;
+  cursor: pointer;
+  transition: 150ms ease;
+}
+
+.tab:hover {
+  color: var(--cn-navy);
+  background: rgb(var(--cn-primary-rgb) / 7%);
+}
+
+.tab:focus-visible {
+  outline: 3px solid rgb(var(--cn-primary-rgb) / 24%);
+  outline-offset: 2px;
+}
+
+.tabAktif {
+  color: var(--cn-surface) !important;
+  background: var(--cn-primary) !important;
+  box-shadow: 0 5px 14px rgb(var(--cn-primary-rgb) / 18%);
+}
+
+.modeLink {
+  display: block;
+  width: 100%;
+  min-height: 38px;
+  margin: 14px 0 0 !important;
+  border: 0;
+  border-top: 1px solid var(--cn-line);
+  color: var(--cn-primary-dark) !important;
+  background: transparent;
+  font: 700 12px/1.4 "IBM Plex Sans", sans-serif;
+  text-align: center;
+  cursor: pointer;
+}
+
+@media (min-width: 521px) and (max-height: 700px) {
+  .halaman {
+    align-items: flex-start;
+    padding-top: 16px;
+  }
+
+  .kartu {
+    max-height: calc(100dvh - 32px) !important;
+  }
+}
+
+.modeLink:hover {
+  color: var(--cn-primary) !important;
+  text-decoration: underline;
+}
+
+.modeLink:focus-visible {
+  border-radius: 5px;
+  outline: 3px solid rgb(var(--cn-primary-rgb) / 24%);
+  outline-offset: 2px;
+}
+
+.kartu :global(input),
+.kartu :global(textarea) {
+  box-sizing: border-box;
+  min-height: 44px;
+  border: 1px solid var(--cn-line) !important;
+  background: var(--cn-surface) !important;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.kartu :global(textarea) {
+  min-height: 78px;
+}
+
+.kartu :global(input:focus),
+.kartu :global(textarea:focus) {
+  border-color: var(--cn-primary) !important;
+  box-shadow: 0 0 0 3px rgb(var(--cn-primary-rgb) / 11%);
+}
+
+.kartu :global(button[type="submit"]) {
+  min-height: 46px;
+  border-radius: 8px !important;
+  background: var(--cn-primary) !important;
+  box-shadow: 0 8px 18px rgb(var(--cn-primary-rgb) / 16%);
+  transition: 150ms ease;
+}
+
+.kartu :global(button[type="submit"]:hover:not(:disabled)) {
+  background: var(--cn-primary-dark) !important;
+  transform: translateY(-1px);
+}
+
+.kartu :global(button[type="submit"]:disabled) {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+@media (max-width: 520px) {
+  .halaman {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .kartu {
+    padding: 20px 18px 22px;
+    border-radius: 12px !important;
+  }
+
+  .tombolBack {
+    min-height: 38px !important;
+  }
+
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .subjudul {
+    font-size: 12px !important;
+  }
+
+  .tab {
+    min-height: 40px;
+  }
+}
+
+:global(:root[data-theme="dark"]) .kartu {
+  border-color: var(--cn-line) !important;
+  background: var(--cn-surface) !important;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 24%) !important;
+}
+
+:global(body:has(#lupa-password-page) .cn-global-credit) {
+  display: none;
+}

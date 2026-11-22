@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { cocokkanKodeOtp } from "@/lib/resend";
+import { cocokkanKodeOtp, hashTokenPermintaanOtp } from "@/lib/email";
 
 // ------------------------------------------------------------
 // POST /api/verify-otp
@@ -20,6 +20,7 @@ const PESAN_GAGAL = "Kode OTP tidak valid atau sudah kadaluarsa";
 interface BodyVerifyOtp {
   tipeAkun?: "GURU" | "SISWA";
   identifier?: string;
+  accessToken?: string;
   otp?: string;
 }
 
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ pesan: "Body request tidak valid" }, { status: 400 });
   }
 
-  const { tipeAkun, identifier, otp } = body;
+  const { tipeAkun, identifier, accessToken, otp } = body;
 
   if (
     (tipeAkun !== "GURU" && tipeAkun !== "SISWA") ||
@@ -49,8 +50,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ pesan: PESAN_GAGAL }, { status: 400 });
   }
 
-  const laporan =
-    tipeAkun === "GURU"
+  if (accessToken && !/^[a-f\d]{64}$/i.test(accessToken)) {
+    return NextResponse.json({ pesan: PESAN_GAGAL }, { status: 400 });
+  }
+
+  const laporan = accessToken
+    ? await db.laporanLupaPassword.findUnique({
+        where: { otpAccessTokenHash: hashTokenPermintaanOtp(accessToken) },
+      })
+    : tipeAkun === "GURU"
       ? await db.laporanLupaPassword.findFirst({
           where: { tipeAkun: "GURU", guru: { nik: idBigInt }, status: "DITERIMA" },
           orderBy: { createdAt: "desc" },
@@ -60,7 +68,14 @@ export async function POST(request: NextRequest) {
           orderBy: { createdAt: "desc" },
         });
 
-  if (!laporan || !laporan.otp || !laporan.otpExpiredAt) {
+  if (
+    !laporan ||
+    laporan.status !== "DITERIMA" ||
+    laporan.tipeAkun !== tipeAkun ||
+    BigInt(laporan.nikNisInput) !== idBigInt ||
+    !laporan.otp ||
+    !laporan.otpExpiredAt
+  ) {
     return NextResponse.json({ pesan: PESAN_GAGAL }, { status: 400 });
   }
   if (!cocokkanKodeOtp(otp, laporan.otp)) {

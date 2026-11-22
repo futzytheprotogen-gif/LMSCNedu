@@ -693,16 +693,26 @@ export default function HalamanDaftarSiswa() {
         >
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
-              <div>
-                <span className={styles.modalEyebrow}>
-                  EDIT DATA SISWA
-                </span>
+              <div className={styles.modalHeading}>
+                <div className={styles.modalIcon} aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                    <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+                    <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+                    <path d="M5 5.5 3.5 7 5 8.5M19 5.5l1.5 1.5L19 8.5" />
+                  </svg>
+                </div>
 
-                <h3>{siswaDiedit.nama}</h3>
+                <div>
+                  <span className={styles.modalEyebrow}>
+                    EDIT DATA SISWA
+                  </span>
 
-                <p>
-                  Perbarui informasi akun siswa.
-                </p>
+                  <h3>{siswaDiedit.nama}</h3>
+
+                  <p>
+                    Perbarui informasi akun siswa.
+                  </p>
+                </div>
               </div>
 
               <button
@@ -717,33 +727,35 @@ export default function HalamanDaftarSiswa() {
             <div className={styles.modalDivider} />
 
             <div className={styles.form}>
-              <div className={styles.formGroup}>
-                <label>Email</label>
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label>Email</label>
 
-                <input
-                  type="email"
-                  value={formEmail}
-                  onChange={(e) =>
-                    setFormEmail(e.target.value)
-                  }
-                  placeholder="Masukkan email"
-                  className={styles.formInput}
-                />
-              </div>
+                  <input
+                    type="email"
+                    value={formEmail}
+                    onChange={(e) =>
+                      setFormEmail(e.target.value)
+                    }
+                    placeholder="Masukkan email"
+                    className={styles.formInput}
+                  />
+                </div>
 
-              <div className={styles.formGroup}>
-                <label>NIS</label>
+                <div className={styles.formGroup}>
+                  <label>NIS</label>
 
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={formNis}
-                  onChange={(e) =>
-                    setFormNis(e.target.value)
-                  }
-                  placeholder="Masukkan NIS"
-                  className={styles.formInput}
-                />
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={formNis}
+                    onChange={(e) =>
+                      setFormNis(e.target.value)
+                    }
+                    placeholder="Masukkan NIS"
+                    className={styles.formInput}
+                  />
+                </div>
               </div>
 
               <div className={styles.formRow}>
@@ -759,21 +771,6 @@ export default function HalamanDaftarSiswa() {
                     className={styles.formInput}
                   />
                 </div>
-
-                <div className={styles.formGroup}>
-                  <label>Rombel akademik</label>
-                  <select
-                    className={styles.formInput}
-                    onChange={(event) => setFormRombelId(event.target.value)}
-                    value={formRombelId}
-                  >
-                    {daftarRombel.map((rombel) => (
-                      <option key={rombel.id} value={rombel.id}>{rombel.label}</option>
-                    ))}
-                  </select>
-                  <small className={styles.formHint}>Perubahan kelas dilakukan manual; keanggotaan kelas belajar tidak ikut berubah.</small>
-                </div>
-
                 <div className={styles.formGroup}>
                   <label>Jenis Kelamin</label>
 
@@ -797,6 +794,20 @@ export default function HalamanDaftarSiswa() {
                     </option>
                   </select>
                 </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Rombel akademik</label>
+                <select
+                  className={styles.formInput}
+                  onChange={(event) => setFormRombelId(event.target.value)}
+                  value={formRombelId}
+                >
+                  {daftarRombel.map((rombel) => (
+                    <option key={rombel.id} value={rombel.id}>{rombel.label}</option>
+                  ))}
+                </select>
+                <small className={styles.formHint}>Perubahan kelas dilakukan manual; keanggotaan kelas belajar tidak ikut berubah.</small>
               </div>
 
               {pesanErrorEdit && (

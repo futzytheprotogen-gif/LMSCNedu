@@ -36,6 +36,11 @@ const PREFIX_PER_ROLE: Record<RoleAplikasi, string[]> = {
   SISWA: ["/siswa"],
 };
 
+const API_DIIZINKAN_SAAT_PASSWORD_SEMENTARA = new Set([
+  "/api/sesi",
+  "/api/ganti-password-awal",
+]);
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isApi = pathname.startsWith("/api/");
@@ -120,12 +125,25 @@ export async function proxy(request: NextRequest) {
   // default) -> semua halaman lain diblokir, cuma boleh ke satu
   // tempat: /ganti-password-awal
   if (sesi.passwordSementara && pathname !== "/ganti-password-awal") {
-    return NextResponse.redirect(new URL("/ganti-password-awal", request.url));
+    if (isApi) {
+      if (!API_DIIZINKAN_SAAT_PASSWORD_SEMENTARA.has(pathname)) {
+        return NextResponse.json(
+          { pesan: "Ganti password awal sebelum mengakses layanan ini." },
+          { status: 403 }
+        );
+      }
+    } else {
+      return NextResponse.redirect(new URL("/ganti-password-awal", request.url));
+    }
   }
 
   // Sebaliknya: yang password-nya udah bukan sementara lagi gak perlu
   // (dan gak boleh) balik ke halaman ganti-password-awal
-  if (!sesi.passwordSementara && pathname === "/ganti-password-awal") {
+  if (
+    !sesi.passwordSementara &&
+    !isApi &&
+    pathname === "/ganti-password-awal"
+  ) {
     return NextResponse.redirect(
       new URL(halamanDashboard(sesi.role), request.url)
     );

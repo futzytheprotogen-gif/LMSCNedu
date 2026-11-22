@@ -51,17 +51,20 @@ dashboard.
 ## Password recovery email
 
 Teacher and student recovery requests send a one-time code to the email address
-stored on the account after the submitted NIK/NIS, email, and date of birth
-match. Configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in the server
-environment. The sender address must belong to a domain verified in Resend;
-Resend's `onboarding@resend.dev` sender is limited to testing and cannot deliver
-to arbitrary school email addresses. Keep these values private and out of source
-control.
+stored on the account after the submitted NIK/NIS and email match. Configure
+`GMAIL_USER` with the Gmail address that will send messages and
+`GMAIL_APP_PASSWORD` with its Google App Password in the server environment.
+App Passwords require 2-Step Verification to be enabled on the Google account.
+Keep these values private and out of source control.
 
-If the email provider is unavailable or rejects delivery, the verified request
-stays in Admin > Laporan. An admin can retry email delivery or create a manual
-six-digit OTP and relay it privately to the account owner. OTP codes expire
-after 10 minutes.
+If Gmail is unavailable or rejects delivery, the verified request stays in
+Admin > Laporan. An admin can retry email delivery or create a manual six-digit
+OTP. The code appears automatically on the same browser session that submitted
+the request; keep that Lupa Password page open while the admin processes it.
+Manual codes are encrypted at rest and expire after 10 minutes.
+
+Apply the database migration before deploying this flow with
+`npx prisma migrate deploy`.
 
 ## Learn More
 

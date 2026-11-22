@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { urlFilePrivat } from "@/lib/file-url";
 import { unggahFileDariBrowser } from "@/lib/upload-client";
 import BackAction from "@/components/BackAction";
@@ -87,6 +88,25 @@ export default function HalamanProfil() {
     };
   }, [iniProfilSendiri, params.userId]);
 
+  useEffect(() => {
+    return () => {
+      if (previewFoto?.startsWith("blob:")) URL.revokeObjectURL(previewFoto);
+    };
+  }, [previewFoto]);
+
+  useEffect(() => {
+    if (!modalTerbuka) return;
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape" && !sedangSimpan) {
+        setModalTerbuka(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [modalTerbuka, sedangSimpan]);
+
   function bukaModalEdit() {
     if (!profil) return;
     setNamaEdit(profil.nama);
@@ -101,6 +121,13 @@ export default function HalamanProfil() {
   function pilihFoto(file: File | null) {
     setFileFoto(file);
     setPreviewFoto(file ? URL.createObjectURL(file) : null);
+  }
+
+  function tutupModalEdit() {
+    if (sedangSimpan) return;
+    setModalTerbuka(false);
+    setFileFoto(null);
+    setPreviewFoto(null);
   }
 
   async function simpanProfil() {
@@ -132,6 +159,13 @@ export default function HalamanProfil() {
 
       setProfil(data.data);
       setModalTerbuka(false);
+      setFileFoto(null);
+      setPreviewFoto(null);
+    } catch (reason) {
+      console.error("Gagal menyimpan profil:", reason);
+      setPesanError(
+        reason instanceof Error ? reason.message : "Gagal menyimpan profil."
+      );
     } finally {
       setSedangSimpan(false);
     }
@@ -157,7 +191,14 @@ export default function HalamanProfil() {
           <div className={styles.profileTop} style={estilo.barisAtas}>
             <div className={styles.avatar} style={estilo.avatarWadah}>
               {profil.fotoProfil ? (
-                <img src={urlFilePrivat(profil.fotoProfil) ?? undefined} alt={profil.nama} style={estilo.avatarFoto} />
+                <Image
+                  alt={profil.nama}
+                  height={88}
+                  src={urlFilePrivat(profil.fotoProfil) ?? ""}
+                  style={estilo.avatarFoto}
+                  unoptimized
+                  width={88}
+                />
               ) : (
                 <div style={estilo.avatarInisial}>{inisial}</div>
               )}
@@ -204,69 +245,146 @@ export default function HalamanProfil() {
 
       {/* ---- Modal Edit Profil ---- */}
       {modalTerbuka && (
-        <div style={estilo.overlay} onClick={() => setModalTerbuka(false)}>
-          <div style={estilo.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 style={estilo.judulModal}>Edit Profil</h3>
-
-            <div style={estilo.previewFotoWadah}>
-              {previewFoto || fotoUrl ? (
-                <img src={urlFilePrivat(previewFoto ?? fotoUrl) ?? ""} alt="Preview" style={estilo.previewFoto} />
-              ) : (
-                <div style={estilo.previewFotoKosong}>{inisial}</div>
-              )}
-              <label style={estilo.tombolGantiFoto}>
-                Ganti Foto
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => pilihFoto(e.target.files?.[0] ?? null)}
-                  style={{ display: "none" }}
-                />
-              </label>
-            </div>
-
-            <label style={estilo.label}>
-              Nama
-              <input
-                type="text"
-                value={namaEdit}
-                onChange={(e) => setNamaEdit(e.target.value)}
-                style={estilo.input}
-              />
-            </label>
-
-            <label style={estilo.label}>
-              Deskripsi
-              <textarea
-                value={deskripsiEdit}
-                onChange={(e) => setDeskripsiEdit(e.target.value)}
-                rows={3}
-                style={estilo.textarea}
-                placeholder="Ceritakan sedikit tentang dirimu..."
-              />
-            </label>
-
-            <p style={estilo.catatanKunci}>
-              Email, {profil.role === "SISWA" ? "NIS" : profil.role === "GURU" ? "NIK" : "role"},
-              {profil.role === "SISWA" || profil.role === "GURU" ? " dan jurusan" : ""} tidak bisa
-              diubah di sini — hubungi admin sekolah kalau ada yang salah.
-            </p>
-
-            {pesanError && <p style={estilo.pesan_error}>{pesanError}</p>}
-
-            <div style={estilo.barisTombolModal}>
+        <div
+          className={styles.modalOverlay}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) tutupModalEdit();
+          }}
+        >
+          <section
+            aria-labelledby="modal-edit-profil-title"
+            aria-modal="true"
+            className={styles.modal}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+          >
+            <header className={styles.modalHeader}>
+              <div className={styles.modalHeading}>
+                <div className={styles.modalIcon} aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                    <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+                    <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+                    <path d="m16 5 3-3 3 3-8.5 8.5-4 1 1-4L19 2" />
+                  </svg>
+                </div>
+                <div>
+                  <span className={styles.modalEyebrow}>PENGATURAN PROFIL</span>
+                  <h2 id="modal-edit-profil-title">Edit Profil</h2>
+                  <p>Perbarui nama, deskripsi, dan foto profilmu.</p>
+                </div>
+              </div>
               <button
-                onClick={() => setModalTerbuka(false)}
-                style={estilo.tombolBatal}
+                aria-label="Tutup"
+                className={styles.modalClose}
                 disabled={sedangSimpan}
+                onClick={tutupModalEdit}
+                type="button"
               >
-                Batal
+                ×
               </button>
-              <button onClick={simpanProfil} style={estilo.tombolSimpan} disabled={sedangSimpan}>
-                {sedangSimpan ? "Menyimpan..." : "Simpan"}
-              </button>
-            </div>
-          </div>
+            </header>
+
+            <form
+              className={styles.modalForm}
+              onSubmit={(event) => {
+                event.preventDefault();
+                void simpanProfil();
+              }}
+            >
+              <div className={styles.modalBody}>
+                <label className={styles.photoPicker} htmlFor="foto-profil">
+                  {previewFoto || fotoUrl ? (
+                    <Image
+                      alt="Foto profil"
+                      className={styles.photoAvatar}
+                      height={68}
+                      src={
+                        previewFoto
+                          ? urlFilePrivat(previewFoto) ?? ""
+                          : urlFilePrivat(fotoUrl) ?? ""
+                      }
+                      unoptimized
+                      width={68}
+                    />
+                  ) : (
+                    <span className={styles.photoAvatarFallback}>{inisial}</span>
+                  )}
+                  <span className={styles.photoDetails}>
+                    <strong>Foto profil</strong>
+                    <span>Gunakan foto yang jelas agar profil mudah dikenali.</span>
+                    <span className={styles.photoButton}>Pilih foto</span>
+                  </span>
+                  <input
+                    accept="image/*"
+                    className={styles.fileInput}
+                    disabled={sedangSimpan}
+                    id="foto-profil"
+                    onChange={(event) => {
+                      pilihFoto(event.target.files?.[0] ?? null);
+                      event.target.value = "";
+                    }}
+                    type="file"
+                  />
+                </label>
+
+                <div className={styles.field}>
+                  <label htmlFor="nama-profil">Nama</label>
+                  <input
+                    className={styles.formInput}
+                    disabled={sedangSimpan}
+                    id="nama-profil"
+                    onChange={(event) => setNamaEdit(event.target.value)}
+                    required
+                    type="text"
+                    value={namaEdit}
+                  />
+                </div>
+
+                <div className={styles.field}>
+                  <label htmlFor="deskripsi-profil">Deskripsi</label>
+                  <textarea
+                    className={styles.formTextarea}
+                    disabled={sedangSimpan}
+                    id="deskripsi-profil"
+                    onChange={(event) => setDeskripsiEdit(event.target.value)}
+                    placeholder="Ceritakan sedikit tentang dirimu..."
+                    rows={4}
+                    value={deskripsiEdit}
+                  />
+                </div>
+
+                <p className={styles.formHint}>
+                  Email, {profil.role === "SISWA" ? "NIS" : profil.role === "GURU" ? "NIK" : "role"},
+                  {profil.role === "SISWA" || profil.role === "GURU" ? " dan jurusan" : ""} tidak bisa
+                  diubah di sini — hubungi admin sekolah kalau ada yang salah.
+                </p>
+
+                {pesanError && (
+                  <div className={styles.errorBox} role="alert">
+                    {pesanError}
+                  </div>
+                )}
+              </div>
+
+              <footer className={styles.modalFooter}>
+                <button
+                  className={styles.cancelButton}
+                  disabled={sedangSimpan}
+                  onClick={tutupModalEdit}
+                  type="button"
+                >
+                  Batal
+                </button>
+                <button
+                  className={styles.saveButton}
+                  disabled={sedangSimpan}
+                  type="submit"
+                >
+                  {sedangSimpan ? "Menyimpan..." : "Simpan Perubahan"}
+                </button>
+              </footer>
+            </form>
+          </section>
         </div>
       )}
     </div>
@@ -396,100 +514,4 @@ const estilo = {
   garisPemisah: { height: "1px", backgroundColor: "var(--cn-coral-tint)", margin: "0 0 20px" },
   judulBio: { margin: "0 0 8px 0", fontSize: "13px", fontWeight: 700, color: "var(--cn-text)" },
   bio: { margin: 0, fontSize: "14px", lineHeight: 1.7, color: "var(--cn-coral-dark)" },
-  overlay: {
-    position: "fixed" as const,
-    inset: 0,
-    backgroundColor: "rgba(var(--cn-navy-rgb), 0.4)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "16px",
-    zIndex: 50,
-  },
-  modal: {
-    width: "100%",
-    maxWidth: "420px",
-    backgroundColor: "var(--cn-surface)",
-    borderRadius: "14px",
-    padding: "24px",
-    maxHeight: "85vh",
-    overflowY: "auto" as const,
-  },
-  judulModal: { margin: "0 0 16px 0", fontSize: "16px", fontWeight: 700, color: "var(--cn-navy)" },
-  previewFotoWadah: {
-    display: "flex",
-    flexDirection: "column" as const,
-    alignItems: "center",
-    gap: "10px",
-    marginBottom: "18px",
-  },
-  previewFoto: { width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover" as const },
-  previewFotoKosong: {
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    backgroundColor: "var(--cn-tint)",
-    color: WARNA_PRIMARY,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "28px",
-    fontWeight: 800,
-  },
-  tombolGantiFoto: {
-    fontSize: "12px",
-    fontWeight: 600,
-    color: WARNA_PRIMARY,
-    cursor: "pointer",
-  },
-  label: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "6px",
-    fontSize: "13px",
-    fontWeight: 600,
-    color: "var(--cn-navy)",
-    marginBottom: "14px",
-  },
-  input: {
-    padding: "10px 12px",
-    borderRadius: "8px",
-    border: "1px solid var(--cn-line)",
-    fontSize: "14px",
-    color: "var(--cn-navy)",
-    outline: "none",
-  },
-  textarea: {
-    padding: "10px 12px",
-    borderRadius: "8px",
-    border: "1px solid var(--cn-line)",
-    fontSize: "14px",
-    color: "var(--cn-navy)",
-    outline: "none",
-    resize: "vertical" as const,
-    fontFamily: "inherit",
-  },
-  catatanKunci: { fontSize: "11px", color: "var(--cn-muted)", margin: "0 0 14px 0", lineHeight: 1.5 },
-  pesan_error: { color: "var(--cn-danger)", fontSize: "13px", margin: "0 0 12px 0" },
-  barisTombolModal: { display: "flex", justifyContent: "flex-end", gap: "8px" },
-  tombolBatal: {
-    padding: "8px 16px",
-    borderRadius: "8px",
-    border: "1px solid var(--cn-line)",
-    backgroundColor: "var(--cn-surface)",
-    color: "var(--cn-coral-dark)",
-    fontSize: "14px",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  tombolSimpan: {
-    padding: "8px 16px",
-    borderRadius: "8px",
-    border: "none",
-    backgroundColor: WARNA_PRIMARY,
-    color: "var(--cn-surface)",
-    fontSize: "14px",
-    fontWeight: 700,
-    cursor: "pointer",
-  },
 };

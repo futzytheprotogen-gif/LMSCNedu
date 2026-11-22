@@ -484,20 +484,22 @@ model SubmissionTugas {
 // ------------------------------------------------------------
 
 model LaporanLupaPassword {
-  id             String          @id @default(cuid())
-  tipeAkun       TipeAkunLaporan
-  guruId         String?
-  siswaId        String?
-  email          String
-  nikNisInput    String
-  tanggalLahir   DateTime
-  alasan         String          @db.Text
-  status         StatusLaporan   @default(MENUNGGU)
-  otp            String?
-  otpExpiredAt   DateTime?
-  diprosesOlehId String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id                 String          @id @default(cuid())
+  tipeAkun           TipeAkunLaporan
+  guruId             String?
+  siswaId            String?
+  email              String
+  nikNisInput        String
+  tanggalLahir       DateTime
+  alasan             String          @db.Text
+  status             StatusLaporan   @default(MENUNGGU)
+  otp                String?
+  otpEncrypted       String?         @db.Text
+  otpExpiredAt       DateTime?
+  otpAccessTokenHash String?         @unique @db.VarChar(64)
+  diprosesOlehId     String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 
   guru         Guru?  @relation(fields: [guruId], references: [id], onDelete: SetNull)
   siswa        Siswa? @relation(fields: [siswaId], references: [id], onDelete: SetNull)

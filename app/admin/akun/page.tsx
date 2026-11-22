@@ -10,6 +10,16 @@ type TipeAkun = "SISWA" | "GURU" | "KEPSEK" | "KURIKULUM";
 interface RombelRingkas {
   id: string;
   label: string;
+  jenjang: string;
+  angkatan: number | null;
+  jurusanId: string | null;
+  jurusan: string | null;
+  variasi: string | null;
+}
+
+interface JurusanRingkas {
+  id: string;
+  nama: string;
 }
 
 interface MapelRingkas {
@@ -26,6 +36,7 @@ interface HasilImporAkun {
 export default function HalamanBuatAkun() {
   const [tipeAkun, setTipeAkun] = useState<TipeAkun>("SISWA");
 
+  const [daftarJurusan, setDaftarJurusan] = useState<JurusanRingkas[]>([]);
   const [daftarRombel, setDaftarRombel] = useState<RombelRingkas[]>([]);
   const [daftarMapel, setDaftarMapel] = useState<MapelRingkas[]>([]);
 
@@ -38,6 +49,8 @@ export default function HalamanBuatAkun() {
 
   // Field khusus siswa
   const [nis, setNis] = useState("");
+  const [jurusanId, setJurusanId] = useState("");
+  const [jenjangDipilih, setJenjangDipilih] = useState("");
   const [rombelId, setRombelId] = useState("");
 
   // Field khusus guru
@@ -56,11 +69,24 @@ export default function HalamanBuatAkun() {
 
   const akunAdminTier = tipeAkun === "KEPSEK" || tipeAkun === "KURIKULUM";
   const akunDenganNomorIdentitas = tipeAkun === "SISWA" || tipeAkun === "GURU";
+  const rombelUmum = daftarRombel.filter((rombel) => !rombel.jurusanId && rombel.angkatan === null);
+  const rombelJurusanDipilih = jurusanId.startsWith("umum:")
+    ? daftarRombel.filter((rombel) => rombel.id === jurusanId.slice("umum:".length))
+    : daftarRombel.filter((rombel) => rombel.jurusanId === jurusanId);
+  const pilihanJenjang = [...new Set(rombelJurusanDipilih.map((rombel) =>
+    rombel.angkatan === null ? "umum" : String(rombel.angkatan)
+  ))];
+  const pilihanRombel = rombelJurusanDipilih.filter((rombel) =>
+    jenjangDipilih === "umum"
+      ? rombel.angkatan === null
+      : String(rombel.angkatan) === jenjangDipilih
+  );
 
   useEffect(() => {
     fetch("/api/kelas-referensi")
       .then((r) => r.json())
       .then((data) => {
+        setDaftarJurusan(data.data?.jurusan ?? []);
         setDaftarRombel(data.data?.rombel ?? []);
         setDaftarMapel(data.data?.mapel ?? []);
       })
@@ -76,6 +102,8 @@ export default function HalamanBuatAkun() {
     setDeskripsi("");
     setJenisKelamin("");
     setNis("");
+    setJurusanId("");
+    setJenjangDipilih("");
     setRombelId("");
     setNik("");
     setMapelIdsDipilih([]);
@@ -455,8 +483,69 @@ export default function HalamanBuatAkun() {
             {/* SISWA */}
             {tipeAkun === "SISWA" && (
               <div style={styles.field}>
-                <label style={styles.label}>
+                <span style={styles.label}>
                   Rombel akademik
+                  <span style={styles.required}>*</span>
+                </span>
+
+                <label style={styles.label}>
+                  Jurusan
+                  <span style={styles.required}>*</span>
+                </label>
+
+                <select
+                  value={jurusanId}
+                  onChange={(e) => {
+                    setJurusanId(e.target.value);
+                    setJenjangDipilih("");
+                    setRombelId("");
+                  }}
+                  required
+                  style={styles.input}
+                >
+                  <option value="">Pilih jurusan...</option>
+                  {daftarJurusan.map((jurusan) => (
+                    <option key={jurusan.id} value={jurusan.id}>
+                      {jurusan.nama}
+                    </option>
+                  ))}
+                  {rombelUmum.map((rombel) => (
+                    <option key={rombel.id} value={`umum:${rombel.id}`}>
+                      {rombel.jenjang} (tanpa jurusan)
+                    </option>
+                  ))}
+                </select>
+
+                <label style={styles.label}>
+                  Jenjang kelas
+                  <span style={styles.required}>*</span>
+                </label>
+
+                <select
+                  value={jenjangDipilih}
+                  onChange={(e) => {
+                    setJenjangDipilih(e.target.value);
+                    setRombelId("");
+                  }}
+                  required
+                  disabled={!jurusanId}
+                  style={styles.input}
+                >
+                  <option value="">
+                    {jurusanId ? "Pilih jenjang kelas..." : "Pilih jurusan terlebih dahulu"}
+                  </option>
+
+                  {pilihanJenjang.map((jenjang) => (
+                    <option key={jenjang} value={jenjang}>
+                      {jenjang === "umum"
+                        ? rombelJurusanDipilih[0]?.jenjang
+                        : `Kelas ${jenjang}`}
+                    </option>
+                  ))}
+                </select>
+
+                <label style={styles.label}>
+                  Kelas
                   <span style={styles.required}>*</span>
                 </label>
 
@@ -464,24 +553,22 @@ export default function HalamanBuatAkun() {
                   value={rombelId}
                   onChange={(e) => setRombelId(e.target.value)}
                   required
+                  disabled={!jenjangDipilih}
                   style={styles.input}
                 >
                   <option value="">
-                    Pilih rombel...
+                    {jenjangDipilih ? "Pilih kelas..." : "Pilih jenjang kelas terlebih dahulu"}
                   </option>
 
-                  {daftarRombel.map((r) => (
-                    <option
-                      key={r.id}
-                      value={r.id}
-                    >
-                      {r.label}
+                  {pilihanRombel.map((rombel) => (
+                    <option key={rombel.id} value={rombel.id}>
+                      {rombel.label}
                     </option>
                   ))}
                 </select>
 
                 <span style={styles.helper}>
-                  Jurusan, tingkat, dan rombel dikelola terpisah di Data Akademik.
+                  Contoh: kelas 12, jurusan PPLG, reguler 1 menjadi “12 PPLG 1”. Jalur Plus menjadi “12 PPLG PLUS”.
                 </span>
               </div>
             )}

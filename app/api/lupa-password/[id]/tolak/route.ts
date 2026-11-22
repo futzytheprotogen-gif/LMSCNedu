@@ -6,15 +6,24 @@ interface KonteksRute {
   params: Promise<{ id: string }>;
 }
 
-// POST /api/lupa-password/[id]/tolak — "Tolak dan Hapus Laporan"
+// POST /api/lupa-password/[id]/tolak
 export async function POST(request: NextRequest, { params }: KonteksRute) {
   try {
     await wajibAdminSaja(request);
     const { id } = await params;
 
-    await db.laporanLupaPassword.delete({ where: { id } });
+    await db.laporanLupaPassword.update({
+      where: { id },
+      data: {
+        status: "DITOLAK",
+        otp: null,
+        otpEncrypted: null,
+        otpExpiredAt: null,
+        otpAccessTokenHash: null,
+      },
+    });
 
-    return NextResponse.json({ pesan: "Laporan berhasil ditolak & dihapus" });
+    return NextResponse.json({ pesan: "Laporan berhasil ditolak" });
   } catch (error) {
     return (
       tanganiErrorRbac(error) ??

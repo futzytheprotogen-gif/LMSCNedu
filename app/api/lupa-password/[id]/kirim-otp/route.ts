@@ -3,20 +3,20 @@ import { db } from "@/lib/db";
 import { wajibAdminSaja, tanganiErrorRbac } from "@/lib/rbac";
 import {
   buatKodeOtp,
+  enkripsiKodeOtp,
   EMAIL_OTP_TERSEDIA,
   hashKodeOtp,
   hitungWaktuKadaluarsaOtp,
   kirimEmailOtp,
-} from "@/lib/resend";
+} from "@/lib/email";
 
 interface KonteksRute {
   params: Promise<{ id: string }>;
 }
 
 // POST /api/lupa-password/[id]/kirim-otp
-// Dipakai untuk "Terima & Kirim OTP" (laporan MENUNGGU -> DITERIMA)
-// maupun "Kirim Ulang OTP" (laporan udah DITERIMA) — dua-duanya sama
-// aja actionnya: generate OTP baru & kirim ulang emailnya.
+// Dipakai untuk membuat OTP manual pada laporan yang gagal email
+// maupun mengirim ulang OTP pada laporan yang sudah diterima.
 export async function POST(request: NextRequest, { params }: KonteksRute) {
   try {
     await wajibAdminSaja(request);
@@ -31,6 +31,7 @@ export async function POST(request: NextRequest, { params }: KonteksRute) {
         tipeAkun: true,
         email: true,
         status: true,
+        otpAccessTokenHash: true,
         guru: { select: { nama: true, email: true } },
         siswa: { select: { nama: true, email: true } },
       },
@@ -39,9 +40,9 @@ export async function POST(request: NextRequest, { params }: KonteksRute) {
     if (!laporan) {
       return NextResponse.json({ pesan: "Laporan tidak ditemukan" }, { status: 404 });
     }
-    if (laporan.status === "DITOLAK" || laporan.status === "SELESAI") {
+    if (laporan.status === "SELESAI") {
       return NextResponse.json(
-        { pesan: "Laporan ini sudah ditolak/selesai, tidak bisa dikirim OTP lagi" },
+        { pesan: "Laporan ini sudah selesai, tidak bisa dikirim OTP lagi" },
         { status: 400 }
       );
     }
@@ -60,9 +61,15 @@ export async function POST(request: NextRequest, { params }: KonteksRute) {
         { status: 409 }
       );
     }
+    if (mode === "MANUAL" && !laporan.otpAccessTokenHash) {
+      return NextResponse.json(
+        { pesan: "Pemohon perlu mengirim laporan baru agar notifikasi OTP dapat dibuka di halaman lupa password." },
+        { status: 409 }
+      );
+    }
 
     const otp = buatKodeOtp();
-    const otpExpiredAt = hitungWaktuKadaluarsaOtp();
+    const otpExpiredAt = hitungWaktuKadaluarsaOtp(mode);
 
     if (mode === "EMAIL") {
       if (!EMAIL_OTP_TERSEDIA) {
@@ -93,13 +100,17 @@ export async function POST(request: NextRequest, { params }: KonteksRute) {
 
     await db.laporanLupaPassword.update({
       where: { id },
-      data: { status: "DITERIMA", otp: hashKodeOtp(otp), otpExpiredAt },
+      data: {
+        status: "DITERIMA",
+        otp: hashKodeOtp(otp),
+        otpEncrypted: mode === "MANUAL" ? enkripsiKodeOtp(otp) : null,
+        otpExpiredAt,
+      },
     });
 
     if (mode === "MANUAL") {
       return NextResponse.json({
-        pesan: "OTP dibuat. Sampaikan kode ini langsung kepada pemilik akun.",
-        kodeOtp: otp,
+        pesan: "OTP manual dibuat. Kode akan muncul di halaman lupa password pemohon.",
       });
     }
 

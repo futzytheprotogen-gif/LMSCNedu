@@ -86,6 +86,11 @@ interface DetailKelas {
 interface RombelRingkas {
   id: string;
   label: string;
+  jenjang: string;
+  angkatan: number | null;
+  jurusanId: string | null;
+  jurusan: string | null;
+  variasi: string | null;
 }
 
 interface MapelRingkas {
@@ -150,6 +155,8 @@ export default function HalamanDetailKelas() {
     useState(false);
 
   const [rombelDipilih, setRombelDipilih] = useState("");
+  const [jurusanDipilih, setJurusanDipilih] = useState("");
+  const [jenjangRombelDipilih, setJenjangRombelDipilih] = useState("");
 
   const [siswaTersedia, setSiswaTersedia] = useState<
     SiswaTersedia[]
@@ -196,6 +203,51 @@ export default function HalamanDetailKelas() {
       aktivitasSiswa: [],
       aktivitasGuru: [],
     });
+
+  const rombelUmum = daftarRombel.filter(
+    (rombel) => !rombel.jurusanId && rombel.angkatan === null
+  );
+  const daftarJurusanRombel = daftarRombel.reduce<
+    { id: string; nama: string }[]
+  >((hasil, rombel) => {
+    if (
+      rombel.jurusanId &&
+      rombel.jurusan &&
+      !hasil.some((jurusan) => jurusan.id === rombel.jurusanId)
+    ) {
+      hasil.push({ id: rombel.jurusanId, nama: rombel.jurusan });
+    }
+    return hasil;
+  }, []);
+  const pilihanJurusanRombel = [
+    ...daftarJurusanRombel.map((jurusan) => ({
+      value: jurusan.id,
+      label: jurusan.nama,
+    })),
+    ...rombelUmum.map((rombel) => ({
+      value: `umum:${rombel.id}`,
+      label: `${rombel.jenjang} (umum)`,
+    })),
+  ];
+  const rombelJurusanDipilih = jurusanDipilih.startsWith("umum:")
+    ? daftarRombel.filter(
+        (rombel) => rombel.id === jurusanDipilih.slice("umum:".length)
+      )
+    : daftarRombel.filter(
+        (rombel) => rombel.jurusanId === jurusanDipilih
+      );
+  const pilihanJenjangRombel = [
+    ...new Set(
+      rombelJurusanDipilih.map((rombel) =>
+        rombel.angkatan === null ? "umum" : String(rombel.angkatan)
+      )
+    ),
+  ];
+  const pilihanKelasRombel = rombelJurusanDipilih.filter((rombel) =>
+    jenjangRombelDipilih === "umum"
+      ? rombel.angkatan === null
+      : String(rombel.angkatan) === jenjangRombelDipilih
+  );
 
   /* ==========================================================================
      LOAD DETAIL KELAS
@@ -442,6 +494,8 @@ export default function HalamanDetailKelas() {
   function bukaModalSiswa() {
     setModalSiswaTerbuka(true);
     setRombelDipilih("");
+    setJurusanDipilih("");
+    setJenjangRombelDipilih("");
     setSiswaTersedia([]);
     setPencarianSiswaModal("");
   }
@@ -449,6 +503,8 @@ export default function HalamanDetailKelas() {
   function tutupModalSiswa() {
     setModalSiswaTerbuka(false);
     setRombelDipilih("");
+    setJurusanDipilih("");
+    setJenjangRombelDipilih("");
     setSiswaTersedia([]);
     setPencarianSiswaModal("");
   }
@@ -1801,46 +1857,80 @@ export default function HalamanDetailKelas() {
 
             {/* ROMBEL */}
 
-            <label
-              className={
-                styles.selectLabel
-              }
-            >
+            <div className={styles.selectLabel}>
               Rombel
 
-              <select
-                value={
-                  rombelDipilih
-                }
-                onChange={(event) =>
-                  pilihRombel(
-                    event.target
-                      .value
-                  )
-                }
-              >
-                <option value="">
-                  Pilih rombel...
-                </option>
-
-                {daftarRombel.map(
-                  (rombel) => (
-                    <option
-                      key={
-                        rombel.id
-                      }
-                      value={
-                        rombel.id
-                      }
-                    >
-                      {
-                        rombel.label
-                      }
+              <label className={styles.selectLabel}>
+                Jurusan
+                <select
+                  value={jurusanDipilih}
+                  onChange={(event) => {
+                    setJurusanDipilih(event.target.value);
+                    setJenjangRombelDipilih("");
+                    setRombelDipilih("");
+                    setSiswaTersedia([]);
+                    setPencarianSiswaModal("");
+                  }}
+                >
+                  <option value="">Pilih jurusan...</option>
+                  {pilihanJurusanRombel.map((jurusan) => (
+                    <option key={jurusan.value} value={jurusan.value}>
+                      {jurusan.label}
                     </option>
-                  )
-                )}
-              </select>
-            </label>
+                  ))}
+                </select>
+              </label>
+
+              <label className={styles.selectLabel}>
+                Jenjang kelas
+                <select
+                  value={jenjangRombelDipilih}
+                  disabled={!jurusanDipilih}
+                  onChange={(event) => {
+                    setJenjangRombelDipilih(event.target.value);
+                    setRombelDipilih("");
+                    setSiswaTersedia([]);
+                    setPencarianSiswaModal("");
+                  }}
+                >
+                  <option value="">
+                    {jurusanDipilih
+                      ? "Pilih jenjang kelas..."
+                      : "Pilih jurusan terlebih dahulu"}
+                  </option>
+                  {pilihanJenjangRombel.map((jenjang) => (
+                    <option key={jenjang} value={jenjang}>
+                      {jenjang === "umum"
+                        ? rombelJurusanDipilih[0]?.jenjang
+                        : `Kelas ${jenjang}`}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className={styles.selectLabel}>
+                Kelas
+                <select
+                  value={rombelDipilih}
+                  disabled={!jenjangRombelDipilih}
+                  onChange={(event) => void pilihRombel(event.target.value)}
+                >
+                  <option value="">
+                    {jenjangRombelDipilih
+                      ? "Pilih kelas..."
+                      : "Pilih jenjang kelas terlebih dahulu"}
+                  </option>
+                  {pilihanKelasRombel.map((rombel) => (
+                    <option key={rombel.id} value={rombel.id}>
+                      {rombel.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <span className={styles.selectHint}>
+                Contoh: kelas 12, jurusan PPLG, reguler 1 menjadi “12 PPLG 1”. Jalur Plus menjadi “12 PPLG PLUS”.
+              </span>
+            </div>
 
             {/* SEARCH DALAM MODAL */}
 

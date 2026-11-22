@@ -46,6 +46,12 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    if (!sesi.passwordSementara) {
+      return NextResponse.json(
+        { pesan: "Password awal akun ini sudah diganti." },
+        { status: 409 }
+      );
+    }
 
     let body: BodyGantiPasswordAwal;
     try {

@@ -15,7 +15,7 @@ import { TRANSISI_DRAWER_ROLE, VARIAN_ITEM_MENU_ROLE, VARIAN_MENU_ROLE } from "@
 // Layout Admin
 // Membungkus semua halaman di dalam app/admin/**.
 // Sidebar akan menampilkan notifikasi merah pada menu Laporan
-// apabila terdapat laporan lupa password dengan status MENUNGGU.
+// apabila terdapat laporan lupa password yang gagal email dan perlu OTP manual.
 // ------------------------------------------------------------
 
 const WARNA_PRIMARY = "var(--cn-primary)";
@@ -35,6 +35,7 @@ const MENU_ADMIN: { label: string; href: string; icon: UiIconName; notifikasi?: 
 
 interface DataLaporan {
   status: string;
+  createdAt: string;
 }
 
 export default function LayoutAdmin({
@@ -86,12 +87,14 @@ export default function LayoutAdmin({
 
       const daftarLaporan: DataLaporan[] = data.data ?? [];
 
-      // Hanya laporan MENUNGGU yang dianggap sebagai notifikasi baru.
-      const jumlahMenunggu = daftarLaporan.filter(
-        (laporan) => laporan.status === "MENUNGGU"
-      ).length;
+      const batasBaru = Date.now() - 24 * 60 * 60 * 1000;
+      const jumlahPerluOtpManual = daftarLaporan.filter((laporan) => {
+        const status = laporan.status as string;
+        const createdAt = new Date(laporan.createdAt).getTime();
+        return status === "DITOLAK" && createdAt >= batasBaru;
+      }).length;
 
-      setJumlahLaporan(jumlahMenunggu);
+      setJumlahLaporan(jumlahPerluOtpManual);
     } catch (error) {
       console.error("Gagal mengecek laporan:", error);
     }
@@ -104,14 +107,22 @@ export default function LayoutAdmin({
   useEffect(() => {
     const timer = window.setTimeout(() => { void cekLaporanBaru(); }, 0);
 
-    // Cek setiap 15 detik
+    // Cek setiap 5 detik
     const interval = setInterval(() => {
       cekLaporanBaru();
-    }, 15000);
+    }, 5000);
+
+    const cekSaatAktif = () => {
+      if (document.visibilityState === "visible") void cekLaporanBaru();
+    };
+    document.addEventListener("visibilitychange", cekSaatAktif);
+    window.addEventListener("focus", cekSaatAktif);
 
     return () => {
       window.clearTimeout(timer);
       clearInterval(interval);
+      document.removeEventListener("visibilitychange", cekSaatAktif);
+      window.removeEventListener("focus", cekSaatAktif);
     };
   }, [cekLaporanBaru]);
 
